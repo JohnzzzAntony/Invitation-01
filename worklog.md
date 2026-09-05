@@ -1,0 +1,170 @@
+# Online RSVP — Build Worklog
+
+Shared worklog for all agents working on this project.
+Before starting work, READ this file. After finishing, APPEND your section (do not overwrite).
+
+---
+
+Task ID: 1
+Agent: orchestrator (Z.ai Code main)
+Task: Foundation — schema, seed, types, store, API routes
+
+Work Log:
+- Read full wireframe spec from upload/online-rsvp-high-fidelity-wireframe.md
+- Designed Prisma schema: User, Event, Template, GuestGroup, Guest, RsvpQuestion, RsvpResponse, SubEvent, Campaign, Payment, Notification (JSON columns for theme/sections/settings/gallery/accommodations/registry)
+- Pushed schema to SQLite (`bun run db:push`), installed `qrcode` package
+- Seeded rich demo data (prisma/seed.ts):
+  - Users: john@example.com / demo1234 (owner), admin@onlinersvp.com / admin1234 (role admin)
+  - 8 published templates (Eucalyptus, Modern Minimal, White Rose, Luxury Gold, Golden Hour, Little Star, Summit, Midnight Gala)
+  - Demo event "John & Emily's Wedding" (slug john-emily, published, 186 guests: 121 attending / 42 pending / 23 declined, 6 RSVP questions, 3 sub-events, 3 campaigns, 10 payments, gallery/accommodations/registry)
+  - 2 secondary events (Aurora's 30th Birthday draft, Future Summit 2026 published)
+  - AI-generated images generating in background to /public/images/ (wedding-hero, wedding-story, wedding-gallery-1..4, birthday-hero, corporate-hero)
+- Wrote foundation libs:
+  - src/lib/auth.ts (scrypt password hashing, HMAC session tokens, cookie name orsvp_session)
+  - src/lib/types.ts (ALL shared types + DEFAULT_THEME + DEFAULT_SETTINGS) — the client/server contract
+  - src/lib/sections.ts (schema-driven SECTION_DEFS registry: 14 section types with default content + right-panel field definitions; createSection, reorderSections, sectionPaddingClass)
+  - src/lib/store.ts (zustand: view routing marketing|auth|onboarding|app|public|admin, authMode, user, events, currentEvent, appTab, builderOpen, publicSlug, wizardTemplateId)
+  - src/lib/api.ts (api() fetch helper, formatDate/formatTime/daysUntil/money, downloadCsv/parseCsv, EMAIL_VARIABLES/renderEmailVars)
+  - src/lib/server.ts (getSessionUser via cookie, requireEventOwner, serializeEvent, serializeGuest, parseJson)
+- Wrote globals.css (SaaS palette from spec §52: bg #F8F8F6 surface #FFF text #181816 muted #73736D border #E7E5DF primary #1F2937; Google Fonts import Cormorant Garamond/Playfair Display/Inter; .font-display/.font-heading/.font-eu; custom scrollbars .scrollbar-thin; builder chrome classes; floatIn/slowZoom animations)
+- Updated layout.tsx (metadata "Online RSVP", sonner Toaster top-center richColors)
+- Wrote ALL API routes:
+  - /api/auth/{login,register,logout,me}
+  - /api/templates (GET published)
+  - /api/events (GET list, POST create w/ templateId)
+  - /api/events/[id] (GET/PATCH/DELETE — PATCH accepts name, dates, venue, theme, sections, settings, gallery, accommodations, registryItems, status)
+  - /api/events/[id]/publish (POST action publish|unpublish|pause|archive)
+  - /api/events/[id]/guests (GET, POST single + bulk {guests:[...]} with auto group creation)
+  - /api/guests/[id] (PATCH incl regenerateToken, DELETE)
+  - /api/events/[id]/groups (GET w/ counts, POST), /api/groups/[id] (PATCH, DELETE)
+  - /api/events/[id]/questions (GET, PUT bulk replace)
+  - /api/events/[id]/sub-events (GET, POST), /api/sub-events/[id] (PATCH, DELETE)
+  - /api/events/[id]/campaigns (GET, POST create/send-now), /api/campaigns/[id] (PATCH action send|schedule|cancel, DELETE)
+  - /api/events/[id]/payments (GET, POST)
+  - /api/events/[id]/analytics (GET EventStats: totals, rsvpRate, 30-day trend, emails, payments, pageViews)
+  - /api/events/[id]/rsvp (GET ?token= guest context w/ group-filtered sub-events; POST submit RSVP — upserts guest+response, creates owner notification)
+  - /api/public/[slug] (GET full public event data incl subEvents + questions)
+  - /api/admin/stats (GET platform metrics + trends; requires role admin)
+  - /api/notifications (GET, PATCH mark-all-read)
+
+Stage Summary:
+- Backend + foundation COMPLETE. Demo login: john@example.com / demo1234, admin: admin@onlinersvp.com / admin1234
+- Public event URL contract: GET /api/public/john-emily returns event w/ sections JSON — renderer must map section.type to components
+- IMPORTANT for agents: use `api()` from '@/lib/api' for fetches, `toast` from 'sonner' for notifications, shadcn/ui components from '@/components/ui/*'
+- Next: 4 parallel frontend agents (6-a marketing/auth/wizard, 6-b dashboard shell, 6-c builder/renderer/public, 6-d admin/QR)
+
+---
+
+Task ID: 6-d
+Agent: frontend-agent-d
+Task: Admin panel + shared Logo/TemplateMiniPreview + QR helper
+
+Work Log:
+- Read worklog.md, src/lib/types.ts, store.ts, api.ts, sections.ts and /api/admin/stats route to match contracts exactly
+- src/components/shared/Logo.tsx — 'use client' wordmark: filled Heart in #9A7B5B rounded square (h-7/h-9) + "Online RSVP" font-semibold tracking-tight; size 'sm'|'md'; presentational (parent attaches clicks)
+- src/components/shared/TemplateMiniPreview.tsx — non-interactive mini site mockup from EventTheme + SectionData[]; wrapper gets theme.background/text/bodyFont, pointer-events-none select-none overflow-hidden; renders up to 6 visible sections: hero (bgImage + overlay%, headingFont serif text-lg, date/location, CTA chip with buttonStyle radius pill/square/rounded), countdown (4× "00" boxes), details (2×2 icon cells Calendar/Clock/MapPin/Home), schedule (dot + line rows), gallery (3 secondary squares), rsvp (secondary banner + chip), story (image thumb + bg-black/10 text lines), text/contact (centered lines), footer (secondary bar), map (MapPin block), accommodation/registry (2 cards), divider (hairline); unknown types skipped
+- src/lib/qr.ts — qrDataUrl(text, {dark?, light?}) with dynamic import of qrcode, 512px, margin 2, defaults #272727/#FFFFFF, wrapped error message
+- src/components/admin/AdminPanel.tsx (default export) — admin guard card ("Admin access required" + Back to home → setView('marketing')); own sticky top bar: Logo (→marketing), "Platform Administration" + destructive Admin badge, Exit admin button; desktop w-56 sidebar + mobile chip row for 8 sections (Dashboard/Users/Events/Templates/Payments/Emails/Reports/Settings); fetches GET /api/admin/stats once (async-callback-safe for react-hooks lint, refresh button with spin); Dashboard §42: 4 KPI cards w/ static weekly deltas, recharts BarCharts "New users" (#9A7B5B) + "Events created" (#7C8A6E) over 12-week trend, recent users + recent events tables (max-h-64 scroll, scrollbar-thin); Users tab searchable table + "latest 6" note; Events tab w/ status badges (published sage, draft neutral, paused amber) + View site icon → toast.info; Templates tab static §43 rows w/ swatches + platform-team note; Payments cards (revenue money(), count, avg); Emails big counter + storage Progress; Reports summary paragraphs + 3 Progress bars (storage 86.4/100, published share, domains); Settings Switch rows (registrations ✓, maintenance ✗, local state + toasts); skeletons for loading, dense neutral admin styling, no blue/indigo
+- QA: bun run lint passes for my files (fixed react-hooks/set-state-in-effect by moving setState into promise callbacks); tsc shows no errors in my 4 files (remaining errors pre-exist in foundation routes/AppShell/examples); dev.log compiles clean, GET / 200
+
+Stage Summary:
+- exports (AdminPanel, Logo, TemplateMiniPreview, qrDataUrl)
+- AdminPanel default-export consumed by page.tsx when view==='admin'; Logo + TemplateMiniPreview shared for marketing/dashboard/template cards; qrDataUrl ready for dashboard share/dialog + public RSVP QR
+- Contracts honored: useApp view/user/setView, api()/formatDateShort/money from '@/lib/api', types from '@/lib/types', toast from 'sonner', no next/navigation, no blue/indigo
+
+---
+
+Task ID: 6-a
+Agent: frontend-agent-a
+Task: Marketing website, auth screens, event creation wizard
+
+Work Log:
+- Created src/components/marketing/MarketingSite.tsx (default export MarketingSite):
+  - Sticky blurred header with Heart-logo, scrollIntoView nav (Features/Designs/Pricing/FAQ), Login + Get Started, mobile hamburger with AnimatePresence slide-down (44px touch targets, aria-expanded)
+  - Hero (id=top): staggered framer-motion entrance, eyebrow badge "One-time pricing • Unlimited guests", H1 + sub + CTAs (Create My Event → user ? openOnboarding(null) : openAuth('register')), trust row (12,000+ events / 4.9 stars / no credit card)
+  - Hero browser mockup: fake chrome with url "john-emily.onlinersvp.com", TemplateMiniPreview with hardcoded modern wedding theme (#9A7B5B) + hero/countdown/details/rsvp/footer sections via createSection(), floating LIVE countdown to 2026-10-24 (rAF + 1s interval, hydration-safe), slow-zoom decorative blobs
+  - Designs (id=designs): fetches /api/templates once, category chips (All/Wedding/Birthday/Baby/Corporate/Party), 8 cards with TemplateMiniPreview (h-40, pointer-events-none) + hover lift, Preview Dialog with large preview + tags + "Use This Design" (→ openOnboarding(t.id) or openAuth('register')), Skeleton loading + error retry state, "Explore All Designs" → toast
+  - How it works (id=how): 5 numbered cards 01-05 with icons and dashed lg connectors
+  - Features (id=features): 4 alternating blocks (Website Builder / Guest Management / RSVP Management / Invitations) with check-bullet lists and pure-CSS mock UI cards (builder pane, 4 stat cards + Progress, RSVP form preview, email + QR grid mock)
+  - Pricing (id=pricing): Starter Free / Pro $49 (featured dark card, "Most popular" warm badge) / Studio $149; CTAs gated by login state; "One-time pricing" note
+  - FAQ (id=faq): shadcn Accordion with 6 Q&As (guest limits, custom domain, RSVP editing, Excel import, customization, refunds)
+  - Contact (id=contact): info rows + working form → toast.success('Message sent — we will reply within 24 hours') and clears
+  - Footer: mt-auto, dark #181816, Product/Company/Legal columns (scroll or demo toast), © 2026
+  - Exports default MarketingSite + named BrandLogo for reuse
+- Created src/components/auth/AuthScreen.tsx (default export AuthScreen):
+  - Mode from store.authMode; toggle switches via openAuth('login'|'register')
+  - Inline validation (required, email regex, min 8 chars) with aria-invalid; show/hide password (44px target, aria-label)
+  - Submit → POST /api/auth/{login,register} via api() → setUser → GET /api/events → setEvents → register-or-empty → onboarding, else app; toasts for success/error; Loader2 loading state
+  - Forgot password → toast.info demo hint; disabled-ish Google button → toast.info; muted demo box with Fill button prefilling john@example.com / demo1234; back-to-home link
+- Created src/components/onboarding/CreateEventWizard.tsx (default export CreateEventWizard):
+  - 3-step progress rail (check for done, warm ring for active); AnimatePresence step transitions; step state preserved on back
+  - Step 1: 8 type cards (Heart/Gem/Cake/Sparkles/Baby/Briefcase/PartyPopper/CircleEllipsis), selected = ring-2 ring-primary; Continue gated
+  - Step 2: two-column form (name*, date* min today, timezone Select w/ 6 zones, start/end time defaults 17:00/23:00, host names, venue, address, description) with inline required errors
+  - Step 3: search + style chips, type-matching templates sorted first, scrollable grid (max-h-460 scrollbar-thin), ring+Check selection, wizardTemplateId preselected from store; Skeleton/empty states
+  - Create → POST /api/events {name,type,eventDate,startTime,endTime,timezone,venue,address,description,hostNames,templateId} → setCurrentEvent → refresh /api/events → setEvents → toast 'Event created!' → setAppTab('overview') → setView('app'); "Start from scratch" creates with templateId null
+- All navigation via zustand store actions only (no next/navigation, no <a href>); warm palette (#9A7B5B/#F6F1EA/amber/stone) throughout; verified my 3 files pass eslint with 0 problems
+
+Stage Summary:
+- Exports: MarketingSite (default, src/components/marketing/MarketingSite.tsx), BrandLogo (named, same file), AuthScreen (default, src/components/auth/AuthScreen.tsx), CreateEventWizard (default, src/components/onboarding/CreateEventWizard.tsx)
+- Depends on shared contract: useApp store actions, api()/ApiError, TemplateRecord/EventTheme/SectionData/SessionUser/EventRecord types, createSection from '@/lib/sections', TemplateMiniPreview from '@/components/shared/TemplateMiniPreview' (built by parallel agent, verified at integration)
+- API endpoints consumed: GET /api/templates, POST /api/auth/login, POST /api/auth/register, GET /api/events, POST /api/events
+- Demo credentials surfaced in UI: john@example.com / demo1234
+
+---
+
+Task ID: 6-b
+Agent: frontend-agent-b
+Task: Dashboard app shell + all 9 tabs
+
+Work Log:
+- Read worklog + wireframe §12/21-23/25-26/27/28-29/34/35/39-40/51; read all shared libs (store, api, types, qr) and every API route to match exact payload shapes
+- Created src/components/app/shared.tsx — StatusBadge (✓ Attending / Pending / Declined w/ status colors #7C8A6E/#C9A96A/#B3543F), timeAgo, EmptyState, skeleton helpers, TabHeader, GroupDot, ACCENT #9A7B5B
+- AppShell.tsx (default export): sticky top bar (logo → marketing, event switcher DropdownMenu w/ guest counts + "+ New event" → onboarding, Bell dropdown w/ unread dot + mark-all-read, avatar dropdown w/ View public site + Log out → POST /api/auth/logout + reset); desktop sidebar w-60 (9 nav items, active bg-accent, event URL card); mobile bottom nav (Home/Guests/RSVP/Invitations + More bottom-Sheet); boot logic (fetch /api/events if empty → pick first → GET /api/events/[id] full → setCurrentEvent); guards: signed-out card, loading spinner, "Create your first event" empty state; tab router renders the 8 tab components ('website' tab shows fallback card + opens builder via setBuilderOpen)
+- OverviewTab: time-based greeting + firstName, "N days away" (daysUntil), Published (green dot + view-site icon btn)/Draft badge, 4 stat cards (Total/Attending/Pending/Declined w/ colored values), RSVP-rate Progress + %, 30-day recharts AreaChart (accent #9A7B5B, h-48), Recent RSVPs (respondedAt desc, top 5: avatar, StatusBadge, party size, timeAgo), quick actions [View Event]/[Edit Website]
+- GuestsTab (biggest): search + group/status filters, scrollable table (max-h-[420px] scrollbar-thin) w/ checkbox select-all (indeterminate), name+email, group dot, status badge, party, invited Check/Mail, responded timeAgo, ⋮ actions (View profile / Edit / Copy RSVP link (origin/slug?token → "Personalized link copied") / Show QR (dynamic import '@/lib/qr', try/catch, download PNG) / quick mark status / Remove); bulk bar (N selected, assign group, send invitation → PATCH invited, delete w/ confirm); Add/Edit dialog; right-side profile Sheet (§22 fields + Edit + Send Message toast); CSV import (parseCsv, case-insensitive header detection name/email/group, bulk POST w/ auto group creation) + export CSV; Groups Manager dialog (§23: list w/ counts, inline create name+color, edit dialog PATCH /api/groups/[id], delete confirm)
+- RsvpBuilderTab: two-column — left question list (ArrowUp/ArrowDown reorder, type badge, required *, "Only if attending" badge, edit/delete w/ confirm), add/edit dialog (label, 9 type Select, required Switch, conditional-logic Switch, dynamic options editor for dropdown/radio/checkbox/meal), [Save Changes] w/ dirty dot → PUT questions → toast 'RSVP form saved'; right sticky live preview: Will you attend? radios toggle conditional fields, party stepper, all question types rendered/interactive locally
+- SubEventsTab: cards grid (date/time range, venue, dressCode badge, RSVP-required badge, description, invited-groups color dots), add/edit dialog (name, date, start/end, venue, description, dressCode, RSVP Switch, groups multi-toggle chips → groupIds[]), delete confirm
+- InvitationsTab: campaign cards (type badge, Sent ✓/Scheduled Clock/Draft status badges, Sent/Opened/Clicked mini-stats w/ Send/Eye/MousePointerClick, scheduledAt, ⋮: Preview / Send now (confirm → PATCH action:send) / Schedule (datetime dialog → action:schedule) / Cancel schedule / Edit / Delete); create dialog (name, type, subject, body + EMAIL_VARIABLES chips inserted at cursor via textarea ref, delivery radio now/schedule/draft → POST w/ send flag or scheduledAt); email-client-style Preview dialog w/ renderEmailVars substitution using first guest + event data + RSVP button
+- PaymentsTab: Total collected card (money(paymentsTotal) + count), Record Payment dialog (guest/type/amount → POST), transactions table (max-h scroll, type/status badges, formatDateShort), Export CSV, empty state
+- AnalyticsTab: 5 KPI cards (invited/submitted/attending/declined/pending), RSVP-rate progress + page views, 30-day AreaChart (h-64), Response breakdown PieChart (status colors), Email performance card (Sent/Opened/Clicked + computed rates w/ progress bars), Meal choices horizontal bars from guests.meal
+- SettingsTab: shadcn Tabs — General (name, type, readonly slug + copy/open link buttons, date/times/timezone/venue/address/description/hosts/contacts), Privacy (rsvpMode RadioGroup w/ password input, indexable Switch), RSVP (deadline, maxGuests, plusOne, allowEdit), Notifications (notifyEveryRsvp, dailySummary), Domain (input + Connect → PATCH pending → 1.5s simulated verify → verified badge, remove, CNAME www → cname.onlinersvp.com DNS table card), Danger zone (Pause/Archive via POST publish, Delete w/ typed-confirm AlertDialog → DELETE → refresh → next event or onboarding); each section PATCHes independently → setCurrentEvent(updated) + toast 'Settings saved' + events refresh
+- QA: `bun run lint` clean, `bunx tsc --noEmit` clean for src/components/app (pre-existing errors elsewhere untouched); verified src/lib/qr.ts exists (agent 6-d) and matches qrDataUrl contract
+
+Stage Summary:
+- Exports: AppShell (default, src/components/app/AppShell.tsx); named-default tabs OverviewTab, GuestsTab, RsvpBuilderTab, SubEventsTab, InvitationsTab, PaymentsTab, AnalyticsTab, SettingsTab; shared.tsx exports reusable StatusBadge/EmptyState/skeletons/TabHeader/GroupDot/timeAgo/ACCENT/STATUS_COLOR
+- Integration: render `<AppShell />` when view === 'app'; render full-screen builder when `builderOpen === true` (AppShell sets it via 'Website' nav / Overview 'Edit Website'); public view via openPublic(slug) — renderer agents 6-c supply the overlay; no next/navigation used, all SPA via useApp store
+- Each tab self-fetches on currentEvent.id change (event switcher just works); filters/bulk/dialog states are tab-local; all mutations optimistic-refresh via refresh() helpers
+- Demo login: john@example.com / demo1234 (seed event john-emily w/ 186 guests, 3 campaigns, payments)
+
+---
+Task ID: 7
+Agent: orchestrator (Z.ai Code main)
+Task: Integration, fixes, and end-to-end browser verification
+
+Work Log:
+- Fixed 3 TS errors: admin/stats (Prisma select+include conflict), events/[id]/guests (never[] inference), lib/api.ts error-message union type
+- Integrated SPA router in src/app/page.tsx: session hydration via /api/auth/me → view switching (marketing/auth/onboarding/app/public/admin); builderOpen renders WebsiteBuilder full-screen over AppShell
+- Added admin entry points: marketing footer "Admin" link + AppShell account menu "Platform admin" item (role==='admin' only, ShieldCheck icon)
+- Fixed AppShell "No events yet" dead-end: added header with Back-to-home link + Logo
+- Recovered agent 6-c (context deadline): all 4 files (WebsiteBuilder, SectionRenderer, PublicEventSite, RsvpFlow) were fully written before timeout — verified via tsc + browser
+- Re-seeded DB with wedding event bumped to most-recent updatedAt (default event on login)
+- Full browser verification (agent-browser, desktop 1280px + mobile 390px):
+  ✓ Marketing: hero + live mockup countdown, designs grid, features, pricing, FAQ, contact, footer
+  ✓ Auth: wireframe-accurate login/register, demo Fill button, validation
+  ✓ Login john@example.com/demo1234 → dashboard defaults to John & Emily's Wedding (186 guests / 121 yes / 42 pending / 23 no / 77% rate)
+  ✓ Guests tab: table + filters + bulk bar + import/export CSV + Manage Groups + row actions
+  ✓ Builder: left add/sections panel, canvas w/ AI hero image, right auto-generated property panel (content+design), Theme tab (colors/fonts/buttons/radius/spacing), live edit w/ autosave "Saved ✓", undo (Ctrl+Z) works, mobile/tablet/device preview toolbar, Publish/Published menu
+  ✓ Public site (via Preview): full-screen themed hero, live ticking countdown, details, schedule, gallery w/ AI photos, map, accommodation, registry, contact, themed footer, Exit-preview bar
+  ✓ Guest RSVP flow (§31): name/email → YES/NO → party size → sub-events + custom questions (meal/dietary/song/hotel/message) → review → Submit → "You're confirmed!" success + Add to Calendar (.ics) + Change response
+  ✓ Owner notification received: "New RSVP — Test Guest confirmed attendance with 1 guest" (end-to-end loop verified)
+  ✓ QR dialog: personalized guest QR renders + Download PNG
+  ✓ Invitations (3 seeded campaigns w/ sent/opened/clicked stats), Payments ($1,890), Analytics (live numbers after test RSVP: 122 attending), Settings tabs
+  ✓ Super Admin: guard card for non-admin, dashboard KPIs (2 users, 2 active events, 122 RSVPs, $1,890 revenue), 12-week trend charts, recent users/events tables
+  ✓ Mobile 390px: marketing hamburger menu, stacked hero, public site hero + RSVP touch targets
+  ✓ dev.log: zero runtime errors; lint clean; tsc clean (src/)
+- Removed leftover scripts-tmp-gen-images.ts
+
+Stage Summary:
+- PROJECT COMPLETE: full Online RSVP SaaS per wireframe (74 sections of spec) — marketing site, auth, event wizard, dashboard (9 tabs), schema-driven builder w/ 14 section types + theme tokens, public event renderer, 5-step RSVP flow, guest CRM w/ groups + conditional logic, sub-events, campaigns, payments, analytics, QR codes, RBAC admin, custom-domain UI, notifications
+- Login: john@example.com / demo1234 · Admin: admin@onlinersvp.com / admin1234 (footer Admin link)
+- 8 AI-generated photos in /public/images; SQLite seeded w/ 186-guest wedding + 2 more events + 8 templates
