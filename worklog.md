@@ -223,3 +223,25 @@ Stage Summary:
 - PROJECT COMPLETE (vanilla frontend): the entire Online RSVP SaaS frontend is now plain HTML + CSS + JS served statically from /public (index.html, styles.css, js/{app,dashboard,public,admin}.js, css/{dashboard,public,admin}.css) with hash-based SPA routing, consuming the existing Next.js API backend (which also serves as the deployable server). "/" is served by a next.config rewrite to /index.html; page.tsx is a fallback redirect. Deployment-ready: any static host for the frontend (public/ folder) + the Next.js API, or run `next start` for everything on one origin.
 - Logins: john@example.com/demo1234 (owner, 3 events incl. 186-guest wedding) · admin@onlinersvp.com/admin1234 (Platform Admin via footer Admin link)
 - React sources kept in src/components (unused at runtime) for reference/revert.
+
+---
+Task ID: 2
+Agent: orchestrator (Z.ai Code main)
+Task: Rebuild public-facing site as pure HTML/CSS/JS clone of online-rsvp.com design (minimalist, customer-friendly), deployment-ready
+
+Work Log:
+- Crawled https://www.online-rsvp.com/ with page_reader (full section/text map) and agent-browser (fold + full-page screenshots) to extract the design language: teal accent, white bg, serif headings (Cormorant-style) + light sans body (Lato-style), split hero with photo, 4-icon feature strip, 3-step how-it-works, alternating feature rows with mockups, testimonial carousel, press strip, "why choose" grid, dark footer, login dropdown under nav
+- Generated 2 AI images: assets/hero.jpg (bride fastening white heels, 864x1152) and assets/cta-band.jpg (dark seascape, 1344x768)
+- Replaced previous static app in public/: wrote public/index.html (semantic single page, all-original copy, distinct "Ever RSVP" brand), public/styles.css (~1200 lines: design tokens, header/hero/sections/footer, reveal animations, full responsive at 1020/900/620/380px), public/js/app.js (~430 lines vanilla JS: sticky header, burger menu, login dropdown + validation, scroll-reveal, active nav, counters, testimonial carousel w/ autoplay+swipe, FAQ accordion, demo RSVP modal w/ localStorage persistence + reset, toasts, back-to-top)
+- Feature-row mockups built in pure CSS (template swatches, editor, question form, URL bar, payments, dashboard donut) — no external assets needed
+- Kept next.config.ts rewrite "/" -> /index.html; public/ is the deployable static root (index.html + styles.css + js/app.js + assets/)
+- Fixed 2 bugs found in verification: [hidden] attribute overridden by display rules (added [hidden]{display:none!important}) and .field label selector leaking uppercase onto radio pills
+- Hardened mobile menu to close on any in-page anchor click
+- Browser-verified end-to-end: desktop fold + full page (all 10 sections render, console clean), demo RSVP submit -> confirmation -> persistence across reload -> reset, carousel arrows/autoplay, accordion, login dropdown, mobile 390x844 (burger menu, stacked hero, footer flush to bottom with 0 gap), back-to-top
+- bun run lint clean; dev.log error-free; closed verification browser
+
+Stage Summary:
+- Deliverable: zero-dependency static site in /public (deployable to any static host as-is; no build step)
+- Design mirrors the reference's minimalist teal/white/serif layout and settings; all copy, testimonials and branding are original ("Ever RSVP")
+- Interactive demo RSVP modal + persistence gives customers a hands-on feel of the product
+- All golden paths verified in a real browser on desktop and mobile
