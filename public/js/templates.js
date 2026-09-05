@@ -1,7 +1,9 @@
 /* ==========================================================================
    Ever RSVP — shared template catalog
    Loaded by create.html, checkout.html and editor.html.
-   Exposes window.EVER_TEMPLATES and window.renderInvite().
+   Exposes window.EVER_TEMPLATES, window.EVER_FONT_PAIRS,
+   window.renderInvite() (legacy card) and window.renderSiteMini()
+   (mini event-WEBSITE preview used across the flow).
    ========================================================================== */
 (function () {
   'use strict';
@@ -56,7 +58,7 @@
   }
 
   /**
-   * Build an invitation preview DOM node.
+   * Build an invitation preview DOM node (legacy card style).
    * opts.size: 'xs' (chips) | 'sm' (cards / summary) | 'lg' (editor canvas)
    * opts.extended: include story / schedule / RSVP blocks (editor canvas)
    */
@@ -114,7 +116,51 @@
     return el;
   }
 
+  /**
+   * Build a miniature EVENT WEBSITE preview (not a card) — a tiny scroll of
+   * what guests actually get: nav, hero, info cards, reply strip, footer.
+   * Used on the design-selection cards and the checkout order summary.
+   */
+  function renderSiteMini(tpl) {
+    var el = document.createElement('div');
+    el.className = 'msite' + (tpl.bordered ? ' msite-bordered' : '') + (tpl.dots ? ' msite-dots' : '');
+    el.style.background = tpl.bg;
+    el.style.color = tpl.text;
+    el.setAttribute('aria-hidden', 'true');
+
+    var html = '' +
+      '<div class="ms-nav">' +
+        '<b>Amelia <i>&middot;</i> Noah</b>' +
+        '<span class="ms-chip" style="background:' + tpl.btn + ';color:' + tpl.btnText + '">RSVP</span>' +
+      '</div>' +
+      '<div class="ms-hero">' +
+        '<span class="ms-kick">Together with their families</span>' +
+        '<strong class="ms-names">Amelia <i style="color:' + tpl.btn + '">&amp;</i> Noah</strong>' +
+        '<span class="ms-rule" style="background:' + tpl.btn + '"></span>' +
+        '<span class="ms-date">Saturday &middot; June 14 &middot; 2026</span>' +
+        '<span class="ms-loc">Rosewood Barn &middot; Kent</span>' +
+      '</div>' +
+      '<div class="ms-cards">' +
+        '<span><b>When</b><i>4:00 pm</i></span>' +
+        '<span><b>Where</b><i>The barn</i></span>' +
+        '<span><b>Dress</b><i>Garden formal</i></span>' +
+      '</div>' +
+      '<div class="ms-day">' +
+        '<b>The day</b>' +
+        '<span><i style="background:' + tpl.btn + '"></i>Ceremony<em>4:00</em></span>' +
+        '<span><i style="background:' + tpl.btn + '"></i>Dinner<em>6:30</em></span>' +
+      '</div>' +
+      '<div class="ms-foot">' +
+        '<span class="ms-tag" style="color:' + tpl.btn + '">#AmeliaAndNoah</span>' +
+        '<span class="ms-reply">Will you join us?</span>' +
+      '</div>';
+
+    el.innerHTML = html;
+    return el;
+  }
+
   window.EVER_TEMPLATES = TEMPLATES;
   window.EVER_FONT_PAIRS = FONT_PAIRS;
   window.renderInvite = renderInvite;
+  window.renderSiteMini = renderSiteMini;
 })();

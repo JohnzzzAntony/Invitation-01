@@ -36,11 +36,11 @@
   var tpl = findTpl(flow.design);
 
   var previewBox = document.getElementById('summary-preview');
-  if (previewBox && window.renderInvite) {
-    previewBox.appendChild(window.renderInvite(tpl, {}, { size: 'sm' }));
+  if (previewBox && window.renderSiteMini) {
+    previewBox.appendChild(window.renderSiteMini(tpl));
   }
   var nameEl = document.getElementById('summary-design-name');
-  if (nameEl) nameEl.textContent = '“' + tpl.name + '” design';
+  if (nameEl) nameEl.textContent = '“' + tpl.name + '” event website';
 
   /* ---------- Input formatting ---------- */
   var cardInput = document.getElementById('pay-card');

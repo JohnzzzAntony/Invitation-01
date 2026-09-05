@@ -268,3 +268,22 @@ Stage Summary:
 - Complete customer journey now works: Get started -> design selection -> $25 payment -> live design editor, all vanilla HTML/CSS/JS
 - State machine via localStorage: ever-rsvp-flow (design, paid, order, published, slug) + ever-rsvp-event (all editor state, autosaved)
 - public/ remains a zero-build deployable static root; 4 pages total (index, create, checkout, editor)
+
+---
+Task ID: 4
+Agent: orchestrator (Z.ai Code main)
+Task: Replace invitation-card editor with a full event-WEBSITE builder ("No need a invitation card need a invitation event website builder with all fields and styles present as before build")
+
+Work Log:
+- Extended public/js/templates.js with renderSiteMini(tpl) — a miniature EVENT WEBSITE preview (top nav + hero + when/where/dress cards + day timeline + footer strip); kept renderInvite for compatibility
+- create.js card previews + checkout.js order summary now render mini websites; create.html/checkout.html copy updated ("complete event website", "Website builder & hosting", '"Midnight" event website')
+- Rebuilt editor.html as a website-builder shell: sticky Content/Design tabs in the sidebar, static Basics group (both partners, date, venue, city), JS-generated section groups, Design panel (template chips, typography cards, accent dots, button-shape picker, section-spacing select)
+- Rewrote editor.js: 13 website sections (hero, countdown, welcome, story, when&where, schedule, gallery, RSVP, travel, registry, FAQ, contact, footer) each with enable "eye", up/down reorder, full field sets, list editors (schedule items, FAQ items with add/remove/retitle), RSVP question toggles; live scrolling preview (.pv) with mini nav (scroll-to-section), live ticking countdown, themed when&where cards, timeline, CSS gallery tiles, interactive RSVP (accept/decline -> thanks state), FAQ accordion, contact chips, themed footer; theme = template + font pair (classic/romantic/modern) + accent color (6) + button shape (pill/soft/square) + section spacing (cozy/normal/airy); debounced autosave + Save toast + reload persistence + publish overlay (slug URL from names) + order/published badge; state v2 with v1 migration (story/showStory/showSchedule/question toggles carried over)
+- Appended ~700 lines to styles.css: .msite mini site, editor tabs/2col/section tools/list editors/shape picker, full .pv preview system (CSS vars for accent/btn text, font-pair/shape/spacing modifier classes, color-mix hairlines with rgba fallbacks), mobile-frame tightening + responsive
+- Fixes found during browser verification: (1) marketing h1/h2 teal color leaked into preview -> .pv h1-h4 { color: inherit }; (2) static demo date was in the past (sandbox date 2026-09-05) so countdown showed "Just married!" -> defaults now compute date = today+9 months, RSVP deadline = today+6; (3) Basics inputs not populated from saved state on boot -> fillBasics() added; (4) section tool clicks (eye/up/down) inside <summary> toggled the accordion -> preventDefault+stopPropagation
+- Verified end-to-end (agent-browser, 1440px + 390px): / -> Get started -> create (mini-site cards) -> Midnight -> checkout ('"Midnight" event website', formatted card) -> pay -> editor redirect (order badge EV-...); live rename Juniper -> preview+nav update; Design tab: teal accent + Modern type + pill buttons + airy spacing all render in preview; template switch to Eucalyptus; hide Welcome (struck-through + removed from preview); reorder story up; add/edit schedule item "Sparkler send-off"; RSVP accept -> thanks; mobile device toggle frame; Save toast; full persistence across reload (names/tpl/font/shape/spacing/hidden sections/list count); Publish -> juniper-noah.ever-rsvp.com overlay + Published badge; countdown ticking (281 days); editor + create at 390px stack correctly; zero console errors on /, create, checkout, editor; bun run lint clean; dev.log error-free
+
+Stage Summary:
+- The Get-started journey now sells and builds an EVENT WEBSITE (not a card): design selection (mini website previews) -> $25 checkout -> full website builder with every section, every field and complete style controls + live preview
+- State: ever-rsvp-flow (design/paid/order/published/slug) + ever-rsvp-event v2 (basics, order[], sections{} with per-section content + on/off, theme: templateId/fontPair/accent/btnShape/spacing)
+- public/ remains the zero-build deployable static root; pages: index, create, checkout, editor

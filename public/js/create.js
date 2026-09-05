@@ -35,7 +35,7 @@
 
     var preview = document.createElement('div');
     preview.className = 'tpl-preview';
-    preview.appendChild(window.renderInvite(tpl, {}, { size: 'sm' }));
+    preview.appendChild(window.renderSiteMini(tpl));
 
     var meta = document.createElement('div');
     meta.className = 'tpl-meta';

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Design editor — Ever RSVP</title>
-  <meta name="description" content="Customize your event page: template, fonts, colors and details — with a live preview." />
+  <title>Website builder — Ever RSVP</title>
+  <meta name="description" content="Build your event website: every section, every field, fonts and colors — with a live preview." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231798b8'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,10 +20,10 @@
     <span class="ed-badge" id="ed-badge" title="Order status">Editor</span>
 
     <div class="ed-device" role="group" aria-label="Preview device">
-      <button class="ed-dev-btn on" type="button" data-dev="desktop" aria-label="Desktop preview">
+      <button class="ed-dev-btn on" type="button" data-dev="desktop" aria-label="Desktop preview" aria-pressed="true">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="1.8"/><path d="M9 20.5h6M12 17v3.5"/></svg>
       </button>
-      <button class="ed-dev-btn" type="button" data-dev="mobile" aria-label="Mobile preview">
+      <button class="ed-dev-btn" type="button" data-dev="mobile" aria-label="Mobile preview" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.5 18h3"/></svg>
       </button>
     </div>
@@ -36,91 +36,92 @@
 
   <main class="ed-shell" id="main">
     <!-- Sidebar -->
-    <aside class="ed-sidebar" aria-label="Design settings">
+    <aside class="ed-sidebar" aria-label="Website settings">
 
-      <details class="ed-group" open>
-        <summary>Template</summary>
-        <div class="ed-body">
-          <div class="tpl-chips" id="tpl-chips" role="radiogroup" aria-label="Template"></div>
-        </div>
-      </details>
+      <div class="ed-tabs" role="tablist" aria-label="Editor panels">
+        <button class="ed-tab on" id="tab-content" type="button" role="tab" aria-selected="true" aria-controls="panel-content">Content</button>
+        <button class="ed-tab" id="tab-design" type="button" role="tab" aria-selected="false" aria-controls="panel-design">Design</button>
+      </div>
 
-      <details class="ed-group" open>
-        <summary>Typography</summary>
-        <div class="ed-body">
-          <div class="font-cards" id="font-cards" role="radiogroup" aria-label="Font pair"></div>
-        </div>
-      </details>
+      <!-- ============ CONTENT PANEL ============ -->
+      <div class="ed-panel" id="panel-content" role="tabpanel" aria-labelledby="tab-content">
 
-      <details class="ed-group" open>
-        <summary>Accent color</summary>
-        <div class="ed-body">
-          <div class="color-dots" id="color-dots" role="radiogroup" aria-label="Accent color"></div>
-        </div>
-      </details>
+        <details class="ed-group" open>
+          <summary>Basics</summary>
+          <div class="ed-body">
+            <div class="ed-2col">
+              <div class="ed-field">
+                <label for="ed-nameA">First partner</label>
+                <input id="ed-nameA" type="text" data-sec="_basic" data-k="nameA" placeholder="Amelia" />
+              </div>
+              <div class="ed-field">
+                <label for="ed-nameB">Second partner</label>
+                <input id="ed-nameB" type="text" data-sec="_basic" data-k="nameB" placeholder="Noah" />
+              </div>
+            </div>
+            <div class="ed-field">
+              <label for="ed-date">Date</label>
+              <input id="ed-date" type="date" data-sec="_basic" data-k="date" value="2026-06-14" />
+            </div>
+            <div class="ed-2col">
+              <div class="ed-field">
+                <label for="ed-venue">Venue</label>
+                <input id="ed-venue" type="text" data-sec="_basic" data-k="venue" placeholder="Rosewood Barn" />
+              </div>
+              <div class="ed-field">
+                <label for="ed-city">City / region</label>
+                <input id="ed-city" type="text" data-sec="_basic" data-k="city" placeholder="Kent" />
+              </div>
+            </div>
+          </div>
+        </details>
 
-      <details class="ed-group" open>
-        <summary>Event details</summary>
-        <div class="ed-body">
-          <div class="ed-field">
-            <label for="ed-nameA">First partner</label>
-            <input id="ed-nameA" type="text" placeholder="Amelia" />
-          </div>
-          <div class="ed-field">
-            <label for="ed-nameB">Second partner</label>
-            <input id="ed-nameB" type="text" placeholder="Noah" />
-          </div>
-          <div class="ed-field">
-            <label for="ed-date">Date</label>
-            <input id="ed-date" type="date" value="2026-06-14" />
-          </div>
-          <div class="ed-field">
-            <label for="ed-venue">Venue</label>
-            <input id="ed-venue" type="text" placeholder="Rosewood Barn" />
-          </div>
-          <div class="ed-field">
-            <label for="ed-city">City / region</label>
-            <input id="ed-city" type="text" placeholder="Kent" />
-          </div>
-        </div>
-      </details>
+        <!-- Section groups are generated here -->
+        <div id="sec-groups"></div>
 
-      <details class="ed-group">
-        <summary>Story &amp; schedule</summary>
-        <div class="ed-body">
-          <label class="ed-check">
-            <input type="checkbox" id="ed-showStory" checked />
-            <span>Show “our story”</span>
-          </label>
-          <div class="ed-field">
-            <label for="ed-story">A line about you two</label>
-            <textarea id="ed-story" rows="3" placeholder="Ten years, two cities and one very spoilt cat…"></textarea>
-          </div>
-          <label class="ed-check">
-            <input type="checkbox" id="ed-showSchedule" checked />
-            <span>Show the day’s schedule</span>
-          </label>
-        </div>
-      </details>
+        <p class="ed-footnote">Tip — use the arrows to reorder sections and the eye to hide one. Your website keeps every change automatically.</p>
+      </div>
 
-      <details class="ed-group">
-        <summary>RSVP questions</summary>
-        <div class="ed-body">
-          <label class="ed-check">
-            <input type="checkbox" id="ed-qMenu" checked />
-            <span>Ask for menu selection</span>
-          </label>
-          <label class="ed-check">
-            <input type="checkbox" id="ed-qPlus" checked />
-            <span>Collect plus-ones</span>
-          </label>
-          <label class="ed-check">
-            <input type="checkbox" id="ed-qSong" />
-            <span>Collect song requests</span>
-          </label>
-          <p class="ed-hint">Guests answer these right after accepting.</p>
-        </div>
-      </details>
+      <!-- ============ DESIGN PANEL ============ -->
+      <div class="ed-panel" id="panel-design" role="tabpanel" aria-labelledby="tab-design" hidden>
+
+        <details class="ed-group" open>
+          <summary>Template</summary>
+          <div class="ed-body">
+            <div class="tpl-chips" id="tpl-chips" role="radiogroup" aria-label="Template"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Typography</summary>
+          <div class="ed-body">
+            <div class="font-cards" id="font-cards" role="radiogroup" aria-label="Font pair"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Accent color</summary>
+          <div class="ed-body">
+            <div class="color-dots" id="color-dots" role="radiogroup" aria-label="Accent color"></div>
+          </div>
+        </details>
+
+        <details class="ed-group" open>
+          <summary>Buttons &amp; spacing</summary>
+          <div class="ed-body">
+            <label class="ed-label" id="lbl-shape">Button shape</label>
+            <div class="shape-row" id="shape-row" role="radiogroup" aria-labelledby="lbl-shape"></div>
+            <div class="ed-field ed-mt">
+              <label for="ed-spacing">Section spacing</label>
+              <select id="ed-spacing" data-style="spacing">
+                <option value="cozy">Cozy</option>
+                <option value="normal">Normal</option>
+                <option value="airy">Airy</option>
+              </select>
+            </div>
+          </div>
+        </details>
+      </div>
     </aside>
 
     <!-- Canvas -->
@@ -138,8 +139,8 @@
       <span class="done-check" aria-hidden="true">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
       </span>
-      <h2 class="m-names" id="pub-title">You’re live!</h2>
-      <p class="m-meta">Your event page is ready to share with guests.</p>
+      <h2 class="m-names" id="pub-title">You&rsquo;re live!</h2>
+      <p class="m-meta">Your event website is ready to share with guests.</p>
       <div class="pub-url-row">
         <span class="pub-url" id="pub-url">amelia-noah.ever-rsvp.com</span>
         <button class="btn btn-ghost btn-sm" id="copy-url" type="button">Copy</button>
