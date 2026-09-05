@@ -168,3 +168,58 @@ Stage Summary:
 - PROJECT COMPLETE: full Online RSVP SaaS per wireframe (74 sections of spec) — marketing site, auth, event wizard, dashboard (9 tabs), schema-driven builder w/ 14 section types + theme tokens, public event renderer, 5-step RSVP flow, guest CRM w/ groups + conditional logic, sub-events, campaigns, payments, analytics, QR codes, RBAC admin, custom-domain UI, notifications
 - Login: john@example.com / demo1234 · Admin: admin@onlinersvp.com / admin1234 (footer Admin link)
 - 8 AI-generated photos in /public/images; SQLite seeded w/ 186-guest wedding + 2 more events + 8 templates
+
+---
+Task ID: 2-core
+Agent: orchestrator (Z.ai Code main)
+Task: Vanilla HTML/CSS/JS frontend — core runtime, design system, marketing/auth/wizard views
+
+Work Log:
+- User requested the frontend be rebuilt with simple HTML/CSS/JS (framework-free). Strategy: static SPA in /public (hash routing) consuming the EXISTING backend APIs; React frontend kept in src/ but no longer served at "/".
+- Created public/index.html — app shell (#app, #toaster, #modal-root) loading styles.css + css/{dashboard,public,admin}.css + js/{app,dashboard,public,admin}.js (deferred, in order).
+- Created public/styles.css (~700 lines): full design system from spec §52 (bg #F8F8F6 surface #FFF text #181816 muted #73736D border #E7E5DF primary #1F2937 accent #9A7B5B sage #7C8A6E amber #C9A96A danger #B3543F; Inter + Cormorant Garamond + Playfair Display via Google Fonts) + shared components (btn/input/card/badge/chip/table/progress/skeleton/spinner/empty/modal/toast/dropdown/tabs/accordion/avatar) + marketing/auth/wizard view styles + mini-site preview styles.
+- Created public/js/app.js (~1365 lines, node --check clean):
+  - window.App core: state{user,events,currentEvent,hydrated,authMode,wizardTemplateId}, views registry, hash router (names: marketing, auth, create, dashboard '#/app/:tab', builder, site '#/site/:slug', admin), route cleanups (addCleanup for intervals), api() helper, esc/icon/qs/qsa/fmt*/timeAgo/money/avatarHtml/plural, toast, modal.open({title,body,wide,xl,footer,onMount})+close, confirm, bindDropdowns([data-dd]+.dropdown-menu), chartArea/chartDonut/chartBarsH (SVG), downloadCsv/parseCsv, EMAIL_VARIABLES/renderEmailVars, countdown binder.
+  - Ported SECTION_DEFS (14 types), getSectionDef, createSection, reorderSections, miniPreview(theme, sections) (static mock renderer for cards/mockups) from src/lib/sections.ts contract.
+  - App.views.marketing: sticky header + mobile burger, hero (wireframe copy) + browser mockup (miniPreview + LIVE countdown to 2026-10-24 + float chips), how-it-works (5), designs grid (GET /api/templates, category chips, preview modal → "Use This Design" → #/create w/ wizardTemplateId), 4 feature rows w/ CSS mock visuals, pricing (Starter $0/Pro $49/Studio $149 one-time), FAQ accordion (6), contact form → toast, dark footer w/ Admin link + demo creds.
+  - App.views.auth: login/register (mode in state.authMode), split screen w/ testimonial panel, validation (aria-invalid), show/hide pw, demo Fill (john@example.com/demo1234), POST /api/auth/{login,register} → setUser → GET /api/events → '#/app' or '#/create'.
+  - App.views.create (wizard): 3-step rail, 8 type cards, details form (name/date/tz/times/hosts/venue/addr/desc), template picker (search + style chips + type-matched order + miniPreview, preselect from wizardTemplateId, "start from scratch"), POST /api/events → currentEvent + '#/app'.
+- Created src/app/api/qr/route.ts — GET /api/qr?text=&dark=&light= → image/svg+xml via installed qrcode pkg (offline-safe QR for frontend).
+- next.config.ts: rewrites.beforeFiles [{source:'/', destination:'/index.html'}] so "/" serves the static app; src/app/page.tsx now fallback-redirects to /index.html. (Dev server restart required.)
+
+Stage Summary:
+- CORE CONTRACT for remaining vanilla views (dashboard.js, public.js, admin.js):
+  * Register: App.views.dashboard = {render(params), mount(params)} (params[0]=tab: overview|website|guests|rsvp|subevents|invitations|payments|analytics|settings); App.views.builder = {render,mount} ('#/builder' full-screen); App.views.site = {render,mount} (params[0]=slug, hash may contain '?token='); App.views.admin = {render,mount}.
+  * render() must be sync (skeletons ok); fetch in mount() and update DOM. Use App.addCleanup(fn) for intervals/listeners that must die on navigation.
+  * Available: App.{state,api,esc,icon,qs,qsa,fmtDate,fmtDateShort,fmtTime,daysUntil,money,timeAgo,initials,avatarHtml,plural,toast,modal,confirm,bindDropdowns,chartArea,chartDonut,chartBarsH,downloadCsv,parseCsv,EMAIL_VARIABLES,renderEmailVars,SECTION_DEFS,getSectionDef,createSection,reorderSections,miniPreview,bindCountdown,DEFAULT_THEME,navigate,rerender,addCleanup}
+  * ~70 icons via App.icon(name): heart search menu x check check-circle x-circle chevron-down/up/left/right arrow-right/left/up/down calendar calendar-days clock timer map-pin users user-plus user mail mail-check send settings bar-chart trending-up credit-card gift layout image images type book-open list-checks building minus panel-bottom sparkles gem cake baby briefcase party-popper ellipsis more-vertical plus trash pencil copy qr-code eye eye-off log-out bell shield shield-check upload download external-link link globe lock star palette refresh home filter phone info alert file zap click monitor tablet smartphone undo save grip loader message key database activity moon inbox wallet
+  * Shared CSS classes in styles.css (see file): .btn(-primary/accent/outline/ghost/danger/danger-soft/light/sm/lg/block) .icon-btn(.sm) .card(.card-pad/.card-hover) .field/.label/.hint/.error-text .input/.select/.textarea/.input-wrap .form-grid(.span-2) .switch .badge(-neutral/green/amber/red/accent/dark) .chip(.active) .table-wrap/.table .progress .stat-card(.stat-label/.stat-value/.stat-sub) .skeleton .spinner(.spinner-lg) .empty(.empty-ic) .modal-* .toast-* .dropdown(-menu/-item/-sep/-label) .tabs/.tab .acc-* .avatar(.sm/.lg) .view/.view-body/.footer-stick .container .muted/.small/.tiny/.center/.eyebrow
+  * View-specific CSS goes in css/dashboard.css, css/public.css, css/admin.css (already linked by index.html). Use CSS vars from styles.css. NO blue/indigo.
+- Demo data: john@example.com/demo1234 (event john-emily, 186 guests), admin@onlinersvp.com/admin1234 (role admin). Images: /images/{wedding-hero,wedding-story,wedding-gallery-1..4,birthday-hero,corporate-hero}.jpg
+- Next: parallel agents 2-a (dashboard.js+css/dashboard.css) and 2-b (public.js+css/public.css, admin.js+css/admin.css), then integration + browser verification.
+
+---
+Task ID: 2-a / 2-b / 3 (integration)
+Agent: orchestrator (Z.ai Code main)
+Task: Vanilla dashboard.js + public.js/admin.js delivered by parallel agents (context-deadline recovery) + integration, bug fixes, end-to-end browser verification
+
+Work Log:
+- Agents for 2-a (dashboard.js 2970 lines + css/dashboard.css 397 lines) and 2-b (public.js 1049 lines + css/public.css 482 lines, admin.js 484 lines + css/admin.css 173 lines) wrote all files before hitting the context deadline (worklog append missed — recorded here).
+- Verified registrations: A.views.dashboard ('#/app/:tab', 9 tabs via dashRender/dashMount/TABS), A.views.builder ('#/builder', 3-pane builder w/ section list, live canvas renderSectionFull, property panel, theme tab, device preview, undo, autosave), App.views.site ('#/site/:slug' themed renderer + 5-step RSVP flow + lightbox + ICS), App.views.admin ('#/admin', guard + dashboard/users/events/templates/payments/emails/reports/settings).
+- Verified all API calls match backend routes (events, guests, groups, questions PUT, sub-events, campaigns w/ actions, payments, analytics, publish actions, notifications, admin/stats, templates, public/[slug], rsvp GET?token/POST).
+- Restarted dev server for next.config rewrite: GET / now serves public/index.html (200); all assets 200; new /api/qr returns branded SVG QR.
+- Fixed in verification loop:
+  1) styles.css: added default .ic sizing (unsized SVGs blew up layout, e.g. hero eyebrow) + .eyebrow .ic 14px.
+  2) styles.css: .dropdown-menu default display:none (menus rendered open on load).
+  3) dashboard.js secWrap: missing semicolon after extraStyle (hero style concatenated 'color:#fff'+'background-image:...' → invalid inline CSS → blank hero canvas).
+  4) public.js cssUrl: used double quotes inside style="..." attribute → attribute terminated early, breaking hero/story/gallery backgrounds. Switched to single quotes + escaping.
+  5) public.js RSVP flow: bindFlow(host) scoped to modal body but Continue lives in modal footer sibling → buttons never bound (flow stuck at step 1). Now binds on .modal-panel; success screen re-binds ICS/Change-response buttons.
+  6) DB cleanup: deleted 2 junk "Can you" test events; replaced external hero bgImage (github.io URL) with /images/wedding-hero.jpg on john-emily event.
+  7) app.js: refactored `var self/w = this` aliases to named refs (eslint no-this-alias) — bun run lint now exits 0.
+- Browser verification (agent-browser, 1440px + 390px): marketing (hero, mockup w/ live countdown, designs from API w/ preview modal + Use This Design, pricing, FAQ, contact, footer), auth (login demo acct), dashboard overview (186/121/42/23 stats, 77% rate, SVG trend chart, recent RSVPs), guests (search/filters/CSV/groups/row menu incl. QR dialog w/ personalized link), RSVP form builder (6 questions + live preview), invitations (3 campaigns w/ stats), analytics (KPIs, donut, email + meal charts), builder (hero now renders w/ local image, property panel w/ content+design fields), public site (full-viewport themed hero, LIVE countdown ticking, story, details, schedule, gallery w/ 6 photos + lightbox, OSM map embed, accommodation, registry, RSVP banner, contact, footer, Exit-preview bar), RSVP flow e2e (identity → accepts → party 3 + 2 sub-events → meal/dietary/song/hotel questions → review → Submit → "You're confirmed!" + Add to Calendar), backend confirmed (attending 121→122, rsvpRate 78%, admin RSVPs 122), admin guard for non-admin + full admin dashboard for admin@onlinersvp.com, mobile 390px marketing + public site.
+- Regression: wizard type→details→template picker steps all work post-refactor; zero runtime errors in dev.log; GET / and all API routes 200.
+
+Stage Summary:
+- PROJECT COMPLETE (vanilla frontend): the entire Online RSVP SaaS frontend is now plain HTML + CSS + JS served statically from /public (index.html, styles.css, js/{app,dashboard,public,admin}.js, css/{dashboard,public,admin}.css) with hash-based SPA routing, consuming the existing Next.js API backend (which also serves as the deployable server). "/" is served by a next.config rewrite to /index.html; page.tsx is a fallback redirect. Deployment-ready: any static host for the frontend (public/ folder) + the Next.js API, or run `next start` for everything on one origin.
+- Logins: john@example.com/demo1234 (owner, 3 events incl. 186-guest wedding) · admin@onlinersvp.com/admin1234 (Platform Admin via footer Admin link)
+- React sources kept in src/components (unused at runtime) for reference/revert.
