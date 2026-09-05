@@ -23,6 +23,9 @@
     toastTimer = setTimeout(function () { toastEl.hidden = true; }, 3200);
   }
 
+  /* Expose for the flow pages (create / checkout / editor) */
+  window.everToast = toast;
+
   $$('[data-demo-toast]').forEach(function (el) {
     el.addEventListener('click', function (e) {
       if (el.tagName === 'A') e.preventDefault();

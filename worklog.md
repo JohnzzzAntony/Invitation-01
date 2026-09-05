@@ -245,3 +245,26 @@ Stage Summary:
 - Design mirrors the reference's minimalist teal/white/serif layout and settings; all copy, testimonials and branding are original ("Ever RSVP")
 - Interactive demo RSVP modal + persistence gives customers a hands-on feel of the product
 - All golden paths verified in a real browser on desktop and mobile
+
+---
+Task ID: 3
+Agent: orchestrator (Z.ai Code main)
+Task: Full Get-started journey — design selection page, payment page, design editor page (all pure HTML/CSS/JS)
+
+Work Log:
+- Built shared catalog public/js/templates.js: 9 original templates (Eucalyptus, Blush, Monogram, Golden Hour, Midnight, Garden Party, Ocean, Terracotta, Ivory) with palettes/categories + renderInvite() producing CSS-only invitation previews at 3 sizes (card/summary/editor canvas), incl. extended blocks (story, schedule, RSVP questions)
+- Exposed window.everToast from app.js; routed ALL homepage Get started CTAs (header, hero, mobile menu, CTA band) to create.html
+- create.html + create.js (step 1): step indicator, style filter chips (All/Elegant/Floral/Modern/Classic/Watercolor), 9 template cards with live previews, keyboard-accessible selection -> saves flow.design to localStorage -> checkout.html
+- checkout.html + checkout.js (step 2): sticky order summary (selected design preview, $25 lines, perks, secure note) + payment form with auto-formatting (card 4-4-4-4, expiry MM / YY, numeric CVC), full inline validation (email/name/16-digit card/future expiry/CVC), simulated processing spinner -> success screen with order number -> auto-redirect editor.html; guards direct visits without a design
+- editor.html + editor.js (step 3): app-style top bar (order badge -> Published, desktop/mobile preview toggle, Save, Publish), sidebar groups (template chips, 3 font pairs, 6 accent colors, event details fields, story/schedule toggles, RSVP question toggles), live canvas preview re-rendered on every change, debounced autosave + Save button + reload persistence, Publish -> success overlay with slug URL (from edited names) + copy button
+- Appended ~700 lines to styles.css: flow pages, steps, cards, checkout, editor shell, shared .inv invitation preview system, responsive (1020/900/620)
+- Fixed bug: JS-created template cards had .reveal but were created after app.js observer setup -> removed reveal from cards
+- UX fix: "Event details" group now open by default (name fields visible immediately)
+- Verified end-to-end in browser: Get started -> create (filters 2/9 cards) -> pick Midnight -> checkout (summary shows Midnight; empty submit = 5 inline errors; card/expiry auto-format; pay -> processing -> success EV-xxxxxx) -> editor (order badge, template/accent/name edits update canvas, mobile toggle, Save toast, edit persistence across reload, Publish -> overlay with juno-theo.ever-rsvp.com + Copy + badge Published)
+- Note: agent-browser synthetic text entry into editor sidebar fields proved unreliable (env focus quirk); app logic verified via programmatic input events, which produce identical results to real typing; all click flows verified by real clicks
+- Mobile verified: create page single column + footer gap 0; editor stacks correctly with persisted fields; console/error-free; bun run lint clean
+
+Stage Summary:
+- Complete customer journey now works: Get started -> design selection -> $25 payment -> live design editor, all vanilla HTML/CSS/JS
+- State machine via localStorage: ever-rsvp-flow (design, paid, order, published, slug) + ever-rsvp-event (all editor state, autosaved)
+- public/ remains a zero-build deployable static root; 4 pages total (index, create, checkout, editor)
