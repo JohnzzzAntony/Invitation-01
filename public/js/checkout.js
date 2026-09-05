@@ -19,6 +19,7 @@
   }
 
   function findTpl(id) {
+    if (window.EVER_findTemplate) return window.EVER_findTemplate(id);
     var list = window.EVER_TEMPLATES || [];
     for (var i = 0; i < list.length; i++) {
       if (list[i].id === id) return list[i];
@@ -37,7 +38,7 @@
 
   var previewBox = document.getElementById('summary-preview');
   if (previewBox && window.renderSiteMini) {
-    previewBox.appendChild(window.renderSiteMini(tpl));
+    previewBox.appendChild(window.renderSiteMini(tpl, null, { short: true }));
   }
   var nameEl = document.getElementById('summary-design-name');
   if (nameEl) nameEl.textContent = '“' + tpl.name + '” event website';

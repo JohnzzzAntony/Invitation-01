@@ -305,3 +305,26 @@ Work Log:
 Stage Summary:
 - Website code is healthy: every page renders error-free and the full Get-started -> design -> payment -> editor journey works end-to-end
 - The reported "session init failed" / "pretty print error" is a chat/preview gateway session issue, not an app bug — resolved by reloading the preview panel; no code changes required
+
+---
+Task ID: 6
+Agent: orchestrator (Z.ai Code main)
+Task: Rebuild the template system around the user's reference design (Ananya & Rohan style wedding event website): one format for all designs, editor options for every field, multiple design variants, "create your own design" support, pure HTML/CSS/JS, deployment-ready
+
+Work Log:
+- Generated 6 bundled photos (assets/ws-couple|cafe|proposal|rings|dance|decor.jpg); regenerated hero once to remove burned-in text; two files from a racy parallel batch had to be regenerated sequentially (rate limit 429 on parallel CLI calls)
+- Rewrote public/js/templates.js as the shared engine: 8 themed designs of ONE reference format (Emerald&Gold, Royal Maroon, Blush Rose, Midnight Navy, Sage Garden, Champagne Ivory, Terracotta Sun, Lavender Mist — palette vars + name font + ornament style), custom-template CRUD in localStorage, siteDefaults() (Ananya & Rohan sample content), renderSite() full renderer (hero w/ monogram+nav+script names+Enter Invitation, countdown timer + Date/Time/Venue/Dress cards + View on Map, story milestones with heart connectors, gallery strip, event cards with SVG icons, venue panel + OpenStreetMap embed + amenities, RSVP form, contact footer with crest/socials), renderSiteMini(tpl,data,{short}) for design cards and checkout summary, tickCountdowns() + bindSite() (anchor scroll, RSVP demo submit), EVER_* API
+- New public/js/designer.js: "Create your own design" modal (name, 5 color pickers, 4 name fonts, 3 ornament styles, live mini preview) shared by create.html and editor.html via [data-open-designer]
+- Rewrote public/js/editor.js: state v3 + v2/v1 migration; Basics (partners, date, time, venue, address, city, dress, quote) + 8 section groups each with eye/up/down reorder tools, full field sets and list editors (story milestones, gallery photos w/ library+URL, events w/ icon picker, amenities, meal options, RSVP options, social toggles); Design tab: template chips (builtin+custom+New design), name/body font, accent dots + custom color, button shape, spacing; debounced autosave + Save toast + publish overlay
+- create.js/create.html: 9 theme cards render mini-sites, "My designs" filter, custom cards with edit/delete, dashed builder card; checkout.js uses EVER_findTemplate + short mini summary
+- Appended ~600 lines to styles.css (.ws full site, .wsm mini, designer modal, editor design tab, create cards, responsive + mobile frame tightening)
+- Browser fixes during verification: designer modal crashed on #dsn-title→#designer-title id mismatch; mini ornament selector .wsm.wsm-orn-*→.wsm.ws-orn-*; .wsm-hero-img absolute overridden by `.wsm-hero > *` (specificity fix); RSVP success box moved inside card (grid-column span); anchor scroll retargeted to .ed-canvas-wrap
+- Verified E2E (agent-browser 1440px + 390px): create (10 cards incl. custom + builder), custom "Royal Peacock" created in editor with peacock colors applied live, "Blush Copper" created on create page → checkout (custom summary, EV-953929) → editor; story milestone edit → preview+storage; add/remove milestone; hide/show section; RSVP validation + success state; mobile device toggle; publish overlay (ananya-rohan.ever-rsvp.com); fresh full flow home→create→Blush Rose→pay EV-759350→editor; mobile single-column layouts; zero console errors on all pages
+- Deleted dead files: public/js/dashboard.js, admin.js, public.js (old full-stack leftovers, unreferenced); public/ is 100% vanilla HTML/CSS/JS (src/app/page.tsx is only a redirect fallback behind the "/" rewrite, never user-facing)
+- bun run lint clean; dev.log error-free
+
+Stage Summary:
+- All designs now share the reference format: Hero → Countdown & details → Our story → Gallery → Events → Venue & map → RSVP → Contact footer
+- 8 builtin designs + unlimited user-created designs (name/colors/fonts/ornaments) editable at any time from the design gallery or the editor
+- Every visible field of every section is editable with live preview; state persists (ever-rsvp-event v3, ever-rsvp-flow, ever-rsvp-custom-tpl)
+- Deployment = copy public/ (zero build, zero dependencies beyond Google Fonts CDN)
