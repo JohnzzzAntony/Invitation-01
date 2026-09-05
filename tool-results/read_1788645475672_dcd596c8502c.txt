@@ -1,0 +1,946 @@
+     1→/* ==========================================================================
+     2→   Ever RSVP — event WEBSITE builder (step 3)
+     3→   Left: Content (basics + every website section) / Design tabs.
+     4→   Right: live scrolling preview of the full event website.
+     5→   ========================================================================== */
+     6→(function () {
+     7→  'use strict';
+     8→
+     9→  var FLOW_KEY = 'ever-rsvp-flow';
+    10→  var EVENT_KEY = 'ever-rsvp-event';
+    11→
+    12→  /* ---------- Catalog / style meta ---------- */
+    13→
+    14→  var ACCENTS = [
+    15→    { id: 'tpl',        label: 'Template',   hex: null },
+    16→    { id: 'teal',       label: 'Teal',       hex: '#1798b8' },
+    17→    { id: 'gold',       label: 'Gold',       hex: '#b9975b' },
+    18→    { id: 'sage',       label: 'Sage',       hex: '#7f9c7c' },
+    19→    { id: 'terracotta', label: 'Terracotta', hex: '#b3704e' },
+    20→    { id: 'navy',       label: 'Navy',       hex: '#22384a' }
+    21→  ];
+    22→
+    23→  var SHAPES = [
+    24→    { id: 'pill',   label: 'Pill',   radius: '999px' },
+    25→    { id: 'soft',   label: 'Soft',   radius: '10px' },
+    26→    { id: 'square', label: 'Square', radius: '2px' }
+    27→  ];
+    28→
+    29→  /* Every website section: fields, toggles and list editors */
+    30→  var SECTIONS = [
+    31→    { id: 'hero', label: 'Hero',
+    32→      fields: [
+    33→        { k: 'kicker',  label: 'Kicker', type: 'text', ph: 'Together with their families' },
+    34→        { k: 'tagline', label: 'Tagline under the names', type: 'text', ph: 'are getting married' }
+    35→      ] },
+    36→    { id: 'countdown', label: 'Countdown',
+    37→      fields: [ { k: 'label', label: 'Label', type: 'text', ph: 'Counting down to the big day' } ] },
+    38→    { id: 'welcome', label: 'Welcome note',
+    39→      fields: [
+    40→        { k: 'title', label: 'Title', type: 'text', ph: 'Welcome, dear guests' },
+    41→        { k: 'text',  label: 'Message', type: 'textarea', ph: 'We are so excited to celebrate with you…' }
+    42→      ] },
+    43→    { id: 'story', label: 'Our story',
+    44→      fields: [
+    45→        { k: 'title', label: 'Title', type: 'text', ph: 'Our story' },
+    46→        { k: 'text',  label: 'Text', type: 'textarea', ph: 'Ten years, two cities…' }
+    47→      ] },
+    48→    { id: 'details', label: 'When & where',
+    49→      fields: [
+    50→        { k: 'time',      label: 'Time', type: 'text', ph: '4:00 in the afternoon' },
+    51→        { k: 'address',   label: 'Address', type: 'text', ph: '420 Lavender Lane, Hillcrest' },
+    52→        { k: 'dressCode', label: 'Dress code', type: 'text', ph: 'Garden formal' }
+    53→      ] },
+    54→    { id: 'schedule', label: 'Schedule',
+    55→      fields: [ { k: 'title', label: 'Title', type: 'text', ph: 'The day' } ],
+    56→      list: { k: 'items', fields: [
+    57→        { k: 'time', label: 'Time', type: 'text', ph: '4:00 PM' },
+    58→        { k: 'title', label: 'Title', type: 'text', ph: 'Ceremony' },
+    59→        { k: 'desc', label: 'Description', type: 'text', ph: 'Garden lawn' }
+    60→      ], blank: { time: '', title: 'New item', desc: '' } } },
+    61→    { id: 'gallery', label: 'Gallery',
+    62→      fields: [
+    63→        { k: 'title', label: 'Title', type: 'text', ph: 'Moments' },
+    64→        { k: 'note',  label: 'Caption', type: 'textarea', ph: 'Tag us in your photos…' }
+    65→      ] },
+    66→    { id: 'rsvp', label: 'RSVP',
+    67→      fields: [
+    68→        { k: 'title',    label: 'Title', type: 'text', ph: 'Will you join us?' },
+    69→        { k: 'deadline', label: 'Reply-by date', type: 'date' },
+    70→        { k: 'note',     label: 'Note', type: 'text', ph: 'Kindly reply by 1 May 2026' }
+    71→      ],
+    72→      checks: [
+    73→        { k: 'qMenu', label: 'Ask for menu selection' },
+    74→        { k: 'qPlus', label: 'Collect plus-ones' },
+    75→        { k: 'qSong', label: 'Collect song requests' }
+    76→      ] },
+    77→    { id: 'travel', label: 'Travel & stay',
+    78→      fields: [
+    79→        { k: 'title', label: 'Title', type: 'text', ph: 'Travel & stay' },
+    80→        { k: 'text',  label: 'Text', type: 'textarea', ph: 'A block of rooms is held at…' }
+    81→      ] },
+    82→    { id: 'registry', label: 'Gifts & registry',
+    83→      fields: [
+    84→        { k: 'title', label: 'Title', type: 'text', ph: 'Gifts' },
+    85→        { k: 'text',  label: 'Text', type: 'textarea', ph: 'Your presence is the greatest gift…' }
+    86→      ] },
+    87→    { id: 'faq', label: 'F.A.Q.', fields: [],
+    88→      list: { k: 'items', fields: [
+    89→        { k: 'q', label: 'Question', type: 'text', ph: 'Can I bring a plus-one?' },
+    90→        { k: 'a', label: 'Answer', type: 'textarea', ph: 'Of course — indicate it on your reply.' }
+    91→      ], blank: { q: 'New question', a: '' } } },
+    92→    { id: 'contact', label: 'Contact',
+    93→      fields: [
+    94→        { k: 'email', label: 'E-mail', type: 'text', ph: 'hello@example.com' },
+    95→        { k: 'phone', label: 'Phone (optional)', type: 'text', ph: '+1 555 010 2030' }
+    96→      ] },
+    97→    { id: 'footer', label: 'Footer',
+    98→      fields: [ { k: 'hashtag', label: 'Hashtag', type: 'text', ph: '#AmeliaAndNoah' } ] }
+    99→  ];
+   100→
+   101→  var ORDER = SECTIONS.map(function (s) { return s.id; });
+   102→
+   103→  /* ---------- State ---------- */
+   104→
+   105→  function futureISO(monthsAhead) {
+   106→    var d = new Date();
+   107→    d.setDate(14);
+   108→    d.setMonth(d.getMonth() + monthsAhead);
+   109→    var m = String(d.getMonth() + 1);
+   110→    if (m.length < 2) m = '0' + m;
+   111→    return d.getFullYear() + '-' + m + '-14';
+   112→  }
+   113→
+   114→  function defaults() {
+   115→    return {
+   116→      v: 2,
+   117→      templateId: 'eucalyptus',
+   118→      fontPair: 'classic',
+   119→      accent: 'tpl',
+   120→      btnShape: 'soft',
+   121→      spacing: 'normal',
+   122→      nameA: 'Amelia', nameB: 'Noah',
+   123→      date: futureISO(9), venue: 'Rosewood Barn', city: 'Kent',
+   124→      order: ORDER.slice(),
+   125→      sections: {
+   126→        hero:      { on: true, kicker: 'Together with their families', tagline: 'are getting married' },
+   127→        countdown: { on: true, label: 'Counting down to the big day' },
+   128→        welcome:   { on: true, title: 'Welcome, dear guests',
+   129→                     text: 'We are so excited to celebrate the day with our favorite people. This little site has everything you need — the schedule, directions, where to stay and your reply card.' },
+   130→        story:     { on: true, title: 'Our story',
+   131→                     text: 'Ten years, two cities and one very spoilt cat — and now, the easy part: a party with all of you.' },
+   132→        details:   { on: true, time: '4:00 in the afternoon',
+   133→                     address: '420 Lavender Lane, Hillcrest', dressCode: 'Garden formal' },
+   134→        schedule:  { on: true, title: 'The day', items: [
+   135→                     { time: '4:00 PM', title: 'Ceremony', desc: 'Rosewood garden lawn' },
+   136→                     { time: '5:30 PM', title: 'Cocktail hour', desc: 'Terrace bar' },
+   137→                     { time: '6:30 PM', title: 'Dinner & dancing', desc: 'The grand barn' } ] },
+   138→        gallery:   { on: true, title: 'Moments', note: '' },
+   139→        rsvp:      { on: true, title: 'Will you join us?', deadline: futureISO(6),
+   140→                     note: 'Kindly reply in good time — every chair counts.', qMenu: true, qPlus: true, qSong: false },
+   141→        travel:    { on: false, title: 'Travel & stay',
+   142→                     text: 'A block of rooms is held at The Little Inn until April. Mention our wedding for the group rate — the shuttle leaves the lobby at 3:15.' },
+   143→        registry:  { on: false, title: 'Gifts',
+   144→                     text: 'Your presence is the greatest gift of all. Should you wish to spoil us anyway, a small registry is open with the usual suspects.' },
+   145→        faq:       { on: true, items: [
+   146→                     { q: 'Can I bring a plus-one?', a: 'Of course — simply note it on your reply and we will save a chair.' },
+   147→                     { q: 'Are children welcome?', a: 'Absolutely. We adore your little ones (and so does the cat).' },
+   148→                     { q: 'What if it rains?', a: 'The ceremony moves into the glasshouse — same time, same joy.' } ] },
+   149→        contact:   { on: true, email: 'hello@ameliaandnoah.com', phone: '+1 (555) 010-2030' },
+   150→        footer:    { on: true, hashtag: '#AmeliaAndNoah' }
+   151→      }
+   152→    };
+   153→  }
+   154→
+   155→  var state = defaults();
+   156→  var ui = { open: {} };   /* remembered open/closed state of sidebar groups */
+   157→  var pvTimer = null;
+   158→
+   159→  /* ---------- Helpers ---------- */
+   160→
+   161→  function readJson(key) {
+   162→    try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+   163→    catch (e) { return null; }
+   164→  }
+   165→  function writeJson(key, val) {
+   166→    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+   167→  }
+   168→  function esc(s) {
+   169→    return String(s == null ? '' : s)
+   170→      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+   171→  }
+   172→  function slugify(s) {
+   173→    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'your-event';
+   174→  }
+   175→  function hexToRgba(hex, a) {
+   176→    var h = String(hex || '').replace('#', '');
+   177→    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+   178→    var n = parseInt(h, 10);
+   179→    if (isNaN(n)) return 'rgba(0,0,0,' + a + ')';
+   180→    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+   181→  }
+   182→  var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+   183→  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+   184→  function dateObj() {
+   185→    var d = new Date((state.date || '2026-06-14') + 'T12:00:00');
+   186→    return isNaN(d.getTime()) ? new Date('2026-06-14T12:00:00') : d;
+   187→  }
+   188→  function fmtDateLong() {
+   189→    var d = dateObj();
+   190→    return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ' · ' + d.getFullYear();
+   191→  }
+   192→  function fmtDateShort() {
+   193→    var d = dateObj();
+   194→    return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+   195→  }
+   196→  function fmtDeadline(iso) {
+   197→    if (!iso) return '';
+   198→    var d = new Date(iso + 'T12:00:00');
+   199→    if (isNaN(d.getTime())) return iso;
+   200→    return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+   201→  }
+   202→  function findTpl(id) {
+   203→    var list = window.EVER_TEMPLATES || [];
+   204→    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+   205→    return list[0];
+   206→  }
+   207→  function accentHex() {
+   208→    for (var i = 0; i < ACCENTS.length; i++) {
+   209→      if (ACCENTS[i].id === state.accent) return ACCENTS[i].hex || findTpl(state.templateId).btn;
+   210→    }
+   211→    return findTpl(state.templateId).btn;
+   212→  }
+   213→  function secMeta(id) {
+   214→    for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].id === id) return SECTIONS[i];
+   215→    return null;
+   216→  }
+   217→
+   218→  /* ---------- Load / save (with v1 migration) ---------- */
+   219→
+   220→  function loadState() {
+   221→    var flow = readJson(FLOW_KEY) || {};
+   222→    var saved = readJson(EVENT_KEY);
+   223→    var d = defaults();
+   224→    if (flow.design) d.templateId = flow.design;
+   225→
+   226→    if (saved && saved.v === 2) {
+   227→      for (var k in d) {
+   228→        if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
+   229→        if (k === 'sections') continue;
+   230→        if (Object.prototype.hasOwnProperty.call(saved, k)) d[k] = saved[k];
+   231→      }
+   232→      if (saved.order && saved.order.length === ORDER.length) d.order = saved.order.slice();
+   233→      for (var sid in d.sections) {
+   234→        if (!Object.prototype.hasOwnProperty.call(d.sections, sid)) continue;
+   235→        if (saved.sections && saved.sections[sid]) {
+   236→          for (var fk in d.sections[sid]) {
+   237→            if (Object.prototype.hasOwnProperty.call(saved.sections[sid], fk)) {
+   238→              d.sections[sid][fk] = saved.sections[sid][fk];
+   239→            }
+   240→          }
+   241→        }
+   242→      }
+   243→    } else if (saved) {
+   244→      /* legacy v1 editor state — carry over what still makes sense */
+   245→      ['templateId','fontPair','accent','nameA','nameB','date','venue','city'].forEach(function (k) {
+   246→        if (Object.prototype.hasOwnProperty.call(saved, k) && saved[k]) d[k] = saved[k];
+   247→      });
+   248→      if (saved.story) d.sections.story.text = saved.story;
+   249→      if (typeof saved.showStory === 'boolean') d.sections.story.on = saved.showStory;
+   250→      if (typeof saved.showSchedule === 'boolean') d.sections.schedule.on = saved.showSchedule;
+   251→      ['qMenu','qPlus','qSong'].forEach(function (k) {
+   252→        if (typeof saved[k] === 'boolean') d.sections.rsvp[k] = saved[k];
+   253→      });
+   254→    }
+   255→    state = d;
+   256→  }
+   257→
+   258→  var saveTimer = null;
+   259→  function autosave() {
+   260→    clearTimeout(saveTimer);
+   261→    saveTimer = setTimeout(function () { writeJson(EVENT_KEY, state); }, 500);
+   262→  }
+   263→  function saveNow(silent) {
+   264→    clearTimeout(saveTimer);
+   265→    writeJson(EVENT_KEY, state);
+   266→    if (!silent && window.everToast) window.everToast('Saved — your website lives on this device.');
+   267→  }
+   268→
+   269→  /* =====================================================================
+   270→     SIDEBAR — content panel
+   271→     ===================================================================== */
+   272→
+   273→  var secGroups = document.getElementById('sec-groups');
+   274→
+   275→  function fieldHtml(secId, f, val, listCtx) {
+   276→    var attrs = listCtx
+   277→      ? ' data-sec="' + secId + '" data-k="' + listCtx.k + '" data-i="' + listCtx.i + '" data-fk="' + f.k + '"'
+   278→      : ' data-sec="' + secId + '" data-k="' + f.k + '"';
+   279→    var id = 'f-' + secId + '-' + (listCtx ? listCtx.k + '-' + listCtx.i + '-' : '') + f.k;
+   280→    var common = ' id="' + id + '" ' + attrs + ' placeholder="' + esc(f.ph || '') + '"';
+   281→    var inner = f.type === 'textarea'
+   282→      ? '<textarea rows="2"' + common + '>' + esc(val) + '</textarea>'
+   283→      : '<input type="' + (f.type === 'date' ? 'date' : 'text') + '" value="' + esc(val) + '"' + common + ' />';
+   284→    return '<div class="ed-field' + (listCtx ? ' ed-field-li' : '') + '"><label for="' + id + '">' + f.label + '</label>' + inner + '</div>';
+   285→  }
+   286→
+   287→  function listHtml(meta, sec) {
+   288→    var cfg = meta.list;
+   289→    var out = '<div class="ed-list" data-list="' + cfg.k + '">';
+   290→    (sec[cfg.k] || []).forEach(function (item, i) {
+   291→      var t = item.title || item.q || ('Item ' + (i + 1));
+   292→      out += '<div class="ed-li" data-i="' + i + '">' +
+   293→        '<div class="ed-li-head"><b>' + (i + 1) + '. ' + esc(t) + '</b>' +
+   294→        '<button type="button" class="li-x" data-act="li-del" data-sec="' + meta.id + '" data-list="' + cfg.k + '" data-i="' + i + '" aria-label="Remove item ' + (i + 1) + '">&times;</button></div>';
+   295→      cfg.fields.forEach(function (f) {
+   296→        out += fieldHtml(meta.id, f, item[f.k] || '', { k: cfg.k, i: i });
+   297→      });
+   298→      out += '</div>';
+   299→    });
+   300→    out += '<button type="button" class="li-add" data-act="li-add" data-sec="' + meta.id + '" data-list="' + cfg.k + '">+ Add item</button>';
+   301→    out += '</div>';
+   302→    return out;
+   303→  }
+   304→
+   305→  function checksHtml(meta, sec) {
+   306→    var out = '';
+   307→    (meta.checks || []).forEach(function (c) {
+   308→      var id = 'ck-' + meta.id + '-' + c.k;
+   309→      out += '<label class="ed-check"><input type="checkbox" id="' + id + '" data-sec="' + meta.id + '" data-k="' + c.k + '"' + (sec[c.k] ? ' checked' : '') + ' /><span>' + c.label + '</span></label>';
+   310→    });
+   311→    return out;
+   312→  }
+   313→
+   314→  function groupHtml(meta, sec) {
+   315→    var open = ui.open[meta.id] !== false && ui.open[meta.id] !== undefined ? ' open' : (ui.open[meta.id] === undefined && (meta.id === 'hero' || meta.id === 'rsvp') ? ' open' : '');
+   316→    var off = sec.on ? '' : ' off';
+   317→    var body = '';
+   318→    (meta.fields || []).forEach(function (f) {
+   319→      body += fieldHtml(meta.id, f, sec[f.k] || '', null);
+   320→    });
+   321→    if (meta.list) body += listHtml(meta, sec);
+   322→    if (meta.checks) {
+   323→      body += '<div class="ed-checks">' + checksHtml(meta, sec) + '</div>';
+   324→      var hint = meta.id === 'rsvp' ? '<p class="ed-hint">Guests answer these right after accepting.</p>' : '';
+   325→      body += hint;
+   326→    }
+   327→    if (!meta.fields.length && !meta.list && !meta.checks) body = '<p class="ed-hint">Nothing to configure here.</p>';
+   328→
+   329→    return '' +
+   330→      '<details class="ed-group sec-group' + off + '"' + open + ' data-sec="' + meta.id + '">' +
+   331→        '<summary>' +
+   332→          '<span class="sec-sum">' + meta.label + '</span>' +
+   333→          '<span class="sec-tools">' +
+   334→            '<button type="button" class="sbtn" data-act="up" data-sec="' + meta.id + '" aria-label="Move ' + meta.label + ' up" title="Move up">&#8593;</button>' +
+   335→            '<button type="button" class="sbtn" data-act="down" data-sec="' + meta.id + '" aria-label="Move ' + meta.label + ' down" title="Move down">&#8595;</button>' +
+   336→            '<button type="button" class="sbtn eye' + (sec.on ? ' on' : '') + '" data-act="eye" data-sec="' + meta.id + '" aria-pressed="' + sec.on + '" aria-label="' + (sec.on ? 'Hide ' : 'Show ') + meta.label + ' section" title="' + (sec.on ? 'Hide section' : 'Show section') + '">' +
+   337→              '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></svg>' +
+   338→            '</button>' +
+   339→          '</span>' +
+   340→        '</summary>' +
+   341→        '<div class="ed-body">' + body + '</div>' +
+   342→      '</details>';
+   343→  }
+   344→
+   345→  function buildContentPanel() {
+   346→    if (!secGroups) return;
+   347→    secGroups.innerHTML = state.order.map(function (id) {
+   348→      return groupHtml(secMeta(id), state.sections[id]);
+   349→    }).join('');
+   350→
+   351→    /* remember open/close (toggle does not bubble) */
+   352→    Array.prototype.forEach.call(secGroups.querySelectorAll('details.sec-group'), function (d) {
+   353→      var id = d.getAttribute('data-sec');
+   354→      d.addEventListener('toggle', function () { ui.open[id] = d.open; });
+   355→    });
+   356→  }
+   357→
+   358→  /* ---------- Field events (delegated) ---------- */
+   359→
+   360→  function onFieldInput(e) {
+   361→    var el = e.target;
+   362→    var secId = el.getAttribute('data-sec');
+   363→    if (el.getAttribute('data-style')) {           /* design panel select */
+   364→      state[el.getAttribute('data-style')] = el.value;
+   365→      autosave(); render();
+   366→      return;
+   367→    }
+   368→    if (!secId) return;
+   369→    var k = el.getAttribute('data-k');
+   370→    var val = el.type === 'checkbox' ? el.checked : el.value;
+   371→    var i = el.getAttribute('data-i');
+   372→
+   373→    if (secId === '_basic') {
+   374→      state[k] = val;
+   375→    } else if (i !== null && i !== undefined) {
+   376→      state.sections[secId][k][+i][el.getAttribute('data-fk')] = val;
+   377→      var li = el.closest('.ed-li');
+   378→      if (li) {
+   379→        var b = li.querySelector('.ed-li-head b');
+   380→        var item = state.sections[secId][k][+i];
+   381→        if (b) b.textContent = (+i + 1) + '. ' + (item.title || item.q || 'Item ' + (+i + 1));
+   382→      }
+   383→    } else {
+   384→      state.sections[secId][k] = val;
+   385→    }
+   386→    autosave(); render();
+   387→  }
+   388→
+   389→  function onSidebarClick(e) {
+   390→    var btn = e.target.closest('[data-act]');
+   391→    if (!btn) return;
+   392→    e.preventDefault();          /* keep summary from toggling when using the tools */
+   393→    e.stopPropagation();
+   394→    var act = btn.getAttribute('data-act');
+   395→    var secId = btn.getAttribute('data-sec');
+   396→
+   397→    if (act === 'eye') {
+   398→      var s = state.sections[secId];
+   399→      s.on = !s.on;
+   400→      btn.classList.toggle('on', s.on);
+   401→      btn.setAttribute('aria-pressed', String(s.on));
+   402→      btn.setAttribute('aria-label', (s.on ? 'Hide ' : 'Show ') + secMeta(secId).label + ' section');
+   403→      var grp = secGroups.querySelector('details[data-sec="' + secId + '"]');
+   404→      if (grp) grp.classList.toggle('off', !s.on);
+   405→      autosave(); render();
+   406→      return;
+   407→    }
+   408→
+   409→    if (act === 'up' || act === 'down') {
+   410→      var idx = state.order.indexOf(secId);
+   411→      var to = act === 'up' ? idx - 1 : idx + 1;
+   412→      if (to < 0 || to >= state.order.length) return;
+   413→      var tmp = state.order[idx];
+   414→      state.order[idx] = state.order[to];
+   415→      state.order[to] = tmp;
+   416→      buildContentPanel();
+   417→      autosave(); render();
+   418→      return;
+   419→    }
+   420→
+   421→    if (act === 'li-add') {
+   422→      var cfg = secMeta(secId).list;
+   423→      state.sections[secId][cfg.k].push(JSON.parse(JSON.stringify(cfg.blank)));
+   424→      buildContentPanel();
+   425→      autosave(); render();
+   426→      return;
+   427→    }
+   428→
+   429→    if (act === 'li-del') {
+   430→      var listK = btn.getAttribute('data-list');
+   431→      var di = +btn.getAttribute('data-i');
+   432→      state.sections[secId][listK].splice(di, 1);
+   433→      buildContentPanel();
+   434→      autosave(); render();
+   435→    }
+   436→  }
+   437→
+   438→  /* =====================================================================
+   439→     SIDEBAR — design panel
+   440→     ===================================================================== */
+   441→
+   442→  function buildTemplateChips() {
+   443→    var wrap = document.getElementById('tpl-chips');
+   444→    if (!wrap) return;
+   445→    wrap.innerHTML = '';
+   446→    (window.EVER_TEMPLATES || []).forEach(function (tpl) {
+   447→      var b = document.createElement('button');
+   448→      b.type = 'button';
+   449→      b.className = 'tpl-chip' + (tpl.id === state.templateId ? ' on' : '');
+   450→      b.setAttribute('role', 'radio');
+   451→      b.setAttribute('aria-checked', String(tpl.id === state.templateId));
+   452→      b.title = tpl.name;
+   453→      b.innerHTML = '<i style="background:' + tpl.bg + '"></i><span>' + tpl.name + '</span>';
+   454→      b.addEventListener('click', function () {
+   455→        state.templateId = tpl.id;
+   456→        state.accent = 'tpl';
+   457→        saveNow(true);
+   458→        buildTemplateChips(); buildColorDots(); render();
+   459→      });
+   460→      wrap.appendChild(b);
+   461→    });
+   462→  }
+   463→
+   464→  function buildFontCards() {
+   465→    var wrap = document.getElementById('font-cards');
+   466→    if (!wrap) return;
+   467→    wrap.innerHTML = '';
+   468→    var pairs = window.EVER_FONT_PAIRS || {};
+   469→    Object.keys(pairs).forEach(function (id) {
+   470→      var p = pairs[id];
+   471→      var b = document.createElement('button');
+   472→      b.type = 'button';
+   473→      b.className = 'font-card' + (id === state.fontPair ? ' on' : '');
+   474→      b.setAttribute('role', 'radio');
+   475→      b.setAttribute('aria-checked', String(id === state.fontPair));
+   476→      b.innerHTML = '<b class="' + p.sampleClass + '">' + p.sample + '</b><span>' + p.label + '</span>';
+   477→      b.addEventListener('click', function () {
+   478→        state.fontPair = id;
+   479→        saveNow(true);
+   480→        buildFontCards(); render();
+   481→      });
+   482→      wrap.appendChild(b);
+   483→    });
+   484→  }
+   485→
+   486→  function buildColorDots() {
+   487→    var wrap = document.getElementById('color-dots');
+   488→    if (!wrap) return;
+   489→    wrap.innerHTML = '';
+   490→    ACCENTS.forEach(function (a) {
+   491→      var b = document.createElement('button');
+   492→      b.type = 'button';
+   493→      b.className = 'c-dot-btn' + (a.id === state.accent ? ' on' : '');
+   494→      b.setAttribute('role', 'radio');
+   495→      b.setAttribute('aria-checked', String(a.id === state.accent));
+   496→      b.title = a.label;
+   497→      b.setAttribute('aria-label', a.label + ' accent');
+   498→      b.innerHTML = '<i style="background:' + (a.hex || findTpl(state.templateId).btn) + '"></i>';
+   499→      b.addEventListener('click', function () {
+   500→        state.accent = a.id;
+   501→        saveNow(true);
+   502→        buildColorDots(); render();
+   503→      });
+   504→      wrap.appendChild(b);
+   505→    });
+   506→  }
+   507→
+   508→  function buildShapeRow() {
+   509→    var wrap = document.getElementById('shape-row');
+   510→    if (!wrap) return;
+   511→    wrap.innerHTML = '';
+   512→    SHAPES.forEach(function (sh) {
+   513→      var b = document.createElement('button');
+   514→      b.type = 'button';
+   515→      b.className = 'shape-btn' + (sh.id === state.btnShape ? ' on' : '');
+   516→      b.setAttribute('role', 'radio');
+   517→      b.setAttribute('aria-checked', String(sh.id === state.btnShape));
+   518→      b.innerHTML = '<i style="border-radius:' + sh.radius + '"></i><span>' + sh.label + '</span>';
+   519→      b.addEventListener('click', function () {
+   520→        state.btnShape = sh.id;
+   521→        saveNow(true);
+   522→        buildShapeRow(); render();
+   523→      });
+   524→      wrap.appendChild(b);
+   525→    });
+   526→  }
+   527→
+   528→  /* =====================================================================
+   529→     CANVAS — the full event website preview
+   530→     ===================================================================== */
+   531→
+   532→  function pvNavHtml() {
+   533→    var links = [];
+   534→    if (state.sections.story.on) links.push(['pv-sec-story', state.sections.story.title || 'Our story']);
+   535→    if (state.sections.schedule.on) links.push(['pv-sec-schedule', state.sections.schedule.title || 'The day']);
+   536→    if (state.sections.rsvp.on) links.push(['pv-sec-rsvp', 'RSVP']);
+   537→    var r = links.map(function (l) {
+   538→      return '<button type="button" class="pv-nav-link" data-goto="' + l[0] + '">' + esc(l[1]) + '</button>';
+   539→    }).join('');
+   540→    return '' +
+   541→      '<div class="pv-nav">' +
+   542→        '<span class="pv-brand">' + esc(state.nameA) + ' <i>&middot;</i> ' + esc(state.nameB) + '</span>' +
+   543→        '<span class="pv-nav-links">' + r + '</span>' +
+   544→      '</div>';
+   545→  }
+   546→
+   547→  function pvHeroHtml() {
+   548→    var s = state.sections.hero;
+   549→    return '' +
+   550→      '<section class="pv-hero" id="pv-sec-hero">' +
+   551→        '<p class="pv-kicker">' + esc(s.kicker) + '</p>' +
+   552→        '<h1 class="pv-names">' + esc(state.nameA) + ' <span class="pv-amp">&amp;</span> ' + esc(state.nameB) + '</h1>' +
+   553→        '<p class="pv-tagline">' + esc(s.tagline) + '</p>' +
+   554→        '<span class="pv-rule"></span>' +
+   555→        '<p class="pv-date">' + esc(fmtDateLong()) + '</p>' +
+   556→        '<p class="pv-loc">' + esc(state.venue) + ' &middot; ' + esc(state.city) + '</p>' +
+   557→        '<span class="pv-cue" aria-hidden="true">&#8964;</span>' +
+   558→      '</section>';
+   559→  }
+   560→
+   561→  function pvCountdownHtml() {
+   562→    var s = state.sections.countdown;
+   563→    return '' +
+   564→      '<section class="pv-count" id="pv-sec-countdown">' +
+   565→        '<p class="pv-count-label">' + esc(s.label) + '</p>' +
+   566→        '<div class="pv-count-grid" data-countdown>' +
+   567→          '<span class="pv-cb"><b data-cd="d">0</b><i>Days</i></span>' +
+   568→          '<span class="pv-cb"><b data-cd="h">0</b><i>Hours</i></span>' +
+   569→          '<span class="pv-cb"><b data-cd="m">0</b><i>Minutes</i></span>' +
+   570→          '<span class="pv-cb"><b data-cd="s">0</b><i>Seconds</i></span>' +
+   571→        '</div>' +
+   572→      '</section>';
+   573→  }
+   574→
+   575→  function pvSimpleHtml(id, title, text, alt) {
+   576→    return '' +
+   577→      '<section class="pv-sec' + (alt ? ' pv-alt' : '') + '" id="pv-sec-' + id + '">' +
+   578→        '<h2 class="pv-title">' + esc(title) + '</h2>' +
+   579→        '<p class="pv-text">' + esc(text) + '</p>' +
+   580→      '</section>';
+   581→  }
+   582→
+   583→  function pvDetailsHtml() {
+   584→    var s = state.sections.details;
+   585→    var cards = '' +
+   586→      '<div class="pv-card"><b>When</b><span>' + esc(fmtDateShort()) + '</span></div>' +
+   587→      '<div class="pv-card"><b>Ceremony</b><span>' + esc(s.time || '4:00 PM') + '</span></div>' +
+   588→      '<div class="pv-card"><b>Where</b><span>' + esc(state.venue) + '<i>' + esc(s.address) + '</i><i>' + esc(state.city) + '</i></span></div>' +
+   589→      (s.dressCode ? '<div class="pv-card"><b>Dress code</b><span>' + esc(s.dressCode) + '</span></div>' : '');
+   590→    return '' +
+   591→      '<section class="pv-sec" id="pv-sec-details">' +
+   592→        '<h2 class="pv-title">When &amp; where</h2>' +
+   593→        '<div class="pv-cards">' + cards + '</div>' +
+   594→      '</section>';
+   595→  }
+   596→
+   597→  function pvScheduleHtml() {
+   598→    var s = state.sections.schedule;
+   599→    var rows = (s.items || []).map(function (it) {
+   600→      return '<div class="pv-row">' +
+   601→        '<b class="pv-row-time">' + esc(it.time) + '</b>' +
+   602→        '<span class="pv-row-dot"><i></i></span>' +
+   603→        '<span class="pv-row-body"><b>' + esc(it.title) + '</b><i>' + esc(it.desc) + '</i></span>' +
+   604→      '</div>';
+   605→    }).join('');
+   606→    return '' +
+   607→      '<section class="pv-sec pv-alt" id="pv-sec-schedule">' +
+   608→        '<h2 class="pv-title">' + esc(s.title) + '</h2>' +
+   609→        '<div class="pv-timeline">' + rows + '</div>' +
+   610→      '</section>';
+   611→  }
+   612→
+   613→  function pvGalleryHtml() {
+   614→    var s = state.sections.gallery;
+   615→    var accent = accentHex();
+   616→    var text = findTpl(state.templateId).text;
+   617→    var tiles = '';
+   618→    var mixes = [
+   619→      [accent, .28, text, .10], [text, .16, accent, .12], [text, .08, accent, .05],
+   620→      [accent, .14, text, .06], [text, .12, accent, .20], [accent, .22, text, .04]
+   621→    ];
+   622→    for (var i = 0; i < 6; i++) {
+   623→      var m = mixes[i];
+   624→      tiles += '<span class="pv-tile" style="background:linear-gradient(150deg,' +
+   625→        hexToRgba(m[0], m[1]) + ',' + hexToRgba(m[2], m[3]) + ')"></span>';
+   626→    }
+   627→    var note = s.note || ('Tag ' + (state.sections.footer.hashtag || '') + ' — we would love to see the day through your eyes.');
+   628→    return '' +
+   629→      '<section class="pv-sec" id="pv-sec-gallery">' +
+   630→        '<h2 class="pv-title">' + esc(s.title) + '</h2>' +
+   631→        '<div class="pv-gallery">' + tiles + '</div>' +
+   632→        '<p class="pv-note">' + esc(note) + '</p>' +
+   633→      '</section>';
+   634→  }
+   635→
+   636→  function pvRsvpHtml() {
+   637→    var s = state.sections.rsvp;
+   638→    var qs = '';
+   639→    if (s.qMenu) qs += '<span class="pv-q">Menu selection</span>';
+   640→    if (s.qPlus) qs += '<span class="pv-q">Plus-ones</span>';
+   641→    if (s.qSong) qs += '<span class="pv-q">Song requests</span>';
+   642→    return '' +
+   643→      '<section class="pv-sec" id="pv-sec-rsvp">' +
+   644→        '<div class="pv-rsvp-card">' +
+   645→          '<h2 class="pv-title">' + esc(s.title) + '</h2>' +
+   646→          (s.note ? '<p class="pv-note">' + esc(s.note) + (s.deadline ? ' &middot; reply by ' + esc(fmtDeadline(s.deadline)) : '') + '</p>' : '') +
+   647→          '<div class="pv-rsvp-form">' +
+   648→            '<div class="pv-rsvp-btns">' +
+   649→              '<button type="button" class="pv-btn pv-btn-primary" data-rsvp="yes">Joyfully accept</button>' +
+   650→              '<button type="button" class="pv-btn pv-btn-ghost" data-rsvp="no">Regretfully decline</button>' +
+   651→            '</div>' +
+   652→            (qs ? '<div class="pv-qs">' + qs + '</div>' : '') +
+   653→          '</div>' +
+   654→        '</div>' +
+   655→      '</section>';
+   656→  }
+   657→
+   658→  function pvFaqHtml() {
+   659→    var s = state.sections.faq;
+   660→    var items = (s.items || []).map(function (it, i) {
+   661→      return '<details class="pv-faq-i"' + (i === 0 ? ' open' : '') + '>' +
+   662→        '<summary>' + esc(it.q) + '</summary>' +
+   663→        '<p>' + esc(it.a) + '</p>' +
+   664→      '</details>';
+   665→    }).join('');
+   666→    return '' +
+   667→      '<section class="pv-sec pv-alt" id="pv-sec-faq">' +
+   668→        '<h2 class="pv-title">Good to know</h2>' +
+   669→        '<div class="pv-faq">' + items + '</div>' +
+   670→      '</section>';
+   671→  }
+   672→
+   673→  function pvContactHtml() {
+   674→    var s = state.sections.contact;
+   675→    var chips = '';
+   676→    if (s.email) chips += '<a class="pv-chip" href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a>';
+   677→    if (s.phone) chips += '<span class="pv-chip">' + esc(s.phone) + '</span>';
+   678→    return '' +
+   679→      '<section class="pv-sec" id="pv-sec-contact">' +
+   680→        '<h2 class="pv-title">Questions?</h2>' +
+   681→        '<p class="pv-note">We are one message away.</p>' +
+   682→        '<div class="pv-chips">' + chips + '</div>' +
+   683→      '</section>';
+   684→  }
+   685→
+   686→  function pvTravelHtml(id, title, text) {
+   687→    return '' +
+   688→      '<section class="pv-sec pv-alt" id="pv-sec-' + id + '">' +
+   689→        '<h2 class="pv-title">' + esc(title) + '</h2>' +
+   690→        '<p class="pv-text">' + esc(text) + '</p>' +
+   691→      '</section>';
+   692→  }
+   693→
+   694→  function pvFooterHtml() {
+   695→    var s = state.sections.footer;
+   696→    return '' +
+   697→      '<footer class="pv-footer" id="pv-sec-footer">' +
+   698→        '<b class="pv-foot-names">' + esc(state.nameA) + ' &amp; ' + esc(state.nameB) + '</b>' +
+   699→        (s.hashtag ? '<span class="pv-foot-tag">' + esc(s.hashtag) + '</span>' : '') +
+   700→        '<span class="pv-foot-made">Made with <i aria-hidden="true">&#10084;</i> Ever RSVP</span>' +
+   701→      '</footer>';
+   702→  }
+   703→
+   704→  function render() {
+   705→    var canvas = document.getElementById('canvas');
+   706→    if (!canvas) return;
+   707→
+   708→    var tpl = findTpl(state.templateId);
+   709→    var accent = accentHex();
+   710→    var wrap = document.querySelector('.ed-canvas-wrap');
+   711→    var scrollPos = wrap ? wrap.scrollTop : 0;
+   712→    if (pvTimer) { clearInterval(pvTimer); pvTimer = null; }
+   713→
+   714→    var root = document.createElement('div');
+   715→    root.className = 'pv fm-' + state.fontPair + ' bs-' + state.btnShape + ' sp-' + state.spacing + (tpl.dots ? ' pv-dots' : '');
+   716→    root.style.background = tpl.bg;
+   717→    root.style.color = tpl.text;
+   718→    root.style.setProperty('--pv-accent', accent);
+   719→    root.style.setProperty('--pv-btn-text', tpl.btnText);
+   720→    if (tpl.dots) {
+   721→      root.style.backgroundImage = 'radial-gradient(' + hexToRgba(tpl.text, 0.09) + ' 1px, transparent 1.4px)';
+   722→      root.style.backgroundSize = '16px 16px';
+   723→    }
+   724→
+   725→    var html = pvNavHtml() + pvHeroHtml();
+   726→    var alt = false;
+   727→    state.order.forEach(function (id) {
+   728→      var s = state.sections[id];
+   729→      if (!s.on || id === 'hero') return;
+   730→      switch (id) {
+   731→        case 'countdown': html += pvCountdownHtml(); break;
+   732→        case 'welcome':   html += pvSimpleHtml('welcome', s.title, s.text, (alt = !alt)); break;
+   733→        case 'story':     html += pvSimpleHtml('story', s.title, s.text, (alt = !alt)); break;
+   734→        case 'details':   html += pvDetailsHtml(); break;
+   735→        case 'schedule':  html += pvScheduleHtml(); break;
+   736→        case 'gallery':   html += pvGalleryHtml(); break;
+   737→        case 'rsvp':      html += pvRsvpHtml(); break;
+   738→        case 'travel':    html += pvTravelHtml('travel', s.title, s.text, (alt = !alt)); break;
+   739→        case 'registry':  html += pvTravelHtml('registry', s.title, s.text, (alt = !alt)); break;
+   740→        case 'faq':       html += pvFaqHtml(); break;
+   741→        case 'contact':   html += pvContactHtml(); break;
+   742→        case 'footer':    html += pvFooterHtml(); break;
+   743→      }
+   744→    });
+   745→    if (!/pv-footer/.test(html)) html += pvFooterHtml();
+   746→
+   747→    root.innerHTML = html;
+   748→    canvas.innerHTML = '';
+   749→    canvas.appendChild(root);
+   750→
+   751→    /* countdown ticker */
+   752→    var box = root.querySelector('[data-countdown]');
+   753→    if (box) {
+   754→      var set = function () {
+   755→        var diff = dateObj().getTime() - Date.now();
+   756→        var past = diff <= 0;
+   757→        if (past) diff = 0;
+   758→        var d = Math.floor(diff / 864e5);
+   759→        var h = Math.floor(diff % 864e5 / 36e5);
+   760→        var m = Math.floor(diff % 36e5 / 6e4);
+   761→        var sec = Math.floor(diff % 6e4 / 1e3);
+   762→        var q = function (sel, v) {
+   763→          var el2 = box.querySelector('[data-cd="' + sel + '"]');
+   764→          if (el2) el2.textContent = String(v);
+   765→        };
+   766→        q('d', d); q('h', h); q('m', m); q('s', sec);
+   767→        var lbl = root.querySelector('.pv-count-label');
+   768→        if (lbl && past && state.sections.countdown.on) lbl.textContent = 'Just married!';
+   769→      };
+   770→      set();
+   771→      pvTimer = setInterval(set, 1000);
+   772→    }
+   773→
+   774→    if (wrap) wrap.scrollTop = scrollPos;
+   775→  }
+   776→
+   777→  /* ---------- Canvas interactions (delegated; canvas node is persistent) ---------- */
+   778→
+   779→  function bindCanvas() {
+   780→    var canvas = document.getElementById('canvas');
+   781→    if (!canvas) return;
+   782→
+   783→    canvas.addEventListener('click', function (e) {
+   784→
+   785→      /* nav scroll */
+   786→      var go = e.target.closest('[data-goto]');
+   787→      if (go) {
+   788→        var target = document.getElementById(go.getAttribute('data-goto'));
+   789→        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+   790→        return;
+   791→      }
+   792→
+   793→      /* demo RSVP reply */
+   794→      var rsvp = e.target.closest('[data-rsvp]');
+   795→      if (rsvp) {
+   796→        var form = rsvp.closest('.pv-rsvp-form');
+   797→        if (form) {
+   798→          var yes = rsvp.getAttribute('data-rsvp') === 'yes';
+   799→          form.innerHTML = '<p class="pv-thanks">' +
+   800→            (yes ? 'Thank you — we cannot wait to celebrate with you!' : 'Thank you — you will be missed!') +
+   801→            ' <i>(Demo preview)</i></p>';
+   802→        }
+   803→      }
+   804→    });
+   805→  }
+   806→
+   807→  /* =====================================================================
+   808→     Tabs / device / save / publish
+   809→     ===================================================================== */
+   810→
+   811→  function bindTabs() {
+   812→    var t1 = document.getElementById('tab-content');
+   813→    var t2 = document.getElementById('tab-design');
+   814→    var p1 = document.getElementById('panel-content');
+   815→    var p2 = document.getElementById('panel-design');
+   816→    if (!t1 || !t2) return;
+   817→    function pick(which) {
+   818→      var c = which === 'content';
+   819→      t1.classList.toggle('on', c);  t2.classList.toggle('on', !c);
+   820→      t1.setAttribute('aria-selected', String(c)); t2.setAttribute('aria-selected', String(!c));
+   821→      if (p1) p1.hidden = !c;
+   822→      if (p2) p2.hidden = c;
+   823→    }
+   824→    t1.addEventListener('click', function () { pick('content'); });
+   825→    t2.addEventListener('click', function () { pick('design'); });
+   826→  }
+   827→
+   828→  function bindDevice() {
+   829→    var btns = document.querySelectorAll('.ed-dev-btn');
+   830→    Array.prototype.forEach.call(btns, function (btn) {
+   831→      btn.addEventListener('click', function () {
+   832→        Array.prototype.forEach.call(btns, function (b) {
+   833→          b.classList.remove('on'); b.setAttribute('aria-pressed', 'false');
+   834→        });
+   835→        btn.classList.add('on');
+   836→        btn.setAttribute('aria-pressed', 'true');
+   837→        var frame = document.getElementById('canvas-frame');
+   838→        if (frame) frame.classList.toggle('mobile', btn.getAttribute('data-dev') === 'mobile');
+   839→      });
+   840→    });
+   841→  }
+   842→
+   843→  /* ---------- Publish ---------- */
+   844→
+   845→  function initPublish() {
+   846→    var pubOverlay = document.getElementById('pub-overlay');
+   847→    var publishBtn = document.getElementById('publish-btn');
+   848→    if (!publishBtn || !pubOverlay) return;
+   849→
+   850→    publishBtn.addEventListener('click', function () {
+   851→      publishBtn.classList.add('loading');
+   852→      publishBtn.disabled = true;
+   853→
+   854→      setTimeout(function () {
+   855→        publishBtn.classList.remove('loading');
+   856→        publishBtn.disabled = false;
+   857→
+   858→        var flow = readJson(FLOW_KEY) || {};
+   859→        flow.published = true;
+   860→        flow.slug = slugify(state.nameA) + '-' + slugify(state.nameB);
+   861→        writeJson(FLOW_KEY, flow);
+   862→
+   863→        var badge = document.getElementById('ed-badge');
+   864→        if (badge) { badge.textContent = 'Published'; badge.classList.add('live'); }
+   865→
+   866→        var urlEl = document.getElementById('pub-url');
+   867→        if (urlEl) urlEl.textContent = flow.slug + '.ever-rsvp.com';
+   868→        pubOverlay.hidden = false;
+   869→        document.body.style.overflow = 'hidden';
+   870→      }, 1200);
+   871→    });
+   872→
+   873→    function close() {
+   874→      pubOverlay.hidden = true;
+   875→      document.body.style.overflow = '';
+   876→    }
+   877→    var closeBtn = document.getElementById('pub-close');
+   878→    if (closeBtn) closeBtn.addEventListener('click', close);
+   879→    pubOverlay.addEventListener('click', function (e) { if (e.target === pubOverlay) close(); });
+   880→
+   881→    var copyBtn = document.getElementById('copy-url');
+   882→    if (copyBtn) {
+   883→      copyBtn.addEventListener('click', function () {
+   884→        var text = document.getElementById('pub-url').textContent;
+   885→        function done() {
+   886→          copyBtn.textContent = 'Copied!';
+   887→          setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600);
+   888→        }
+   889→        if (navigator.clipboard && navigator.clipboard.writeText) {
+   890→          navigator.clipboard.writeText(text).then(done, done);
+   891→        } else { done(); }
+   892→      });
+   893→    }
+   894→  }
+   895→
+   896→  function initBadge() {
+   897→    var flow = readJson(FLOW_KEY) || {};
+   898→    var badge = document.getElementById('ed-badge');
+   899→    if (!badge) return;
+   900→    if (flow.published) {
+   901→      badge.textContent = 'Published';
+   902→      badge.classList.add('live');
+   903→    } else if (flow.paid) {
+   904→      badge.textContent = 'Order ' + (flow.order || 'paid');
+   905→    }
+   906→  }
+   907→
+   908→  /* ---------- Boot ---------- */
+   909→
+   910→  loadState();
+   911→
+   912→  /* reflect saved state in the static Basics inputs */
+   913→  (function fillBasics() {
+   914→    var map = { 'ed-nameA': 'nameA', 'ed-nameB': 'nameB', 'ed-date': 'date', 'ed-venue': 'venue', 'ed-city': 'city' };
+   915→    Object.keys(map).forEach(function (id) {
+   916→      var el = document.getElementById(id);
+   917→      if (el) el.value = state[map[id]] || '';
+   918→    });
+   919→  })();
+   920→
+   921→  var saveBtn = document.getElementById('save-btn');
+   922→  if (saveBtn) saveBtn.addEventListener('click', function () { saveNow(false); });
+   923→
+   924→  var sidebar = document.querySelector('.ed-sidebar');
+   925→  if (sidebar) {
+   926→    sidebar.addEventListener('input', onFieldInput);
+   927→    sidebar.addEventListener('change', onFieldInput);
+   928→    sidebar.addEventListener('click', onSidebarClick);
+   929→  }
+   930→
+   931→  var spacingSel = document.getElementById('ed-spacing');
+   932→  if (spacingSel) spacingSel.value = state.spacing;
+   933→
+   934→  buildContentPanel();
+   935→  buildTemplateChips();
+   936→  buildFontCards();
+   937→  buildColorDots();
+   938→  buildShapeRow();
+   939→  bindTabs();
+   940→  bindDevice();
+   941→  bindCanvas();
+   942→  initPublish();
+   943→  initBadge();
+   944→  render();
+   945→})();
+   946→
