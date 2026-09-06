@@ -1,113 +1,21 @@
 /* ==========================================================================
-   Ever RSVP — event website builder (step 3)
-   Left: every field of the reference format (hero, countdown & details,
-   story, gallery, events, venue, RSVP, contact) + full design controls.
-   Right: live preview rendered by templates.js.
+   Ever RSVP — event website builder (v4, dynamic sidebar)
+   The sidebar is generated 100% from the active layout's field specs
+   (docs/LAYOUT-SPEC.md): "Basics" from layout.basics and one accordion per
+   section in state.order from layout.sections — so every field of every
+   layout is editable with zero editor changes.
+   Right side: live preview rendered by templates.js (EVER_renderSite).
    ========================================================================== */
 (function () {
   'use strict';
 
+  if (!window.EVER_findLayout || !window.EVER_loadSiteState) return;
+
   var FLOW_KEY = 'ever-rsvp-flow';
-  var EVENT_KEY = 'ever-rsvp-event';
 
   /* ------------------------------------------------------------------ *
-   *  Section + field catalogue                                          *
+   *  Small helpers                                                      *
    * ------------------------------------------------------------------ */
-  var SECTIONS = [
-    { id: 'hero', label: 'Hero',
-      fields: [
-        { k: 'kicker1', label: 'Kicker line 1', type: 'text', ph: "You're invited to" },
-        { k: 'kicker2', label: 'Kicker line 2', type: 'text', ph: 'the wedding of' },
-        { k: 'photo',   label: 'Hero photo', type: 'photo' },
-        { k: 'btnText', label: 'Button text', type: 'text', ph: 'Enter invitation' }
-      ] },
-    { id: 'countdown', label: 'Countdown & details',
-      fields: [
-        { k: 'label', label: 'Countdown label', type: 'text', ph: 'Countdown to our big day' },
-        { k: 'quote', label: 'Quote under the timer', type: 'text', ph: 'Two hearts, one love…' }
-      ] },
-    { id: 'story', label: 'Our story',
-      fields: [ { k: 'title', label: 'Section title', type: 'text', ph: 'Our story' } ],
-      list: { k: 'items', label: 'Milestone', blank: function () {
-        return { photo: 'couple', title: 'New milestone', date: '', text: '' }; },
-        fields: [
-          { k: 'photo', label: 'Photo', type: 'photo' },
-          { k: 'title', label: 'Title', type: 'text', ph: 'First met' },
-          { k: 'date',  label: 'Date line', type: 'text', ph: '14 March 2021' },
-          { k: 'text',  label: 'Description', type: 'text', ph: 'A chance meeting…' }
-        ] } },
-    { id: 'gallery', label: 'Gallery',
-      fields: [
-        { k: 'title', label: 'Section title', type: 'text', ph: 'Gallery' },
-        { k: 'btn',   label: 'Button text (empty = hide)', type: 'text', ph: 'View more photos' }
-      ],
-      list: { k: 'items', label: 'Photo', blank: function () { return { src: 'decor' }; },
-        fields: [ { k: 'src', label: 'Photo', type: 'photo' } ] } },
-    { id: 'events', label: 'Events',
-      fields: [ { k: 'title', label: 'Section title', type: 'text', ph: 'Events' } ],
-      list: { k: 'items', label: 'Event', blank: function () {
-        return { icon: 'rings', name: 'New event', time: '', venue: '' }; },
-        fields: [
-          { k: 'icon',  label: 'Icon', type: 'icon' },
-          { k: 'name',  label: 'Event name', type: 'text', ph: 'Wedding ceremony' },
-          { k: 'time',  label: 'Time', type: 'text', ph: '05:00 PM - 06:30 PM' },
-          { k: 'venue', label: 'Venue / hall', type: 'text', ph: 'The Grand Palms · Main lawn' }
-        ] } },
-    { id: 'venue', label: 'Venue & map',
-      fields: [
-        { k: 'name',    label: 'Venue name', type: 'text', ph: 'The Grand Palms' },
-        { k: 'address', label: 'Full address', type: 'text', ph: 'No. 123, Palm Avenue…' },
-        { k: 'dirUrl',  label: 'Directions link (optional)', type: 'text', ph: 'https://maps.google.com/…' },
-        { k: 'mapUrl',  label: 'Map embed URL (optional)', type: 'text', ph: 'https://www.openstreetmap.org/…' }
-      ],
-      list: { k: 'items', label: 'Amenity', blank: function () { return { icon: 'heart', label: 'New amenity' }; },
-        fields: [
-          { k: 'icon',  label: 'Icon', type: 'icon' },
-          { k: 'label', label: 'Label', type: 'text', ph: 'Ample parking' }
-        ] } },
-    { id: 'rsvp', label: 'RSVP form',
-      fields: [
-        { k: 'title',       label: 'Heading', type: 'text', ph: 'Kindly RSVP' },
-        { k: 'note',        label: 'Note before date', type: 'text', ph: 'Please confirm your presence by' },
-        { k: 'deadline',    label: 'Reply deadline', type: 'date' },
-        { k: 'showPhone',   label: 'Ask for phone number', type: 'check' },
-        { k: 'guestsMax',   label: 'Max guests per reply', type: 'number', min: 1, max: 12 },
-        { k: 'showMsg',     label: 'Include message box', type: 'check' },
-        { k: 'submit',      label: 'Submit button text', type: 'text', ph: 'Submit RSVP' },
-        { k: 'success',     label: 'Success message', type: 'text', ph: 'Thank you!' }
-      ],
-      list: { k: 'meals', label: 'Meal option', blank: function () { return ''; },
-        fields: [ { k: '', label: 'Option', type: 'text', ph: 'Vegetarian' } ] } },
-    { id: 'contact', label: 'Contact & footer',
-      fields: [
-        { k: 'phone',     label: 'Phone', type: 'text', ph: '+91 98765 43210' },
-        { k: 'email',     label: 'E-mail', type: 'text', ph: 'hello@example.com' },
-        { k: 'whatsapp',  label: 'WhatsApp link text', type: 'text', ph: 'WhatsApp us' },
-        { k: 'thanks',    label: 'Thank-you line', type: 'text', ph: 'Thank you for being a part…' },
-        { k: 'copyright', label: 'Copyright extra (optional)', type: 'text', ph: '' },
-        { k: 'credit',    label: 'Credit line', type: 'text', ph: 'Made with ♥ for our big day' },
-        { k: 'social.wa',    label: 'WhatsApp icon', type: 'check' },
-        { k: 'social.fb',    label: 'Facebook icon', type: 'check' },
-        { k: 'social.ig',    label: 'Instagram icon', type: 'check' },
-        { k: 'social.share', label: 'Share icon', type: 'check' }
-      ] }
-  ];
-
-  var TEMPLATE_MAP = { /* old v1/v2 ids → new themes */
-    eucalyptus: 'sage', blush: 'blush', monogram: 'champagne', 'golden-hour': 'champagne',
-    midnight: 'navy', 'garden-party': 'sage', ocean: 'navy', terracotta: 'terracotta', ivory: 'champagne'
-  };
-  var FONT_MAP = { classic: 'corm', romantic: 'paris', modern: 'jost' };
-
-  /* ------------------------------------------------------------------ *
-   *  State                                                              *
-   * ------------------------------------------------------------------ */
-  function defaults() { return window.EVER_siteDefaults(); }
-
-  var state = defaults();
-  var ui = { open: {} };
-  var pvTimer = null;
-
   function readJson(key) {
     try { return JSON.parse(localStorage.getItem(key) || 'null'); }
     catch (e) { return null; }
@@ -117,67 +25,49 @@
   }
   function esc(s) { return window.EVER_esc(s); }
   function slugify(s) {
-    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'your-event';
-  }
-  function deepMerge(dst, src) {
-    if (!src || typeof src !== 'object') return dst;
-    for (var k in src) {
-      if (!Object.prototype.hasOwnProperty.call(src, k)) continue;
-      if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k]) && dst[k] && typeof dst[k] === 'object' && !Array.isArray(dst[k])) {
-        deepMerge(dst[k], src[k]);
-      } else if (src[k] !== undefined) {
-        dst[k] = src[k];
-      }
-    }
-    return dst;
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   }
 
-  function loadState() {
-    var d = defaults();
-    var flow = readJson(FLOW_KEY) || {};
-    if (flow.design) d.templateId = flow.design;
-    var saved = readJson(EVENT_KEY);
-    if (saved && saved.v === 3) {
-      deepMerge(d, saved);
-      if (saved.order && saved.order.length === d.order.length) d.order = saved.order.slice();
-    } else if (saved) {
-      /* v1/v2 migration — carry what still applies */
-      var id = TEMPLATE_MAP[saved.templateId] || saved.templateId;
-      if (id) d.templateId = id;
-      if (saved.fontPair && FONT_MAP[saved.fontPair]) d.nameFont = FONT_MAP[saved.fontPair];
-      ['accent', 'btnShape', 'spacing'].forEach(function (k) {
-        if (saved[k]) d[k] = saved[k];
-      });
-      ['nameA', 'nameB', 'date', 'venue', 'city'].forEach(function (k) {
-        if (saved[k]) d.basics[k] = saved[k];
-      });
-      if (saved.sections) {
-        if (saved.sections.schedule && saved.sections.schedule.items) {
-          d.sections.events.items = saved.sections.schedule.items.map(function (it) {
-            return { icon: 'rings', name: it.title || 'Event', time: it.time || '', venue: it.desc || '' };
-          });
-        }
-        if (saved.sections.rsvp && saved.sections.rsvp.deadline) {
-          d.sections.rsvp.deadline = saved.sections.rsvp.deadline;
-        }
-        if (saved.sections.contact) {
-          d.sections.contact.email = saved.sections.contact.email || d.sections.contact.email;
-          d.sections.contact.phone = saved.sections.contact.phone || d.sections.contact.phone;
-        }
-      }
+  /* dotted-path access: 'social.wa' -> sections.contact.social.wa */
+  function getVal(obj, path) {
+    return String(path || '').split('.').reduce(function (o, k) { return o ? o[k] : undefined; }, obj);
+  }
+  function setVal(obj, path, val) {
+    var ks = String(path || '').split('.');
+    var o = obj;
+    for (var i = 0; i < ks.length - 1; i++) {
+      if (!o[ks[i]] || typeof o[ks[i]] !== 'object') o[ks[i]] = {};
+      o = o[ks[i]];
     }
-    if (!window.EVER_findTemplate(d.templateId)) d.templateId = 'emerald';
-    state = d;
+    o[ks[ks.length - 1]] = val;
   }
 
+  var uid = 0;
+  function nextId() { uid += 1; return 'ed-f' + uid; }
+
+  /* ------------------------------------------------------------------ *
+   *  State                                                              *
+   * ------------------------------------------------------------------ */
+  var state = null;
+  var ui = { open: {} };
+  var pvTimer = null;
   var saveTimer = null;
+
+  function layout() { return window.EVER_findLayout(state.layoutId); }
+
+  /* Core loader: EVER_siteDefaults + v1/v2/v3 -> v4 migration + the
+     flow.design (checkout) override + template existence checks. */
+  function loadState() {
+    state = window.EVER_loadSiteState(readJson(FLOW_KEY) || {});
+  }
+
   function autosave() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(function () { writeJson(EVENT_KEY, state); }, 350);
+    saveTimer = setTimeout(function () { writeJson(window.EVER_EVENT_KEY, state); }, 350);
   }
   function saveNow() {
     clearTimeout(saveTimer);
-    writeJson(EVENT_KEY, state);
+    writeJson(window.EVER_EVENT_KEY, state);
   }
 
   /* ------------------------------------------------------------------ *
@@ -208,64 +98,81 @@
   }
 
   /* ------------------------------------------------------------------ *
-   *  Sidebar — Basics                                                   *
+   *  FieldSpec renderer — one control per spec                          *
+   *  types: text | textarea | date | number | check | select | photo |  *
+   *         icon | color                                                *
    * ------------------------------------------------------------------ */
-  function bindBasics() {
-    document.querySelectorAll('[data-sec="_basic"]').forEach(function (input) {
-      var k = input.getAttribute('data-k');
-      input.value = state.basics[k] || '';
-      input.addEventListener('input', function () {
-        state.basics[k] = input.value;
-        refresh();
-      });
-    });
-  }
+  var ICON_LABELS = {
+    rings: 'Rings', cocktail: 'Glasses', dinner: 'Dinner', music: 'Music',
+    calendar: 'Calendar', clock: 'Clock', pin: 'Pin', dress: 'Dress',
+    car: 'Parking', bell: 'Bell', chair: 'Accessible', snow: 'Cooling',
+    phone: 'Phone', mail: 'Mail', whatsapp: 'WhatsApp', facebook: 'Facebook',
+    instagram: 'Instagram', share: 'Share', heart: 'Heart', camera: 'Camera',
+    chevron: 'Chevron', gift: 'Gift', cake: 'Cake', game: 'Games', home: 'Home',
+    key: 'Key', cross: 'Cross', star: 'Star', moon: 'Moon', sun: 'Sun',
+    leaf: 'Leaf', baby: 'Baby', spark: 'Sparkler', glass: 'Glass'
+  };
 
-  /* ------------------------------------------------------------------ *
-   *  Field renderers                                                    *
-   * ------------------------------------------------------------------ */
   function fieldHtml(f, value, onInput) {
     var wrap = document.createElement('div');
     wrap.className = 'ed-field' + (f.type === 'check' ? ' ed-check' : '');
-    var id = 'f-' + Math.random().toString(36).slice(2, 8);
-    if (f.type === 'check') {
+    var type = f.type || 'text';
+    var id = nextId();
+
+    if (type === 'check') {
       wrap.innerHTML = '<input type="checkbox" id="' + id + '"' + (value ? ' checked' : '') + '/>' +
         '<label for="' + id + '">' + esc(f.label) + '</label>';
       wrap.querySelector('input').addEventListener('change', function (e) { onInput(e.target.checked); });
       return wrap;
     }
+
     var label = '<label for="' + id + '">' + esc(f.label) + '</label>';
-    var ctl;
-    if (f.type === 'date') {
-      ctl = '<input id="' + id + '" type="date" value="' + esc(value) + '"/>';
-    } else if (f.type === 'number') {
-      ctl = '<input id="' + id + '" type="number" min="' + (f.min || 1) + '" max="' + (f.max || 12) + '" value="' + esc(value) + '"/>';
-    } else if (f.type === 'photo') {
-      var opts = '<option value="">Choose photo…</option>';
+    var ctl = '';
+
+    if (type === 'textarea') {
+      ctl = '<textarea id="' + id + '" rows="3" placeholder="' + esc(f.ph || '') + '"></textarea>';
+    } else if (type === 'date') {
+      ctl = '<input id="' + id + '" type="date" value="' + esc(value || '') + '"/>';
+    } else if (type === 'number') {
+      var mn = typeof f.min === 'number' ? f.min : 1;
+      var mx = typeof f.max === 'number' ? f.max : 12;
+      ctl = '<input id="' + id + '" type="number" min="' + mn + '" max="' + mx + '" value="' + esc(value == null ? '' : value) + '"/>';
+    } else if (type === 'select') {
+      var sopts = '';
+      (f.options || []).forEach(function (o) {
+        if (!o || o.length < 2) return;
+        sopts += '<option value="' + esc(o[0]) + '"' + (String(value) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>';
+      });
+      ctl = '<select id="' + id + '">' + sopts + '</select>';
+    } else if (type === 'photo') {
+      var popts = '<option value="">Choose photo…</option>';
       window.EVER_PHOTOS.forEach(function (p) {
-        opts += '<option value="' + p.id + '"' + (value === p.id ? ' selected' : '') + '>' + esc(p.label) + '</option>';
+        popts += '<option value="' + p.id + '"' + (value === p.id ? ' selected' : '') + '>' + esc(p.label) + '</option>';
       });
       var isUrl = value && String(value).indexOf('/') > -1;
       ctl = '<div class="ed-photo-row">' +
-          '<select data-role="pick">' + opts + '</select>' +
+          '<select data-role="pick">' + popts + '</select>' +
           '<input type="text" data-role="url" placeholder="…or paste image URL" value="' + (isUrl ? esc(value) : '') + '"/>' +
         '</div>';
-    } else if (f.type === 'icon') {
-      var labels = { rings: 'Rings', cocktail: 'Glasses', dinner: 'Dinner', music: 'Music', calendar: 'Calendar',
-        clock: 'Clock', pin: 'Pin', dress: 'Dress', car: 'Parking', bell: 'Bell', chair: 'Accessible',
-        snow: 'Cooling', phone: 'Phone', mail: 'Mail', whatsapp: 'WhatsApp', facebook: 'Facebook',
-        instagram: 'Instagram', share: 'Share', heart: 'Heart', camera: 'Camera' };
+    } else if (type === 'icon') {
       var iopts = '';
       Object.keys(window.EVER_ICONS).forEach(function (k) {
-        iopts += '<option value="' + k + '"' + (value === k ? ' selected' : '') + '>' + (labels[k] || k) + '</option>';
+        iopts += '<option value="' + k + '"' + (value === k ? ' selected' : '') + '>' + (ICON_LABELS[k] || k) + '</option>';
       });
-      ctl = '<select data-role="icon">' + iopts + '</select>';
-    } else {
-      ctl = '<input id="' + id + '" type="text" placeholder="' + esc(f.ph || '') + '" value="' + esc(value) + '"/>';
+      ctl = '<select id="' + id + '">' + iopts + '</select>';
+    } else if (type === 'color') {
+      var hex = /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#c9a45c';
+      ctl = '<input id="' + id + '" type="color" value="' + esc(hex) + '"/>';
+    } else { /* text */
+      ctl = '<input id="' + id + '" type="text" placeholder="' + esc(f.ph || '') + '" value="' + esc(value == null ? '' : value) + '"/>';
     }
     wrap.innerHTML = label + ctl;
 
-    if (f.type === 'photo') {
+    if (type === 'textarea') {
+      var ta = wrap.querySelector('textarea');
+      ta.value = value == null ? '' : String(value);
+      ta.addEventListener('input', function () { onInput(ta.value); });
+    } else if (type === 'photo') {
       var pick = wrap.querySelector('[data-role="pick"]');
       var url = wrap.querySelector('[data-role="url"]');
       pick.addEventListener('change', function () {
@@ -273,17 +180,20 @@
         url.value = '';
         onInput(pick.value);
       });
-      url.addEventListener('input', function () {
-        onInput(url.value.trim());
-      });
-    } else if (f.type === 'icon') {
-      wrap.querySelector('select').addEventListener('change', function (e) { onInput(e.target.value); });
-    } else if (f.type !== 'check') {
+      url.addEventListener('input', function () { onInput(url.value.trim()); });
+    } else if (type === 'select' || type === 'icon') {
+      var sel = wrap.querySelector('select');
+      sel.addEventListener('change', function (e) { onInput(e.target.value); });
+    } else if (type === 'color') {
+      var col = wrap.querySelector('input');
+      col.addEventListener('input', function () { onInput(col.value); });
+    } else if (type !== 'check') {
       var txt = wrap.querySelector('input');
       txt.addEventListener('input', function (e) { onInput(e.target.value); });
       /* UX guard for link fields: flag anything that is not an http(s) URL.
          (The renderer also enforces this — see safeUrl() in templates.js.) */
-      if (/Url$/.test(f.k || '')) {
+      var lastKey = String(f.k || '').split('.').pop();
+      if (/Url$/.test(lastKey)) {
         txt.addEventListener('blur', function () {
           var v = txt.value.trim();
           var bad = v !== '' && !/^(https?:\/\/|#[a-z0-9_-]*)/i.test(v);
@@ -295,33 +205,58 @@
     return wrap;
   }
 
-  function getVal(obj, path) {
-    return path.split('.').reduce(function (o, k) { return o ? o[k] : undefined; }, obj);
-  }
-  function setVal(obj, path, val) {
-    var ks = path.split('.');
-    var o = obj;
-    for (var i = 0; i < ks.length - 1; i++) {
-      if (!o[ks[i]] || typeof o[ks[i]] !== 'object') o[ks[i]] = {};
-      o = o[ks[i]];
+  /* ------------------------------------------------------------------ *
+   *  Sidebar — Basics (from layout.basics FieldSpecs)                   *
+   * ------------------------------------------------------------------ */
+  function buildBasics() {
+    var host = document.getElementById('basics-body');
+    if (!host) return;
+    host.innerHTML = '';
+    var specs = layout().basics || [];
+
+    function bind(f) {
+      return fieldHtml(f, getVal(state.basics, f.k), function (v) {
+        setVal(state.basics, f.k, v);
+        refresh();
+      });
     }
-    o[ks[ks.length - 1]] = val;
+
+    var i = 0;
+    while (i < specs.length) {
+      var f = specs[i];
+      var n = specs[i + 1];
+      /* two short text fields look better side by side (nameA + nameB …) */
+      if ((f.type || 'text') === 'text' && n && (n.type || 'text') === 'text') {
+        var row = document.createElement('div');
+        row.className = 'ed-2col';
+        row.appendChild(bind(f));
+        row.appendChild(bind(n));
+        host.appendChild(row);
+        i += 2;
+      } else {
+        host.appendChild(bind(f));
+        i += 1;
+      }
+    }
   }
 
   /* ------------------------------------------------------------------ *
-   *  Sidebar — section groups                                           *
+   *  Sidebar — one accordion per section in state.order                 *
    * ------------------------------------------------------------------ */
   function buildGroups() {
     var host = document.getElementById('sec-groups');
     if (!host) return;
     host.innerHTML = '';
-    var order = state.order && state.order.length ? state.order : SECTIONS.map(function (s) { return s.id; });
+    var ly = layout();
+    var specs = ly.sections || [];
+    var order = (state.order && state.order.length) ? state.order : window.EVER_layoutOrder(ly);
 
     order.forEach(function (sid) {
       var meta = null;
-      SECTIONS.forEach(function (s) { if (s.id === sid) meta = s; });
+      specs.forEach(function (s) { if (s.id === sid) meta = s; });
       if (!meta) return;
       var sec = state.sections[sid];
+      if (!sec || typeof sec !== 'object') sec = state.sections[sid] = { on: true };
 
       var det = document.createElement('details');
       det.className = 'ed-group' + (ui.open[sid] ? ' open' : '') + (sec.on ? '' : ' sec-off');
@@ -332,13 +267,13 @@
         '<span class="sec-tools">' +
           '<button type="button" data-tool="up" aria-label="Move ' + esc(meta.label) + ' up">&#8593;</button>' +
           '<button type="button" data-tool="down" aria-label="Move ' + esc(meta.label) + ' down">&#8595;</button>' +
-          '<button type="button" data-tool="eye" aria-label="Show or hide ' + esc(meta.label) + '" aria-pressed="' + sec.on + '">&#128065;</button>' +
+          '<button type="button" data-tool="eye" aria-label="Show or hide ' + esc(meta.label) + '" aria-pressed="' + !!sec.on + '">&#128065;</button>' +
         '</span>';
 
       var body = document.createElement('div');
       body.className = 'ed-body';
 
-      meta.fields.forEach(function (f) {
+      (meta.fields || []).forEach(function (f) {
         body.appendChild(fieldHtml(f, getVal(sec, f.k), function (v) {
           setVal(sec, f.k, v);
           refresh();
@@ -347,7 +282,8 @@
 
       if (meta.list) buildList(body, meta, sec);
 
-      /* tool buttons */
+      /* tool buttons — preventDefault+stopPropagation so the accordion
+         doesn't toggle when a tool is clicked */
       sum.querySelectorAll('[data-tool]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -381,6 +317,7 @@
   function buildList(body, meta, sec) {
     var cfg = meta.list;
     var arr = sec[cfg.k] = Array.isArray(sec[cfg.k]) ? sec[cfg.k] : [];
+    var blank = cfg.blank || function () { return {}; };
     var listBox = document.createElement('div');
     listBox.className = 'ed-list';
 
@@ -397,8 +334,8 @@
         '</span>';
       li.appendChild(head);
 
-      cfg.fields.forEach(function (f) {
-        var val = f.k ? (item[f.k] || '') : item;
+      (cfg.fields || []).forEach(function (f) {
+        var val = f.k ? (item[f.k] == null ? '' : item[f.k]) : item;
         li.appendChild(fieldHtml(f, val, function (v) {
           if (f.k) item[f.k] = v; else sec[cfg.k][idx] = v;
           refresh();
@@ -423,12 +360,20 @@
     add.className = 'ed-add';
     add.textContent = '+ Add ' + cfg.label.toLowerCase();
     add.addEventListener('click', function () {
-      arr.push(cfg.blank());
+      arr.push(blank());
       buildGroups();
       refresh();
     });
     listBox.appendChild(add);
     body.appendChild(listBox);
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Sidebar assembly                                                   *
+   * ------------------------------------------------------------------ */
+  function buildSidebar() {
+    buildBasics();
+    buildGroups();
   }
 
   /* ------------------------------------------------------------------ *
@@ -446,6 +391,48 @@
     ];
   }
 
+  /* Template switch. Same layout: keep every user edit (current behavior).
+     Different layout: rebuild content over the new layout's defaults —
+     universal fields and keys the NEW layout knows survive via deepMerge,
+     event-type-specific keys do not leak across (e.g. birthday `name`
+     would otherwise hijack the royal publish slug) — and the sidebar
+     rebuilds for the new field specs. */
+  var UNIVERSAL_BASICS = ['nameA', 'nameB', 'date', 'time', 'venue', 'city',
+    'address', 'dress', 'phone', 'email'];
+
+  function applyTemplate(t) {
+    var cur = window.EVER_findTemplate(state.templateId);
+    if (cur && cur.layout === t.layout && window.EVER_findLayout(t.layout || 'royal').id === state.layoutId) {
+      state.templateId = t.id;
+    } else {
+      var next = window.EVER_siteDefaults(t.id);
+      var nl = window.EVER_findLayout(t.layout || 'royal');
+      var keep = {};
+      (nl.basics || []).forEach(function (f) { keep[String(f.k).split('.')[0]] = true; });
+      UNIVERSAL_BASICS.forEach(function (k) { keep[k] = true; });
+      var bb = {};
+      var ob = state.basics || {};
+      for (var bk in ob) {
+        if (Object.prototype.hasOwnProperty.call(ob, bk) && keep[bk]) bb[bk] = ob[bk];
+      }
+      window.EVER_deepMerge(next.basics, bb);
+      var keepSec = state.sections || {};
+      for (var k in keepSec) {
+        if (next.sections[k]) window.EVER_deepMerge(next.sections[k], keepSec[k]);
+      }
+      /* design prefs are layout-independent user choices — carry them over */
+      ['nameFont', 'bodyFont', 'accent', 'btnShape', 'spacing'].forEach(function (p) {
+        if (state[p] !== undefined) next[p] = state[p];
+      });
+      next.templateId = t.id;
+      next.layoutId = window.EVER_findLayout(t.layout || 'royal').id;
+      state = next;
+    }
+    buildSidebar();
+    buildDesign();
+    refresh();
+  }
+
   function buildDesign() {
     /* template chips */
     var chips = document.getElementById('tpl-chips');
@@ -461,9 +448,8 @@
         (t.custom ? '<span class="chip-x" role="button" tabindex="0" aria-label="Edit or remove">&#9998;</span>' : '');
       chip.addEventListener('click', function (e) {
         if (e.target.closest('.chip-x')) return;
-        state.templateId = t.id;
-        buildDesign();
-        refresh();
+        if (state.templateId === t.id) return;
+        applyTemplate(t);
       });
       if (t.custom) {
         var x = chip.querySelector('.chip-x');
@@ -479,9 +465,7 @@
     newChip.setAttribute('data-open-designer', '');
     newChip.innerHTML = '<span class="tpl-swatch new">+</span> New design';
     newChip.__dsnOnSave = function (t) {
-      state.templateId = t.id;
-      buildDesign();
-      refresh();
+      applyTemplate(t);
     };
     chips.appendChild(newChip);
 
@@ -593,7 +577,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   *  Tabs / device / save / publish                                     *
+   *  Chrome: tabs / device / save / publish                             *
    * ------------------------------------------------------------------ */
   function bindChrome() {
     document.querySelectorAll('.ed-tab').forEach(function (tab) {
@@ -630,15 +614,14 @@
     document.getElementById('publish-btn').addEventListener('click', function () {
       saveNow();
       var flow = readJson(FLOW_KEY) || {};
-      var slug = slugify(state.basics.nameA + '-' + state.basics.nameB);
       flow.published = true;
-      flow.slug = slug;
+      flow.slug = publishSlug();
       writeJson(FLOW_KEY, flow);
       var badge = document.getElementById('ed-badge');
       badge.textContent = 'Published';
       badge.classList.add('published');
       var urlEl = document.getElementById('pub-url');
-      if (urlEl) urlEl.textContent = slug + '.ever-rsvp.com';
+      if (urlEl) urlEl.textContent = flow.slug + '.ever-rsvp.com';
       document.getElementById('pub-overlay').hidden = false;
       document.body.classList.add('modal-open');
     });
@@ -655,6 +638,20 @@
         else done();
       });
     }
+  }
+
+  /* Publish slug is layout-aware: every layout names its event differently
+     (wedding partners, birthday name, housewarming family, baptism child,
+     gala host …). The ONLY layout-specific fallback chain in this file. */
+  function publishSlug() {
+    var b = state.basics || {};
+    var pair = [b.nameA, b.nameB].filter(Boolean).join('-');
+    var candidates = [b.title, b.name, pair, b.family, b.child, b.host];
+    for (var i = 0; i < candidates.length; i++) {
+      var s = slugify(candidates[i]);
+      if (s) return s;
+    }
+    return 'your-event';
   }
 
   function toast(msg) {
@@ -682,8 +679,7 @@
    *  Boot                                                               *
    * ------------------------------------------------------------------ */
   loadState();
-  bindBasics();
-  buildGroups();
+  buildSidebar();
   buildDesign();
   bindChrome();
   updateBadge();

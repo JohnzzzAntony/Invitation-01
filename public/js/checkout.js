@@ -36,12 +36,31 @@
   }
   var tpl = findTpl(flow.design);
 
+  /* ---------- Order summary (v4: multi-layout mini + occasion badge) ---------- */
+  function renderMini(t) {
+    try {
+      if (window.EVER_renderSiteMini && window.EVER_layouts && window.EVER_layouts().length) {
+        return window.EVER_renderSiteMini(t, null, { short: true });
+      }
+    } catch (e) { /* fall through to the palette-only shell */ }
+    if (window.EVER_miniRoot) return window.EVER_miniRoot(t, null, t.layout || 'royal');
+    return document.createElement('div');
+  }
+
   var previewBox = document.getElementById('summary-preview');
-  if (previewBox && window.renderSiteMini) {
-    previewBox.appendChild(window.renderSiteMini(tpl, null, { short: true }));
+  if (previewBox) {
+    previewBox.innerHTML = '';
+    previewBox.appendChild(renderMini(tpl));
+    var evMeta = (window.EVER_EVENTS && window.EVER_EVENTS[tpl.event])
+      ? window.EVER_EVENTS[tpl.event].label : '';
+    var catMeta = tpl.category || 'Custom';
+    var metaLine = document.createElement('p');
+    metaLine.className = 'summary-design-meta';
+    metaLine.textContent = evMeta ? evMeta + ' \u00b7 ' + catMeta : catMeta;
+    previewBox.appendChild(metaLine);
   }
   var nameEl = document.getElementById('summary-design-name');
-  if (nameEl) nameEl.textContent = '“' + tpl.name + '” event website';
+  if (nameEl) nameEl.textContent = tpl.name;
 
   /* ---------- Input formatting ---------- */
   var cardInput = document.getElementById('pay-card');

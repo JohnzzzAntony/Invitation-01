@@ -1,0 +1,700 @@
+     1→     1→/* ==========================================================================
+     2→     2→   Ever RSVP — core engine v4: multi-layout template catalog
+     3→     3→   8 layouts (royal, bloom, fiesta, play, cinema, nest, lumen, noir) x
+     4→     4→   27 premium themes across 7 event types. Layouts live in js/layouts/*.js
+     5→     5→   and register themselves via EVER_registerLayout (see docs/LAYOUT-SPEC.md).
+     6→     6→   ========================================================================== */
+     7→     7→(function () {
+     8→     8→  'use strict';
+     9→     9→
+    10→    10→  /* ------------------------------------------------------------------ *
+    11→    11→   *  Icons (inline SVG, stroke = currentColor)                          *
+    12→    12→   * ------------------------------------------------------------------ */
+    13→    13→  var ICONS = {
+    14→    14→    rings:    '<svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="5.5"/><circle cx="15" cy="14" r="5.5"/><path d="M9 8.5 7.5 6h3L9 8.5zm6 0L13.5 6h3L15 8.5z"/></svg>',
+    15→    15→    cocktail: '<svg viewBox="0 0 24 24"><path d="M5 4h14l-7 8v7"/><path d="M8.5 12h7M9 20h6"/></svg>',
+    16→    16→    dinner:   '<svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 0 1 16 0"/><path d="M2.8 16h18.4M12 8V6.2M10.6 6.2h2.8"/></svg>',
+    17→    17→    music:    '<svg viewBox="0 0 24 24"><path d="M9 18.5V6l10-2v12.5"/><circle cx="6.8" cy="18.5" r="2.2"/><circle cx="16.8" cy="16.5" r="2.2"/></svg>',
+    18→    18→    calendar: '<svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>',
+    19→    19→    clock:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.5V12l3 2.2"/></svg>',
+    20→    20→    pin:      '<svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.4-6.5-10a6.5 6.5 0 0 1 13 0c0 4.6-6.5 10-6.5 10z"/><circle cx="12" cy="10.6" r="2.3"/></svg>',
+    21→    21→    dress:    '<svg viewBox="0 0 24 24"><path d="M9.5 3.5 12 6l2.5-2.5M9.5 3.5 8 8l1.6 1.2L8 20.5h8l-1.6-11.3L16 8l-1.5-4.5"/></svg>',
+    22→    22→    car:      '<svg viewBox="0 0 24 24"><path d="M5 13 6.6 8.2A1.6 1.6 0 0 1 8.1 7h7.8a1.6 1.6 0 0 1 1.5 1.2L19 13M5 13h14v5.4h-2.2M5 13v5.4h2.2M7.6 18.4h8.8"/><circle cx="7.8" cy="18.3" r="1.6"/><circle cx="16.2" cy="18.3" r="1.6"/></svg>',
+    23→    23→    bell:     '<svg viewBox="0 0 24 24"><path d="M4 17.5h16M5.5 17.5a6.5 6.5 0 0 1 13 0M12 11V9.2M12 6.6a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z"/></svg>',
+    24→    24→    chair:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="4.6" r="1.9"/><path d="M12 6.5v6M12 12.5H8.4a2 2 0 0 0-2 2V20M12 12.5h3.6a2 2 0 0 1 2 2V20M10 20v-3M14 20v-3"/></svg>',
+    25→    25→    snow:     '<svg viewBox="0 0 24 24"><path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2"/></svg>',
+    26→    26→    phone:    '<svg viewBox="0 0 24 24"><path d="M7.6 3.8 9.8 6a1.7 1.7 0 0 1 0 2.4l-1 1a12.8 12.8 0 0 0 5.8 5.8l1-1a1.7 1.7 0 0 1 2.4 0l2.2 2.2a1.7 1.7 0 0 1 0 2.4l-1.1 1.1c-1 1-2.6 1.3-3.9.7A22 22 0 0 1 5 10.8c-.6-1.3-.3-2.9.7-3.9l1-1a1.7 1.7 0 0 1 .9-2.1z"/></svg>',
+    27→    27→    mail:     '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>',
+    28→    28→    whatsapp: '<svg viewBox="0 0 24 24"><path d="M12 3.5a8.4 8.4 0 0 0-7.3 12.7L3.5 20.5l4.4-1.1A8.4 8.4 0 1 0 12 3.5z"/><path d="M9.3 8.4c.6-.2.8 0 1 .5l.5 1.1c.1.3 0 .6-.2.8l-.5.5a6.4 6.4 0 0 0 2.6 2.6l.5-.5c.2-.2.5-.3.8-.2l1.1.5c.5.2.7.4.5 1-.3.9-1.4 1.3-2.3 1A8.6 8.6 0 0 1 8.3 10.7c-.3-.9.1-2 1-2.3z"/></svg>',
+    29→    29→    facebook: '<svg viewBox="0 0 24 24"><path d="M14.5 8.5H16V5.8h-2c-2 0-3.2 1.3-3.2 3.3v1.7H9v2.6h1.8v6.8h2.7v-6.8h2.2l.4-2.6h-2.6V9.4c0-.6.3-.9 1-.9z"/></svg>',
+    30→    30→    instagram:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r="1" fill="currentColor" stroke="none"/></svg>',
+    31→    31→    share:    '<svg viewBox="0 0 24 24"><circle cx="6.5" cy="12" r="2.3"/><circle cx="17" cy="6.5" r="2.3"/><circle cx="17" cy="17.5" r="2.3"/><path d="m8.6 10.9 6.3-3.2M8.6 13.1l6.3 3.2"/></svg>',
+    32→    32→    heart:    '<svg viewBox="0 0 24 24"><path d="M12 20s-7.2-4.6-7.2-9.8A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.2 2.6C19.2 15.4 12 20 12 20z"/></svg>',
+    33→    33→    camera:   '<svg viewBox="0 0 24 24"><path d="M4 8.5h3l1.6-2.3h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.2"/></svg>',
+    34→    34→    chevron:  '<svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg>',
+    35→    35→    gift:     '<svg viewBox="0 0 24 24"><rect x="4" y="9.5" width="16" height="11" rx="1.5"/><path d="M3.5 6.5h17v3h-17zM12 6.5V20.5M12 6.5s-1-3.5-3.5-3.5a1.9 1.9 0 0 0 0 3.5zM12 6.5s1-3.5 3.5-3.5a1.9 1.9 0 0 1 0 3.5z"/></svg>',
+    36→    36→    cake:     '<svg viewBox="0 0 24 24"><path d="M4 20.5h16M5.5 20.5v-6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v6M9.5 12.5V10M14.5 12.5V10M12 12V9"/><path d="M12 7.2a1.4 1.4 0 1 1 0-2.8 1.4 1.4 0 0 1 0 2.8z"/></svg>',
+    37→    37→    game:     '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.3" fill="currentColor" stroke="none"/></svg>',
+    38→    38→    home:     '<svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v10h12V10M10 20v-6h4v6"/></svg>',
+    39→    39→    key:      '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="m11 11 9 9M17 17l2.2-2.2M14 14l2.2-2.2"/></svg>',
+    40→    40→    cross:    '<svg viewBox="0 0 24 24"><path d="M12 4v16M7.5 9h9"/></svg>',
+    41→    41→    star:     '<svg viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>',
+    42→    42→    moon:     '<svg viewBox="0 0 24 24"><path d="M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5z"/></svg>',
+    43→    43→    sun:      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></svg>',
+    44→    44→    leaf:     '<svg viewBox="0 0 24 24"><path d="M19 5c-8 0-13 4-13 11 0 1.5.3 2.6.7 3C8 13 11 10.5 15.5 9.5 11 12 8.2 15 7.2 19c.7.3 1.6.5 2.8.5 7 0 9-7.5 9-14.5z"/></svg>',
+    45→    45→    baby:     '<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6.5"/><path d="M9.6 9h.01M14.4 9h.01M9.8 12.4a3.2 3.2 0 0 0 4.4 0M12 16.5V21M9 21h6"/></svg>',
+    46→    46→    spark:    '<svg viewBox="0 0 24 24"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/></svg>',
+    47→    47→    glass:    '<svg viewBox="0 0 24 24"><path d="M8 3h8l-1 6a3 3 0 0 1-6 0zM12 12v8M8.5 20h7"/></svg>'
+    48→    48→  };
+    49→    49→
+    50→    50→  /* ------------------------------------------------------------------ *
+    51→    51→   *  Photo library (bundled, deployment-safe relative paths)            *
+    52→    52→   * ------------------------------------------------------------------ */
+    53→    53→  var PHOTOS = [
+    54→    54→    { id: 'couple',   src: 'assets/ws-couple.jpg',   label: 'Couple portrait' },
+    55→    55→    { id: 'cafe',     src: 'assets/ws-cafe.jpg',     label: 'First meeting' },
+    56→    56→    { id: 'proposal', src: 'assets/ws-proposal.jpg', label: 'The proposal' },
+    57→    57→    { id: 'rings',    src: 'assets/ws-rings.jpg',    label: 'The rings' },
+    58→    58→    { id: 'dance',    src: 'assets/ws-dance.jpg',    label: 'First dance' },
+    59→    59→    { id: 'decor',    src: 'assets/ws-decor.jpg',    label: 'Reception decor' },
+    60→    60→    { id: 'shoes',    src: 'assets/hero.jpg',        label: 'Bridal style' },
+    61→    61→    { id: 'band',     src: 'assets/cta-band.jpg',    label: 'Celebration' },
+    62→    62→    { id: 'balloons', src: 'assets/ev-balloons.jpg', label: 'Balloons & confetti' },
+    63→    63→    { id: 'neon',     src: 'assets/ev-neon.jpg',     label: 'Neon party' },
+    64→    64→    { id: 'glam',     src: 'assets/ev-glam.jpg',     label: 'Glam party table' },
+    65→    65→    { id: 'tropical', src: 'assets/ev-tropical.jpg', label: 'Tropical pool party' },
+    66→    66→    { id: 'anniv',    src: 'assets/ev-anniv.jpg',    label: 'Anniversary table' },
+    67→    67→    { id: 'silver',   src: 'assets/ev-silver.jpg',   label: 'Silver celebration' },
+    68→    68→    { id: 'home',     src: 'assets/ev-home.jpg',     label: 'New home porch' },
+    69→    69→    { id: 'cottage',  src: 'assets/ev-cottage.jpg',  label: 'Cottage garden' },
+    70→    70→    { id: 'baptism',  src: 'assets/ev-baptism.jpg',  label: 'Christening candles' },
+    71→    71→    { id: 'baby',     src: 'assets/ev-baby.jpg',     label: 'Baby shower' },
+    72→    72→    { id: 'gala',     src: 'assets/ev-gala.jpg',     label: 'Gala ballroom' },
+    73→    73→    { id: 'star',     src: 'assets/ev-star.jpg',     label: 'Star party' }
+    74→    74→  ];
+    75→    75→
+    76→    76→  /* ------------------------------------------------------------------ *
+    77→    77→   *  Event types                                                        *
+    78→    78→   * ------------------------------------------------------------------ */
+    79→    79→  var EVENTS = {
+    80→    80→    wedding:      { label: 'Wedding',              tagline: 'Ceremonies & receptions' },
+    81→    81→    birthday:     { label: 'Birthday',             tagline: 'Every milestone age' },
+    82→    82→    anniversary:  { label: 'Anniversary',          tagline: 'Renew & remember' },
+    83→    83→    housewarming: { label: 'Housewarming',         tagline: 'New address, open doors' },
+    84→    84→    baptism:      { label: 'Baptism & Christening',tagline: 'A blessed beginning' },
+    85→    85→    baby:         { label: 'Baby Shower & Kids',   tagline: 'Welcome little ones' },
+    86→    86→    gala:         { label: 'Gala & Evening',       tagline: 'Formal affairs' }
+    87→    87→  };
+    88→    88→
+    89→    89→  /* ------------------------------------------------------------------ *
+    90→    90→   *  Fonts                                                              *
+    91→    91→   * ------------------------------------------------------------------ */
+    92→    92→  var NAME_FONTS = {
+    93→    93→    vibes:  { label: 'Script',    cls: 'f-vibes' },
+    94→    94→    paris:  { label: 'Paris',     cls: 'f-paris' },
+    95→    95→    corm:   { label: 'Classic',   cls: 'f-corm' },
+    96→    96→    jost:   { label: 'Modern',    cls: 'f-jost' },
+    97→    97→    pfd:    { label: 'Editorial', cls: 'f-pfd' },
+    98→    98→    cinzel: { label: 'Grand',     cls: 'f-cinzel' },
+    99→    99→    play:   { label: 'Bubbly',    cls: 'f-play' },
+   100→   100→    baloo:  { label: 'Rounded',   cls: 'f-baloo' }
+   101→   101→  };
+   102→   102→  var BODY_FONTS = {
+   103→   103→    lato: { label: 'Lato',  cls: '' },
+   104→   104→    jost: { label: 'Jost',  cls: 'ws-body-jost' }
+   105→   105→  };
+   106→   106→
+   107→   107→  var CUSTOM_KEY = 'ever-rsvp-custom-tpl';
+   108→   108→  var EVENT_KEY  = 'ever-rsvp-event';
+   109→   109→
+   110→   110→  /* ------------------------------------------------------------------ *
+   111→   111→   *  Helpers                                                            *
+   112→   112→   * ------------------------------------------------------------------ */
+   113→   113→  function esc(s) {
+   114→   114→    return String(s == null ? '' : s)
+   115→   115→      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+   116→   116→  }
+   117→   117→  /* Security: only http(s) links and in-page anchors may be used in href/iframe
+   118→   118→     sources the owner can type into — blocks javascript:/data:/vbscript: URLs.  */
+   119→   119→  function safeUrl(u) {
+   120→   120→    var s = String(u || '').trim();
+   121→   121→    return /^(https:\/\/|http:\/\/|#[a-z0-9_-]*)/i.test(s) ? s : '';
+   122→   122→  }
+   123→   123→  function icon(name, cls) {
+   124→   124→    return '<span class="ws-ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true">' +
+   125→   125→      (ICONS[name] || ICONS.heart) + '</span>';
+   126→   126→  }
+   127→   127→  var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+   128→   128→  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+   129→   129→  function dateObj(iso) {
+   130→   130→    var d = new Date((iso || '') + 'T17:00:00');
+   131→   131→    return isNaN(d.getTime()) ? new Date('2026-11-24T17:00:00') : d;
+   132→   132→  }
+   133→   133→  function fmtHeroDate(iso) {
+   134→   134→    var d = dateObj(iso);
+   135→   135→    return d.getDate() + ' \u00b7 ' + MONTHS[d.getMonth()].toUpperCase() + ' \u00b7 ' + d.getFullYear();
+   136→   136→  }
+   137→   137→  function fmtLongDate(iso) {
+   138→   138→    var d = dateObj(iso);
+   139→   139→    return MONTHS[d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear();
+   140→   140→  }
+   141→   141→  function fmtWeekday(iso) {
+   142→   142→    return DAYS[dateObj(iso).getDay()];
+   143→   143→  }
+   144→   144→  function monogram(a, b) {
+   145→   145→    return (String(a || 'A').trim().charAt(0) + ' \u00b7 ' + String(b || 'R').trim().charAt(0)).toUpperCase();
+   146→   146→  }
+   147→   147→  function initials(s) {
+   148→   148→    return String(s || 'E').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase() || 'E';
+   149→   149→  }
+   150→   150→  function photoSrc(idOrUrl) {
+   151→   151→    if (!idOrUrl) return PHOTOS[0].src;
+   152→   152→    if (/^(https?:|data:|\/|assets\/)/.test(idOrUrl)) return idOrUrl;
+   153→   153→    for (var i = 0; i < PHOTOS.length; i++) if (PHOTOS[i].id === idOrUrl) return PHOTOS[i].src;
+   154→   154→    return PHOTOS[0].src;
+   155→   155→  }
+   156→   156→  function directionsUrl(address, city) {
+   157→   157→    return 'https://www.google.com/maps/search/?api=1&query=' +
+   158→   158→      encodeURIComponent(((address || '') + ' ' + (city || '')).trim());
+   159→   159→  }
+   160→   160→  function deepMerge(dst, src) {
+   161→   161→    if (!src || typeof src !== 'object') return dst;
+   162→   162→    for (var k in src) {
+   163→   163→      if (!Object.prototype.hasOwnProperty.call(src, k)) continue;
+   164→   164→      if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k]) && dst[k] && typeof dst[k] === 'object' && !Array.isArray(dst[k])) {
+   165→   165→        deepMerge(dst[k], src[k]);
+   166→   166→      } else if (src[k] !== undefined) {
+   167→   167→        dst[k] = src[k];
+   168→   168→      }
+   169→   169→    }
+   170→   170→    return dst;
+   171→   171→  }
+   172→   172→  function futureISO(monthsAhead, day) {
+   173→   173→    var d = new Date();
+   174→   174→    d.setDate(day || 24);
+   175→   175→    d.setMonth(d.getMonth() + (monthsAhead || 0));
+   176→   176→    var m = String(d.getMonth() + 1); if (m.length < 2) m = '0' + m;
+   177→   177→    var dd = String(d.getDate()); if (dd.length < 2) dd = '0' + dd;
+   178→   178→    return d.getFullYear() + '-' + m + '-' + dd;
+   179→   179→  }
+   180→   180→  function readJson(key) {
+   181→   181→    try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+   182→   182→    catch (e) { return null; }
+   183→   183→  }
+   184→   184→  function writeJson(key, val) {
+   185→   185→    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+   186→   186→  }
+   187→   187→
+   188→   188→  /* ------------------------------------------------------------------ *
+   189→   189→   *  Layout registry                                                    *
+   190→   190→   * ------------------------------------------------------------------ */
+   191→   191→  var LAYOUTS = [];
+   192→   192→  function registerLayout(def) {
+   193→   193→    if (!def || !def.id || !def.render) return;
+   194→   194→    def.sections = def.sections || [];
+   195→   195→    def.basics = def.basics || [];
+   196→   196→    LAYOUTS.push(def);
+   197→   197→  }
+   198→   198→  function layouts() { return LAYOUTS.slice(); }
+   199→   199→  function findLayout(id) {
+   200→   200→    for (var i = 0; i < LAYOUTS.length; i++) if (LAYOUTS[i].id === id) return LAYOUTS[i];
+   201→   201→    return LAYOUTS[0];
+   202→   202→  }
+   203→   203→  function layoutOrder(layout) {
+   204→   204→    return layout.sections.map(function (s) { return s.id; });
+   205→   205→  }
+   206→   206→
+   207→   207→  /* ------------------------------------------------------------------ *
+   208→   208→   *  Theme catalog — 27 designs across 8 layouts / 7 event types        *
+   209→   209→   * ------------------------------------------------------------------ */
+   210→   210→  var THEMES = [
+   211→   211→    /* ---- royal — Classic Wedding --------------------------------- */
+   212→   212→    { id: 'emerald', name: 'Emerald & Gold', event: 'wedding', layout: 'royal', category: 'Classic',
+   213→   213→      dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628', soft: '#efe7d2',
+   214→   214→      nameFont: 'vibes', ornament: 'floral',
+   215→   215→      content: { basics: { nameA: 'Ananya', nameB: 'Rohan' } } },
+   216→   216→    { id: 'maroon', name: 'Royal Maroon', event: 'wedding', layout: 'royal', category: 'Classic',
+   217→   217→      dark: '#47161f', gold: '#d4a95c', bg: '#faf5ec', ink: '#43302c', soft: '#f0e2d4',
+   218→   218→      nameFont: 'vibes', ornament: 'floral',
+   219→   219→      content: { basics: { nameA: 'Meera', nameB: 'Arjun' } } },
+   220→   220→    { id: 'blush', name: 'Blush Rose', event: 'wedding', layout: 'royal', category: 'Floral',
+   221→   221→      dark: '#5c3a40', gold: '#b98a8e', bg: '#faf3ef', ink: '#54423f', soft: '#f2e2dc',
+   222→   222→      nameFont: 'paris', ornament: 'floral',
+   223→   223→      content: { basics: { nameA: 'Sophie', nameB: 'James' } } },
+   224→   224→    { id: 'navy', name: 'Midnight Navy', event: 'wedding', layout: 'royal', category: 'Classic',
+   225→   225→      dark: '#1b2a41', gold: '#c8a96a', bg: '#f6f4ee', ink: '#39404d', soft: '#e4e2d8',
+   226→   226→      nameFont: 'corm', ornament: 'lines',
+   227→   227→      content: { basics: { nameA: 'Elena', nameB: 'Marco' } } },
+   228→   228→
+   229→   229→    /* ---- bloom — Garden & Floral Wedding -------------------------- */
+   230→   230→    { id: 'sage', name: 'Sage Garden', event: 'wedding', layout: 'bloom', category: 'Floral',
+   231→   231→      dark: '#3f5142', gold: '#9a7b4f', bg: '#f5f6f0', ink: '#3d4438', soft: '#e2e8da',
+   232→   232→      nameFont: 'corm', ornament: 'lines',
+   233→   233→      content: { basics: { nameA: 'Freya', nameB: 'Oliver' } } },
+   234→   234→    { id: 'champagne', name: 'Champagne Ivory', event: 'wedding', layout: 'bloom', category: 'Elegant',
+   235→   235→      dark: '#6b5d4a', gold: '#b0955c', bg: '#faf7f0', ink: '#4a4234', soft: '#efe6d4',
+   236→   236→      nameFont: 'corm', ornament: 'geo',
+   237→   237→      content: { basics: { nameA: 'Charlotte', nameB: 'Henry' } } },
+   238→   238→    { id: 'lavender', name: 'Lavender Mist', event: 'wedding', layout: 'bloom', category: 'Floral',
+   239→   239→      dark: '#443a63', gold: '#9a7bc9', bg: '#f7f4fa', ink: '#453e58', soft: '#e7e0f2',
+   240→   240→      nameFont: 'paris', ornament: 'geo',
+   241→   241→      content: { basics: { nameA: 'Isla', nameB: 'Noah' } } },
+   242→   242→    { id: 'marigold', name: 'Marigold Saffron', event: 'wedding', layout: 'bloom', category: 'Floral',
+   243→   243→      dark: '#7c3f10', gold: '#d99a2b', bg: '#fdf6e7', ink: '#5b3a17', soft: '#f7e7c6',
+   244→   244→      nameFont: 'vibes', ornament: 'floral',
+   245→   245→      content: { basics: { nameA: 'Priya', nameB: 'Dev' } } },
+   246→   246→
+   247→   247→    /* ---- fiesta — Birthday ---------------------------------------- */
+   248→   248→    { id: 'balloonpop', name: 'Balloon Pop', event: 'birthday', layout: 'fiesta', category: 'Playful',
+   249→   249→      dark: '#e0447c', gold: '#1f9e8e', bg: '#fff7f9', ink: '#4a2c3a', soft: '#ffe3ee',
+   250→   250→      nameFont: 'play', ornament: 'geo',
+   251→   251→      content: { basics: { name: 'Aarav', age: '7' } } },
+   252→   252→    { id: 'neon', name: 'Neon Eighteen', event: 'birthday', layout: 'fiesta', category: 'Glam',
+   253→   253→      dark: '#0d0a16', gold: '#ff4d8d', bg: '#141020', ink: '#f0ebff', soft: '#241c38',
+   254→   254→      nameFont: 'jost', ornament: 'geo',
+   255→   255→      content: { basics: { name: 'Zoe', age: '18' } } },
+   256→   256→    { id: 'glam', name: 'Golden Sixteen', event: 'birthday', layout: 'fiesta', category: 'Glam',
+   257→   257→      dark: '#2d2013', gold: '#d4a852', bg: '#fffaf3', ink: '#4a3a28', soft: '#f5e8d0',
+   258→   258→      nameFont: 'paris', ornament: 'geo',
+   259→   259→      content: { basics: { name: 'Isabella', age: '16' } } },
+   260→   260→    { id: 'tropical', name: 'Tropical Fiesta', event: 'birthday', layout: 'fiesta', category: 'Playful',
+   261→   261→      dark: '#1f5f5b', gold: '#ff7f5c', bg: '#fff8ef', ink: '#4f3826', soft: '#d8f0ea',
+   262→   262→      nameFont: 'play', ornament: 'geo',
+   263→   263→      content: { basics: { name: 'Maya', age: '30' } } },
+   264→   264→    { id: 'fifty', name: 'Golden Fifty', event: 'birthday', layout: 'fiesta', category: 'Elegant',
+   265→   265→      dark: '#33290f', gold: '#b98a2f', bg: '#fbf6ec', ink: '#4c412c', soft: '#f1e6c8',
+   266→   266→      nameFont: 'corm', ornament: 'lines',
+   267→   267→      content: { basics: { name: 'Robert', age: '50' } } },
+   268→   268→
+   269→   269→    /* ---- cinema — Anniversary ------------------------------------- */
+   270→   270→    { id: 'jubilee', name: 'Golden Jubilee', event: 'anniversary', layout: 'cinema', category: 'Elegant',
+   271→   271→      dark: '#2a2310', gold: '#c9a45c', bg: '#faf5ea', ink: '#453a26', soft: '#efe4c8',
+   272→   272→      nameFont: 'pfd', ornament: 'lines',
+   273→   273→      content: { basics: { nameA: 'Grace', nameB: 'Jonathan', years: '50' } } },
+   274→   274→    { id: 'silver', name: 'Silver Years', event: 'anniversary', layout: 'cinema', category: 'Elegant',
+   275→   275→      dark: '#232c36', gold: '#9fb0c0', bg: '#f6f8fa', ink: '#3a4450', soft: '#e2e8ee',
+   276→   276→      nameFont: 'pfd', ornament: 'lines',
+   277→   277→      content: { basics: { nameA: 'Helen', nameB: 'David', years: '25' } } },
+   278→   278→    { id: 'ruby', name: 'Ruby Romance', event: 'anniversary', layout: 'cinema', category: 'Classic',
+   279→   279→      dark: '#3c1420', gold: '#c23b52', bg: '#fbf3f2', ink: '#4c3036', soft: '#f2dcda',
+   280→   280→      nameFont: 'pfd', ornament: 'floral',
+   281→   281→      content: { basics: { nameA: 'Amara', nameB: 'Kwame', years: '40' } } },
+   282→   282→
+   283→   283→    /* ---- nest — Housewarming -------------------------------------- */
+   284→   284→    { id: 'newkeys', name: 'New Keys', event: 'housewarming', layout: 'nest', category: 'Modern',
+   285→   285→      dark: '#2f4a3e', gold: '#c98f4e', bg: '#f8f6f1', ink: '#3f3a30', soft: '#e8e2d4',
+   286→   286→      nameFont: 'corm', ornament: 'lines',
+   287→   287→      content: { basics: { family: 'The Bennetts' } } },
+   288→   288→    { id: 'cottage', name: 'Cottage Welcome', event: 'housewarming', layout: 'nest', category: 'Rustic',
+   289→   289→      dark: '#5c4632', gold: '#a4703f', bg: '#faf7ee', ink: '#4a4032', soft: '#ece2cc',
+   290→   290→      nameFont: 'corm', ornament: 'floral',
+   291→   291→      content: { basics: { family: 'The Hartleys' } } },
+   292→   292→    { id: 'hearth', name: 'Modern Hearth', event: 'housewarming', layout: 'nest', category: 'Minimal',
+   293→   293→      dark: '#1f1e1b', gold: '#b08b5e', bg: '#f7f6f4', ink: '#33312c', soft: '#e8e5de',
+   294→   294→      nameFont: 'jost', ornament: 'geo',
+   295→   295→      content: { basics: { family: 'The Moreaus' } } },
+   296→   296→
+   297→   297→    /* ---- lumen — Baptism & Christening ---------------------------- */
+   298→   298→    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'lumen', category: 'Soft',
+   299→   299→      dark: '#6f6851', gold: '#b0a583', bg: '#fbf9f4', ink: '#4c463a', soft: '#efe9da',
+   300→   300→      nameFont: 'paris', ornament: 'floral',
+   301→   301→      content: { basics: { child: 'Theodore' } } },
+   302→   302→    { id: 'sky', name: 'Sky of Grace', event: 'baptism', layout: 'lumen', category: 'Soft',
+   303→   303→      dark: '#39586e', gold: '#7fa8c9', bg: '#f4f8fb', ink: '#3a4a58', soft: '#dfeaf2',
+   304→   304→      nameFont: 'paris', ornament: 'lines',
+   305→   305→      content: { basics: { child: 'Lily' } } },
+   306→   306→    { id: 'ivorycross', name: 'Ivory & Gold Cross', event: 'baptism', layout: 'lumen', category: 'Classic',
+   307→   307→      dark: '#5c5140', gold: '#c2a05e', bg: '#fbf8f0', ink: '#4a4234', soft: '#efe7d2',
+   308→   308→      nameFont: 'corm', ornament: 'geo',
+   309→   309→      content: { basics: { child: 'Gabriel' } } },
+   310→   310→
+   311→   311→    /* ---- play — Baby Shower & Kids -------------------------------- */
+   312→   312→    { id: 'teddy', name: 'Teddy Hug', event: 'baby', layout: 'play', category: 'Soft',
+   313→   313→      dark: '#7a5c44', gold: '#c99a6e', bg: '#faf6ef', ink: '#4a4038', soft: '#efe4d2',
+   314→   314→      nameFont: 'play', ornament: 'floral',
+   315→   315→      content: { basics: { name: 'Bennett' } } },
+   316→   316→    { id: 'sunshine', name: 'Sunshine Sprinkle', event: 'baby', layout: 'play', category: 'Playful',
+   317→   317→      dark: '#d99a2b', gold: '#e8862e', bg: '#fffbea', ink: '#5c4a1f', soft: '#f9edcd',
+   318→   318→      nameFont: 'baloo', ornament: 'geo',
+   319→   319→      content: { basics: { name: 'Sunny' } } },
+   320→   320→    { id: 'star', name: 'Little Star', event: 'baby', layout: 'play', category: 'Playful',
+   321→   321→      dark: '#1e2a4a', gold: '#e3b23c', bg: '#f7f9fd', ink: '#39445c', soft: '#e4e9f5',
+   322→   322→      nameFont: 'baloo', ornament: 'geo',
+   323→   323→      content: { basics: { name: 'Aria' } } },
+   324→   324→
+   325→   325→    /* ---- noir — Gala & Evening ------------------------------------ */
+   326→   326→    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'noir', category: 'Elegant',
+   327→   327→      dark: '#0d0c11', gold: '#c9a45c', bg: '#15141a', ink: '#ece9e2', soft: '#232129',
+   328→   328→      nameFont: 'cinzel', ornament: 'lines',
+   329→   329→      content: { basics: { host: 'The Ashford Society' } } },
+   330→   330→    { id: 'velvet', name: 'Velvet Rope', event: 'gala', layout: 'noir', category: 'Classic',
+   331→   331→      dark: '#4a1420', gold: '#c9905c', bg: '#f9f4f4', ink: '#3e262c', soft: '#efdcd9',
+   332→   332→      nameFont: 'cinzel', ornament: 'geo',
+   333→   333→      content: { basics: { host: 'The Beaumont Committee' } } }
+   334→   334→  ];
+   335→   335→
+   336→   336→  /* ------------------------------------------------------------------ *
+   337→   337→   *  Templates: builtin + custom                                        *
+   338→   338→   * ------------------------------------------------------------------ */
+   339→   339→  function readCustom() {
+   340→   340→    try {
+   341→   341→      var arr = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]');
+   342→   342→      return Array.isArray(arr) ? arr : [];
+   343→   343→    } catch (e) { return []; }
+   344→   344→  }
+   345→   345→  function writeCustom(arr) {
+   346→   346→    try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(arr)); } catch (e) { /* ignore */ }
+   347→   347→  }
+   348→   348→  function saveCustomTemplate(t) {
+   349→   349→    var arr = readCustom();
+   350→   350→    t.id = t.id || ('custom-' + Date.now());
+   351→   351→    t.custom = true;
+   352→   352→    t.event = t.event || 'wedding';
+   353→   353→    t.layout = t.layout || 'royal';
+   354→   354→    t.category = t.category || 'Custom';
+   355→   355→    var found = false;
+   356→   356→    for (var i = 0; i < arr.length; i++) {
+   357→   357→      if (arr[i].id === t.id) { arr[i] = t; found = true; break; }
+   358→   358→    }
+   359→   359→    if (!found) arr.push(t);
+   360→   360→    writeCustom(arr);
+   361→   361→    return t;
+   362→   362→  }
+   363→   363→  function deleteCustomTemplate(id) {
+   364→   364→    writeCustom(readCustom().filter(function (t) { return t.id !== id; }));
+   365→   365→  }
+   366→   366→  function allTemplates() { return THEMES.concat(readCustom()); }
+   367→   367→  function findTemplate(id) {
+   368→   368→    var list = allTemplates();
+   369→   369→    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+   370→   370→    return list[0];
+   371→   371→  }
+   372→   372→  function templateExists(id) {
+   373→   373→    return THEMES.some(function (t) { return t.id === id; }) ||
+   374→   374→      readCustom().some(function (t) { return t.id === id; });
+   375→   375→  }
+   376→   376→
+   377→   377→  /* ------------------------------------------------------------------ *
+   378→   378→   *  Default site content for a template                                *
+   379→   379→   *  (layout defaults + template content overrides)                     *
+   380→   380→   * ------------------------------------------------------------------ */
+   381→   381→  function siteDefaults(templateId) {
+   382→   382→    var tpl = templateId ? findTemplate(templateId) : THEMES[0];
+   383→   383→    var layout = findLayout(tpl.layout || 'royal');
+   384→   384→    var dflt = layout.defaults ? layout.defaults() : { basics: {}, sections: {} };
+   385→   385→    var d = {
+   386→   386→      v: 4,
+   387→   387→      layoutId: layout.id,
+   388→   388→      templateId: tpl.id,
+   389→   389→      nameFont: '',            /* '' = follow the template */
+   390→   390→      bodyFont: 'lato',
+   391→   391→      accent: 'tpl',           /* 'tpl' or hex */
+   392→   392→      btnShape: 'soft',
+   393→   393→      spacing: 'normal',
+   394→   394→      basics: dflt.basics || {},
+   395→   395→      order: layoutOrder(layout),
+   396→   396→      sections: dflt.sections || {}
+   397→   397→    };
+   398→   398→    if (tpl.content) {
+   399→   399→      if (tpl.content.basics) deepMerge(d.basics, tpl.content.basics);
+   400→   400→      if (tpl.content.sections) {
+   401→   401→        for (var k in tpl.content.sections) {
+   402→   402→          if (!d.sections[k]) d.sections[k] = { on: true };
+   403→   403→          deepMerge(d.sections[k], tpl.content.sections[k]);
+   404→   404→        }
+   405→   405→      }
+   406→   406→    }
+   407→   407→    return d;
+   408→   408→  }
+   409→   409→
+   410→   410→  /* ------------------------------------------------------------------ *
+   411→   411→   *  State loader (editor) with v1/v2/v3 → v4 migration                 *
+   412→   412→   * ------------------------------------------------------------------ */
+   413→   413→  function loadSiteState(flow) {
+   414→   414→    flow = flow || {};
+   415→   415→    var saved = readJson(EVENT_KEY);
+   416→   416→    var wanted = flow.design || (saved && saved.templateId) || '';
+   417→   417→    if (wanted && !templateExists(wanted)) wanted = '';
+   418→   418→    var d = siteDefaults(wanted || undefined);
+   419→   419→
+   420→   420→    if (!saved || typeof saved !== 'object') return d;
+   421→   421→
+   422→   422→    /* theme-ish top-level fields carry over on every version */
+   423→   423→    ['nameFont', 'bodyFont', 'accent', 'btnShape', 'spacing'].forEach(function (k) {
+   424→   424→      if (saved[k] !== undefined && saved[k] !== null && saved[k] !== '') d[k] = saved[k];
+   425→   425→    });
+   426→   426→
+   427→   427→    var savedLayout = null;
+   428→   428→    if (saved.v === 4 && saved.layoutId && LAYOUTS.some(function (l) { return l.id === saved.layoutId; })) {
+   429→   429→      savedLayout = saved.layoutId;
+   430→   430→    } else if (saved.v === 3) {
+   431→   431→      savedLayout = 'royal'; /* v3 sites used the classic wedding format */
+   432→   432→    }
+   433→   433→
+   434→   434→    if (saved.v === 4) {
+   435→   435→      /* keep user edits; extra section keys are simply ignored by renderers */
+   436→   436→      deepMerge(d, saved);
+   437→   437→      if (saved.order && Array.isArray(saved.order) && saved.order.length) d.order = saved.order.slice();
+   438→   438→    } else if (saved.v === 3) {
+   439→   439→      if (saved.basics) deepMerge(d.basics, saved.basics);
+   440→   440→      if (saved.sections) {
+   441→   441→        for (var k in saved.sections) {
+   442→   442→          if (d.sections[k]) deepMerge(d.sections[k], saved.sections[k]);
+   443→   443→        }
+   444→   444→      }
+   445→   445→      if (Array.isArray(saved.order) && saved.order.length === d.order.length) d.order = saved.order.slice();
+   446→   446→    } else {
+   447→   447→      /* v1/v2 legacy: carry only universal bits */
+   448→   448→      var TMAP = { eucalyptus: 'sage', monogram: 'champagne', 'golden-hour': 'champagne',
+   449→   449→        midnight: 'navy', 'garden-party': 'sage', ocean: 'navy', ivory: 'champagne' };
+   450→   450→      if (saved.sections && saved.sections.rsvp && saved.sections.rsvp.deadline) {
+   451→   451→        d.sections.rsvp.deadline = saved.sections.rsvp.deadline;
+   452→   452→      }
+   453→   453→      if (saved.nameFont === 'classic') d.nameFont = 'corm';
+   454→   454→      if (saved.nameFont === 'romantic') d.nameFont = 'paris';
+   455→   455→      if (saved.nameFont === 'modern') d.nameFont = 'jost';
+   456→   456→      void TMAP;
+   457→   457→    }
+   458→   458→
+   459→   459→    /* the design picked in checkout wins, but keep edits when the layout matches */
+   460→   460→    if (flow.design && templateExists(flow.design) && flow.design !== d.templateId) {
+   461→   461→      var newTpl = findTemplate(flow.design);
+   462→   462→      if (newTpl.layout === d.layoutId) {
+   463→   463→        d.templateId = flow.design; /* keep user edits */
+   464→   464→      } else {
+   465→   465→        d = siteDefaults(flow.design); /* new event type → fresh sample content */
+   466→   466→      }
+   467→   467→    }
+   468→   468→    if (!templateExists(d.templateId)) d.templateId = THEMES[0].id;
+   469→   469→    var tpl = findTemplate(d.templateId);
+   470→   470→    if (!LAYOUTS.some(function (l) { return l.id === d.layoutId; }) || d.layoutId !== (tpl.layout || 'royal')) {
+   471→   471→      /* switching layouts keeps overlapping content keys via deepMerge below */
+   472→   472→      var keep = { basics: d.basics, sections: d.sections };
+   473→   473→      d = siteDefaults(d.templateId);
+   474→   474→      deepMerge(d.basics, keep.basics);
+   475→   475→      for (var sk in keep.sections) {
+   476→   476→        if (d.sections[sk]) deepMerge(d.sections[sk], keep.sections[sk]);
+   477→   477→      }
+   478→   478→    }
+   479→   479→    void savedLayout;
+   480→   480→    return d;
+   481→   481→  }
+   482→   482→
+   483→   483→  /* ------------------------------------------------------------------ *
+   484→   484→   *  Theme CSS variables + root elements                                *
+   485→   485→   * ------------------------------------------------------------------ */
+   486→   486→  function themeVars(tpl, data) {
+   487→   487→    var v = {
+   488→   488→      '--ws-dark': tpl.dark, '--ws-gold': tpl.gold,
+   489→   489→      '--ws-bg': tpl.bg, '--ws-ink': tpl.ink, '--ws-soft': tpl.soft
+   490→   490→    };
+   491→   491→    if (data && data.accent && data.accent !== 'tpl' && /^#?[0-9a-fA-F]{3,8}$/.test(data.accent)) {
+   492→   492→      v['--ws-gold'] = data.accent.charAt(0) === '#' ? data.accent : '#' + data.accent;
+   493→   493→    }
+   494→   494→    return v;
+   495→   495→  }
+   496→   496→  function applyVars(el, tpl, data) {
+   497→   497→    var v = themeVars(tpl, data);
+   498→   498→    for (var k in v) el.style.setProperty(k, v[k]);
+   499→   499→  }
+   500→   500→  function siteRoot(data, tpl, opts) {
+   501→   501→    opts = opts || {};
+   502→   502→    var layout = findLayout(data.layoutId || tpl.layout || 'royal');
+   503→   503→    var el = document.createElement('div');
+   504→   504→    el.className = 'ws ws-' + layout.id + ' ws-orn-' + (tpl.ornament || 'lines') + ' ' +
+   505→   505→      (BODY_FONTS[data.bodyFont] || BODY_FONTS.lato).cls +
+   506→   506→      ' ws-bs-' + (data.btnShape || 'soft') + ' ws-sp-' + (data.spacing || 'normal') +
+   507→   507→      (opts.interactive ? ' ws-live' : '');
+   508→   508→    applyVars(el, tpl, data);
+   509→   509→    return el;
+   510→   510→  }
+   511→   511→  function miniRoot(tpl, data, layoutId) {
+   512→   512→    var el = document.createElement('div');
+   513→   513→    el.className = 'wsm ws-' + (layoutId || tpl.layout || 'royal') + ' ws-orn-' + (tpl.ornament || 'lines');
+   514→   514→    el.setAttribute('aria-hidden', 'true');
+   515→   515→    applyVars(el, tpl, data);
+   516→   516→    return el;
+   517→   517→  }
+   518→   518→
+   519→   519→  /* ------------------------------------------------------------------ *
+   520→   520→   *  Shared partials used by layouts                                    *
+   521→   521→   * ------------------------------------------------------------------ */
+   522→   522→  function timerHtml(dateISO) {
+   523→   523→    return '<div class="ws-timer" data-ws-deadline="' + esc(dateISO) + 'T17:00:00" aria-label="Countdown timer">' +
+   524→   524→      '<span class="ws-tbox"><b data-u="d">00</b><i>Days</i></span>' +
+   525→   525→      '<span class="ws-tbox"><b data-u="h">00</b><i>Hours</i></span>' +
+   526→   526→      '<span class="ws-tbox"><b data-u="m">00</b><i>Minutes</i></span>' +
+   527→   527→      '<span class="ws-tbox"><b data-u="s">00</b><i>Seconds</i></span>' +
+   528→   528→    '</div>';
+   529→   529→  }
+   530→   530→  function rsvpFormHtml(r) {
+   531→   531→    var guests = '<option value="">Number of guests</option>';
+   532→   532→    for (var i = 1; i <= (parseInt(r.guestsMax, 10) || 6); i++) guests += '<option value="' + i + '">' + i + '</option>';
+   533→   533→    var meals = '<option value="">Meal preference</option>';
+   534→   534→    (r.meals || []).forEach(function (m) { meals += '<option>' + esc(m) + '</option>'; });
+   535→   535→    return '<form class="ws-rsvp-form" novalidate>' +
+   536→   536→      '<div class="ws-frow">' +
+   537→   537→        '<input type="text" name="name" placeholder="Your name" required/>' +
+   538→   538→        (r.showPhone ? '<input type="tel" name="phone" placeholder="Phone number"/>' : '') +
+   539→   539→      '</div>' +
+   540→   540→      '<div class="ws-frow">' +
+   541→   541→        '<select name="guests">' + guests + '</select>' +
+   542→   542→        '<select name="attend" required><option value="">Will you attend?</option><option>Joyfully accept</option><option>Regretfully decline</option></select>' +
+   543→   543→      '</div>' +
+   544→   544→      '<div class="ws-frow">' +
+   545→   545→        '<select name="meal">' + meals + '</select>' +
+   546→   546→      '</div>' +
+   547→   547→      (r.showMsg ? '<textarea name="msg" rows="3" placeholder="Your message (optional)"></textarea>' : '') +
+   548→   548→      '<button class="ws-btn ws-btn-dark ws-submit" type="submit">' + esc(r.submit || 'Submit RSVP') + ' ' + icon('heart') + '</button>' +
+   549→   549→    '</form>';
+   550→   550→  }
+   551→   551→  function mapIframe(url, title) {
+   552→   552→    var src = safeUrl(url);
+   553→   553→    return src
+   554→   554→      ? '<iframe class="ws-map" src="' + esc(src) + '" title="' + esc(title || 'Venue map') + '" loading="lazy" referrerpolicy="no-referrer"></iframe>'
+   555→   555→      : '<div class="ws-map ws-map-empty">' + icon('pin') + '<p>Map coming soon</p></div>';
+   556→   556→  }
+   557→   557→
+   558→   558→  /* ------------------------------------------------------------------ *
+   559→   559→   *  Renderers (dispatch to the layout)                                 *
+   560→   560→   * ------------------------------------------------------------------ */
+   561→   561→  function renderSite(data, opts) {
+   562→   562→    data = data || siteDefaults();
+   563→   563→    var tpl = findTemplate(data.templateId);
+   564→   564→    var layout = findLayout(data.layoutId || tpl.layout || 'royal');
+   565→   565→    return layout.render(data, tpl, opts || {});
+   566→   566→  }
+   567→   567→
+   568→   568→  function renderSiteMini(tpl, data, opts) {
+   569→   569→    opts = opts || {};
+   570→   570→    if (typeof tpl === 'string') tpl = findTemplate(tpl);
+   571→   571→    data = data || siteDefaults(tpl.id);
+   572→   572→    data.templateId = tpl.id;
+   573→   573→    var layout = findLayout(tpl.layout || data.layoutId || 'royal');
+   574→   574→    if (layout.mini) return layout.mini(data, tpl, opts);
+   575→   575→    return miniRoot(tpl, data, layout.id);
+   576→   576→  }
+   577→   577→
+   578→   578→  /* ------------------------------------------------------------------ *
+   579→   579→   *  Live behaviours: countdown + anchors + RSVP + scroll reveal        *
+   580→   580→   * ------------------------------------------------------------------ */
+   581→   581→  function tickCountdowns(root) {
+   582→   582→    var timers = (root || document).querySelectorAll('[data-ws-deadline]');
+   583→   583→    Array.prototype.forEach.call(timers, function (t) {
+   584→   584→      var end = new Date(t.getAttribute('data-ws-deadline')).getTime();
+   585→   585→      if (isNaN(end)) return;
+   586→   586→      var diff = Math.max(0, end - Date.now());
+   587→   587→      var d = Math.floor(diff / 864e5),
+   588→   588→          h = Math.floor(diff % 864e5 / 36e5),
+   589→   589→          m = Math.floor(diff % 36e5 / 6e4),
+   590→   590→          s = Math.floor(diff % 6e4 / 1e3);
+   591→   591→      var map = { d: d, h: h, m: m, s: s };
+   592→   592→      for (var u in map) {
+   593→   593→        var node = t.querySelector('[data-u="' + u + '"]');
+   594→   594→        if (node) node.textContent = String(map[u]).length < 2 ? '0' + map[u] : String(map[u]);
+   595→   595→      }
+   596→   596→    });
+   597→   597→  }
+   598→   598→
+   599→   599→  function bindSite(root) {
+   600→   600→    if (!root || root.__wsBound) return;
+   601→   601→    root.__wsBound = true;
+   602→   602→    /* gentle scroll-reveal for site sections (JS-added class: no-JS visitors
+   603→   603→       never see hidden content; honours prefers-reduced-motion) */
+   604→   604→    var reduceMotion = false;
+   605→   605→    try { reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* ignore */ }
+   606→   606→    if (!reduceMotion && 'IntersectionObserver' in window) {
+   607→   607→      var secs = root.querySelectorAll('.ws-sec, .ws-footer');
+   608→   608→      Array.prototype.forEach.call(secs, function (sec) { sec.classList.add('ws-anim'); });
+   609→   609→      var secIO = new IntersectionObserver(function (entries) {
+   610→   610→        entries.forEach(function (en) {
+   611→   611→          if (en.isIntersecting) { en.target.classList.add('ws-in'); secIO.unobserve(en.target); }
+   612→   612→        });
+   613→   613→      }, { threshold: 0.12 });
+   614→   614→      Array.prototype.forEach.call(secs, function (sec) { secIO.observe(sec); });
+   615→   615→    }
+   616→   616→    /* smooth anchor scrolling inside the preview */
+   617→   617→    root.addEventListener('click', function (e) {
+   618→   618→      var a = e.target.closest ? e.target.closest('[data-goto]') : null;
+   619→   619→      if (!a || !root.contains(a)) return;
+   620→   620→      e.preventDefault();
+   621→   621→      var target = root.querySelector('#ws-sec-' + a.getAttribute('data-goto'));
+   622→   622→      var wrap = root.closest('.ed-canvas-wrap') || document.getElementById('canvas-frame') || root.parentElement;
+   623→   623→      if (target && wrap) {
+   624→   624→        var top = target.getBoundingClientRect().top - wrap.getBoundingClientRect().top + wrap.scrollTop - 10;
+   625→   625→        wrap.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+   626→   626→      }
+   627→   627→    });
+   628→   628→    /* RSVP demo submit */
+   629→   629→    root.addEventListener('submit', function (e) {
+   630→   630→      var form = e.target.closest ? e.target.closest('.ws-rsvp-form') : null;
+   631→   631→      if (!form || !root.contains(form)) return;
+   632→   632→      e.preventDefault();
+   633→   633→      var name = form.querySelector('[name="name"]');
+   634→   634→      var attend = form.querySelector('[name="attend"]');
+   635→   635→      if (name && !name.value.trim()) { name.classList.add('ws-err'); name.focus(); return; }
+   636→   636→      if (attend && !attend.value) { attend.classList.add('ws-err'); attend.focus(); return; }
+   637→   637→      var doneMsg = root.__wsData && root.__wsData.sections && root.__wsData.sections.rsvp &&
+   638→   638→                    root.__wsData.sections.rsvp.success;
+   639→   639→      var box = document.createElement('div');
+   640→   640→      box.className = 'ws-rsvp-done';
+   641→   641→      box.innerHTML = '<span class="ws-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span>' +
+   642→   642→        '<b>RSVP received</b><p>' + esc(doneMsg || 'Thank you!') + '</p>';
+   643→   643→      form.hidden = true;
+   644→   644→      (form.parentElement || form.closest('.ws-sec') || root).appendChild(box);
+   645→   645→    });
+   646→   646→    root.addEventListener('input', function (e) {
+   647→   647→      if (e.target.classList) e.target.classList.remove('ws-err');
+   648→   648→    }, true);
+   649→   649→  }
+   650→   650→
+   651→   651→  /* ------------------------------------------------------------------ */
+   652→   652→  window.EVER_EVENTS = EVENTS;
+   653→   653→  window.EVER_THEMES = THEMES;
+   654→   654→  window.EVER_ICONS = ICONS;
+   655→   655→  window.EVER_PHOTOS = PHOTOS;
+   656→   656→  window.EVER_NAME_FONTS = NAME_FONTS;
+   657→   657→  window.EVER_BODY_FONTS = BODY_FONTS;
+   658→   658→  window.EVER_registerLayout = registerLayout;
+   659→   659→  window.EVER_layouts = layouts;
+   660→   660→  window.EVER_findLayout = findLayout;
+   661→   661→  window.EVER_layoutOrder = layoutOrder;
+   662→   662→  window.EVER_siteDefaults = siteDefaults;
+   663→   663→  window.EVER_loadSiteState = loadSiteState;
+   664→   664→  window.EVER_renderSite = renderSite;
+   665→   665→  window.EVER_renderSiteMini = renderSiteMini;
+   666→   666→  window.EVER_allTemplates = allTemplates;
+   667→   667→  window.EVER_findTemplate = findTemplate;
+   668→   668→  window.EVER_templateExists = templateExists;
+   669→   669→  window.EVER_saveCustomTemplate = saveCustomTemplate;
+   670→   670→  window.EVER_deleteCustomTemplate = deleteCustomTemplate;
+   671→   671→  window.EVER_readCustomTemplates = readCustom;
+   672→   672→  window.EVER_tickCountdowns = tickCountdowns;
+   673→   673→  window.EVER_bindSite = bindSite;
+   674→   674→  window.EVER_esc = esc;
+   675→   675→  window.EVER_safeUrl = safeUrl;
+   676→   676→  window.EVER_photoSrc = photoSrc;
+   677→   677→  window.EVER_fmtHeroDate = fmtHeroDate;
+   678→   678→  window.EVER_fmtLongDate = fmtLongDate;
+   679→   679→  window.EVER_fmtWeekday = fmtWeekday;
+   680→   680→  window.EVER_dateObj = dateObj;
+   681→   681→  window.EVER_monogram = monogram;
+   682→   682→  window.EVER_initials = initials;
+   683→   683→  window.EVER_directionsUrl = directionsUrl;
+   684→   684→  window.EVER_applyVars = applyVars;
+   685→   685→  window.EVER_siteRoot = siteRoot;
+   686→   686→  window.EVER_miniRoot = miniRoot;
+   687→   687→  window.EVER_timerHtml = timerHtml;
+   688→   688→  window.EVER_rsvpFormHtml = rsvpFormHtml;
+   689→   689→  window.EVER_mapIframe = mapIframe;
+   690→   690→  window.EVER_icon = icon;
+   691→   691→  window.EVER_deepMerge = deepMerge;
+   692→   692→  window.EVER_futureISO = futureISO;
+   693→   693→  window.EVER_readJson = readJson;
+   694→   694→  window.EVER_writeJson = writeJson;
+   695→   695→  window.EVER_EVENT_KEY = EVENT_KEY;
+   696→   696→  /* backwards-compatible aliases */
+   697→   697→  window.EVER_TEMPLATES = THEMES;
+   698→   698→  window.renderSiteMini = function (tpl, data) { return renderSiteMini(tpl, data); };
+   699→   699→})();
+   700→   700→

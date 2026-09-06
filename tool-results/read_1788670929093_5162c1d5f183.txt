@@ -1,0 +1,716 @@
+     1→     1→<!DOCTYPE html>
+     2→     2→<html lang="en">
+     3→     3→<head>
+     4→     4→  <meta charset="UTF-8" />
+     5→     5→  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     6→     6→  <title>Wedding Website Builder with Online RSVP | Ever RSVP</title>
+     7→     7→  <meta name="description" content="Create an elegant wedding website with online RSVP in minutes — 14 designer templates, unlimited guests, custom questions. $25 once, no subscription." />
+     8→     8→  <meta name="keywords" content="wedding website builder, online RSVP, wedding RSVP tracker, event website templates, online invitation, RSVP website, wedding page" />
+     9→     9→  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    10→    10→  <link rel="canonical" href="https://everrsvp.com/" />
+    11→    11→  <meta name="theme-color" content="#1798b8" />
+    12→    12→  <meta name="author" content="Ever RSVP" />
+    13→    13→
+    14→    14→  <!-- Open Graph (Facebook / WhatsApp / LinkedIn preview) -->
+    15→    15→  <meta property="og:type" content="website" />
+    16→    16→  <meta property="og:site_name" content="Ever RSVP" />
+    17→    17→  <meta property="og:url" content="https://everrsvp.com/" />
+    18→    18→  <meta property="og:title" content="Ever RSVP — Beautiful Wedding Websites with Online RSVP" />
+    19→    19→  <meta property="og:description" content="14 designer templates, unlimited guests, one simple $25 payment. Your guests reply in under a minute — no app, no sign-up." />
+    20→    20→  <meta property="og:image" content="https://everrsvp.com/assets/og-cover.jpg" />
+    21→    21→  <meta property="og:image:width" content="1440" />
+    22→    22→  <meta property="og:image:height" content="736" />
+    23→    23→  <meta property="og:locale" content="en_US" />
+    24→    24→
+    25→    25→  <!-- Twitter card -->
+    26→    26→  <meta name="twitter:card" content="summary_large_image" />
+    27→    27→  <meta name="twitter:title" content="Ever RSVP — Beautiful Wedding Websites with Online RSVP" />
+    28→    28→  <meta name="twitter:description" content="14 designer templates, unlimited guests, one simple $25 payment." />
+    29→    29→  <meta name="twitter:image" content="https://everrsvp.com/assets/og-cover.jpg" />
+    30→    30→
+    31→    31→  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231798b8'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
+    32→    32→  <link rel="preconnect" href="https://fonts.googleapis.com" />
+    33→    33→  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    34→    34→  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+    35→    35→  <link rel="stylesheet" href="styles.css" />
+    36→    36→
+    37→    37→  <!-- Structured data: Organization + WebSite -->
+    38→    38→  <script type="application/ld+json">
+    39→    39→  {
+    40→    40→    "@context": "https://schema.org",
+    41→    41→    "@graph": [
+    42→    42→      {
+    43→    43→        "@type": "Organization",
+    44→    44→        "@id": "https://everrsvp.com/#org",
+    45→    45→        "name": "Ever RSVP",
+    46→    46→        "url": "https://everrsvp.com/",
+    47→    47→        "logo": "https://everrsvp.com/assets/og-cover.jpg",
+    48→    48→        "description": "Beautiful event websites with effortless online RSVPs — one simple payment, no subscription.",
+    49→    49→        "sameAs": []
+    50→    50→      },
+    51→    51→      {
+    52→    52→        "@type": "WebSite",
+    53→    53→        "@id": "https://everrsvp.com/#site",
+    54→    54→        "url": "https://everrsvp.com/",
+    55→    55→        "name": "Ever RSVP",
+    56→    56→        "publisher": { "@id": "https://everrsvp.com/#org" },
+    57→    57→        "inLanguage": "en"
+    58→    58→      },
+    59→    59→      {
+    60→    60→        "@type": "Product",
+    61→    61→        "name": "Ever RSVP — Event Website & Online RSVP",
+    62→    62→        "description": "A beautiful event website with online RSVP: designer templates, unlimited guests, custom questions, guest dashboard and CSV export.",
+    63→    63→        "brand": { "@id": "https://everrsvp.com/#org" },
+    64→    64→        "offers": {
+    65→    65→          "@type": "Offer",
+    66→    66→          "price": "25.00",
+    67→    67→          "priceCurrency": "USD",
+    68→    68→          "availability": "https://schema.org/InStock",
+    69→    69→          "url": "https://everrsvp.com/#pricing",
+    70→    70→          "description": "One-time payment — lifetime access, no subscription."
+    71→    71→        },
+    72→    72→        "aggregateRating": {
+    73→    73→          "@type": "AggregateRating",
+    74→    74→          "ratingValue": "5",
+    75→    75→          "reviewCount": "4",
+    76→    76→          "bestRating": "5"
+    77→    77→        }
+    78→    78→      },
+    79→    79→      {
+    80→    80→        "@type": "FAQPage",
+    81→    81→        "mainEntity": [
+    82→    82→          {
+    83→    83→            "@type": "Question",
+    84→    84→            "name": "How long does it take to set up?",
+    85→    85→            "acceptedAnswer": { "@type": "Answer", "text": "Most hosts publish their page in under ten minutes: pick a design, add your details, share the link. You can change anything later." }
+    86→    86→          },
+    87→    87→          {
+    88→    88→            "@type": "Question",
+    89→    89→            "name": "Do my guests need an account or an app?",
+    90→    90→            "acceptedAnswer": { "@type": "Answer", "text": "No. Guests open your personal link and reply in less than a minute — no registration, no download, no fuss." }
+    91→    91→          },
+    92→    92→          {
+    93→    93→            "@type": "Question",
+    94→    94→            "name": "What does the $25 include?",
+    95→    95→            "acceptedAnswer": { "@type": "Answer", "text": "Everything: all designs, unlimited guests, custom questions, sub-events, the dashboard, exports and email support. One payment — no renewals, ever." }
+    96→    96→          },
+    97→    97→          {
+    98→    98→            "@type": "Question",
+    99→    99→            "name": "Can I try it before paying?",
+   100→   100→            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Build your entire page for free and preview it as often as you like — you only pay when you are ready to publish." }
+   101→   101→          },
+   102→   102→          {
+   103→   103→            "@type": "Question",
+   104→   104→            "name": "Can we keep our event private?",
+   105→   105→            "acceptedAnswer": { "@type": "Answer", "text": "Of course. Add a password to your page, or allow replies only from guests on your list. All data is encrypted." }
+   106→   106→          },
+   107→   107→          {
+   108→   108→            "@type": "Question",
+   109→   109→            "name": "Can I change the design after publishing?",
+   110→   110→            "acceptedAnswer": { "@type": "Answer", "text": "Anytime. Switch templates, colors and photos whenever you like — your guest replies stay safe." }
+   111→   111→          }
+   112→   112→        ]
+   113→   113→      }
+   114→   114→    ]
+   115→   115→  }
+   116→   116→  </script>
+   117→   117→</head>
+   118→   118→<body>
+   119→   119→  <a class="skip-link" href="#overview">Skip to content</a>
+   120→   120→
+   121→   121→  <!-- ======================= HEADER ======================= -->
+   122→   122→  <header class="site-header" id="top">
+   123→   123→    <div class="container header-inner">
+   124→   124→      <a class="logo" href="#top" aria-label="Ever RSVP — home">
+   125→   125→        EVER&nbsp;<span>RSVP</span>
+   126→   126→      </a>
+   127→   127→
+   128→   128→      <nav class="main-nav" aria-label="Primary">
+   129→   129→        <a href="#overview" class="nav-link">Overview</a>
+   130→   130→        <a href="#designs" class="nav-link">Designs</a>
+   131→   131→        <a href="#faq" class="nav-link">F.A.Q.</a>
+   132→   132→
+   133→   133→        <div class="login-wrap">
+   134→   134→          <button class="nav-link login-toggle" type="button" aria-expanded="false" aria-controls="login-panel">
+   135→   135→            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19.2c.9-3.1 3.4-4.8 6.5-4.8s5.6 1.7 6.5 4.8"/></svg>
+   136→   136→            Login
+   137→   137→          </button>
+   138→   138→
+   139→   139→          <div class="login-panel" id="login-panel" hidden>
+   140→   140→            <form class="login-form" novalidate>
+   141→   141→              <label for="login-email">E-mail</label>
+   142→   142→              <input id="login-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" />
+   143→   143→              <label for="login-pass">Password</label>
+   144→   144→              <input id="login-pass" name="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+   145→   145→              <p class="login-error" role="alert" hidden></p>
+   146→   146→              <button class="btn btn-primary btn-block" type="submit">Login</button>
+   147→   147→              <div class="or-divider"><span>or</span></div>
+   148→   148→              <button class="btn btn-ghost btn-block" type="button" data-demo-toast="Social login is disabled in this design demo.">
+   149→   149→                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r="1" fill="currentColor" stroke="none"/></svg>
+   150→   150→                Continue with Instagram
+   151→   151→              </button>
+   152→   152→              <button class="btn btn-ghost btn-block" type="button" data-demo-toast="Social login is disabled in this design demo.">
+   153→   153→                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8.5V7c0-.8.5-1.2 1.2-1.2H16V3.2h-2.1C11.6 3.2 10.5 4.9 10.5 7v1.5H8.5V11h2v7h3.5v-7h2.2l.4-2.5H14z"/></svg>
+   154→   154→                Continue with Facebook
+   155→   155→              </button>
+   156→   156→            </form>
+   157→   157→          </div>
+   158→   158→        </div>
+   159→   159→
+   160→   160→        <a href="create.html" class="btn btn-primary btn-nav">Get started</a>
+   161→   161→      </nav>
+   162→   162→
+   163→   163→      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+   164→   164→        <span></span><span></span><span></span>
+   165→   165→      </button>
+   166→   166→    </div>
+   167→   167→  </header>
+   168→   168→
+   169→   169→  <!-- Mobile slide-in menu -->
+   170→   170→  <div class="mobile-menu" id="mobile-menu" hidden>
+   171→   171→    <nav aria-label="Mobile">
+   172→   172→      <a href="#overview">Overview</a>
+   173→   173→      <a href="#designs">Designs</a>
+   174→   174→      <a href="#faq">F.A.Q.</a>
+   175→   175→      <a href="create.html">Login</a>
+   176→   176→      <a href="create.html" class="btn btn-primary btn-block">Get started</a>
+   177→   177→    </nav>
+   178→   178→  </div>
+   179→   179→
+   180→   180→  <main>
+   181→   181→    <!-- ======================= HERO ======================= -->
+   182→   182→    <section class="hero" id="overview">
+   183→   183→      <div class="hero-media" aria-hidden="false">
+   184→   184→        <img src="assets/hero.jpg" alt="Bride fastening the bow on her white wedding shoe" fetchpriority="high" />
+   185→   185→      </div>
+   186→   186→      <div class="container hero-inner">
+   187→   187→        <div class="hero-copy reveal">
+   188→   188→          <p class="kicker">Online RSVP, elegant &amp; easy</p>
+   189→   189→          <h1>Beautiful RSVP websites for weddings &amp; every celebration.</h1>
+   190→   190→          <p class="lead">
+   191→   191→            Build a lovely event page in minutes, send your online invitations,
+   192→   192→            and watch every guest reply arrive in one place.
+   193→   193→            It takes 10&nbsp;minutes to set up and costs <strong>$25 only</strong> — once.
+   194→   194→          </p>
+   195→   195→          <div class="hero-actions">
+   196→   196→            <a href="create.html" class="btn btn-primary btn-lg">Get started</a>
+   197→   197→            <a href="#designs" class="arrow-link">Explore the designs <span aria-hidden="true">&#8594;</span></a>
+   198→   198→          </div>
+   199→   199→        </div>
+   200→   200→      </div>
+   201→   201→    </section>
+   202→   202→
+   203→   203→    <!-- ======================= FEATURE STRIP ======================= -->
+   204→   204→    <section class="feature-strip" id="features" aria-label="Highlights">
+   205→   205→      <div class="container strip-grid">
+   206→   206→        <div class="strip-item reveal">
+   207→   207→          <span class="strip-icon" aria-hidden="true">
+   208→   208→            <svg viewBox="0 0 24 24"><path d="M12 3.6l2.5 5.1 5.6.8-4 4 .9 5.6-5-2.7-5 2.7.9-5.6-4-4 5.6-.8z"/></svg>
+   209→   209→          </span>
+   210→   210→          <h3>The most beautiful</h3>
+   211→   211→          <p>Modern &amp; elegant templates designed by professionals — or bring your own style.</p>
+   212→   212→        </div>
+   213→   213→        <div class="strip-item reveal">
+   214→   214→          <span class="strip-icon" aria-hidden="true">
+   215→   215→            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.4 12.3l2.4 2.4 4.8-5"/></svg>
+   216→   216→          </span>
+   217→   217→          <h3>The easiest to use</h3>
+   218→   218→          <p>Drag, drop, edit, re-arrange. Pick your colors &amp; fonts — ready in minutes.</p>
+   219→   219→        </div>
+   220→   220→        <div class="strip-item reveal">
+   221→   221→          <span class="strip-icon" aria-hidden="true">
+   222→   222→            <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h2M10 12h10M4 17h10M18 17h2"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="17" r="2"/></svg>
+   223→   223→          </span>
+   224→   224→          <h3>Advanced features</h3>
+   225→   225→          <p>Custom questions, sub-events &amp; reminders, managed from a smart dashboard.</p>
+   226→   226→        </div>
+   227→   227→        <div class="strip-item reveal">
+   228→   228→          <span class="strip-icon" aria-hidden="true">
+   229→   229→            <svg viewBox="0 0 24 24"><rect x="3.2" y="5.6" width="17.6" height="12.8" rx="2"/><path d="M3.2 9.6h17.6M6.6 14.8h4"/></svg>
+   230→   230→          </span>
+   231→   231→          <h3>$25 only</h3>
+   232→   232→          <p>No ads. No subscription or recurring fee. Unlimited guests + all features.</p>
+   233→   233→        </div>
+   234→   234→      </div>
+   235→   235→    </section>
+   236→   236→
+   237→   237→    <!-- ======================= HOW IT WORKS ======================= -->
+   238→   238→    <section class="how" id="how">
+   239→   239→      <div class="container">
+   240→   240→        <p class="kicker center reveal">How does it work?</p>
+   241→   241→        <h2 class="section-title center reveal">Three simple steps</h2>
+   242→   242→        <ol class="steps">
+   243→   243→          <li class="step reveal">
+   244→   244→            <span class="step-num" aria-hidden="true">1</span>
+   245→   245→            <h3>Create your event website</h3>
+   246→   246→            <p>Pick a design, add your details, and preview it live.</p>
+   247→   247→          </li>
+   248→   248→          <li class="step reveal">
+   249→   249→            <span class="step-num" aria-hidden="true">2</span>
+   250→   250→            <h3>Invite your guests to respond</h3>
+   251→   251→            <p>Share your personal link — or send invitations from the app.</p>
+   252→   252→          </li>
+   253→   253→          <li class="step reveal">
+   254→   254→            <span class="step-num" aria-hidden="true">3</span>
+   255→   255→            <h3>Track your RSVPs</h3>
+   256→   256→            <p>Every reply lands in your dashboard, ready to export.</p>
+   257→   257→          </li>
+   258→   258→        </ol>
+   259→   259→      </div>
+   260→   260→    </section>
+   261→   261→
+   262→   262→    <!-- ======================= SHOWCASE ROWS ======================= -->
+   263→   263→    <section class="showcases" id="designs">
+   264→   264→
+   265→   265→      <!-- Row 1 — Pick a design -->
+   266→   266→      <div class="container showcase">
+   267→   267→        <div class="showcase-media reveal">
+   268→   268→          <div class="mock" role="img" aria-label="Six sample invitation design thumbnails">
+   269→   269→            <div class="swatches">
+   270→   270→              <div class="sw sw-eucalyptus"><span class="sw-script">Amelia</span><span class="sw-amp">&amp;</span><span class="sw-script">Noah</span></div>
+   271→   271→              <div class="sw sw-blush"><span class="sw-serif">A&nbsp;·&nbsp;N</span><span class="sw-sub">JUNE 2026</span></div>
+   272→   272→              <div class="sw sw-minimal"><span class="sw-serif">A&amp;N</span><span class="sw-sub">THE WEDDING</span></div>
+   273→   273→              <div class="sw sw-gold"><span class="sw-script">Amelia</span><span class="sw-serif sw-small">&amp; Noah</span></div>
+   274→   274→              <div class="sw sw-navy"><span class="sw-serif">SAVE<br/>THE&nbsp;DATE</span></div>
+   275→   275→              <div class="sw sw-botanical"><span class="sw-serif">Garden<br/>Party</span></div>
+   276→   276→            </div>
+   277→   277→          </div>
+   278→   278→        </div>
+   279→   279→        <div class="showcase-copy reveal">
+   280→   280→          <h3>Pick a design</h3>
+   281→   281→          <p>
+   282→   282→            Choose amongst 100s of professional themes — elegant, modern, classic,
+   283→   283→            floral, watercolor, geometric — there is a beautiful design for every
+   284→   284→            celebration. Take a look at the
+   285→   285→            <button class="inline-link" type="button" data-demo-modal>event page demo</button>.
+   286→   286→          </p>
+   287→   287→        </div>
+   288→   288→      </div>
+   289→   289→
+   290→   290→      <!-- Row 2 — Customise -->
+   291→   291→      <div class="container showcase rev">
+   292→   292→        <div class="showcase-media reveal">
+   293→   293→          <div class="mock" role="img" aria-label="Design editor with font and color options">
+   294→   294→            <div class="editor">
+   295→   295→              <div class="editor-bar"><i></i><i></i><i></i></div>
+   296→   296→              <div class="editor-body">
+   297→   297→                <div class="editor-side">
+   298→   298→                  <span class="side-label">Fonts</span>
+   299→   299→                  <span class="font-chip serif">Aa</span>
+   300→   300→                  <span class="font-chip">Aa</span>
+   301→   301→                  <span class="side-label">Colors</span>
+   302→   302→                  <span class="dots"><i style="background:#1798b8"></i><i style="background:#9db89a"></i><i style="background:#d8a7a0"></i><i style="background:#b9975b"></i></span>
+   303→   303→                </div>
+   304→   304→                <div class="editor-preview">
+   305→   305→                  <span class="ep-kicker">TOGETHER WITH THEIR FAMILIES</span>
+   306→   306→                  <span class="ep-names">Amelia &amp; Noah</span>
+   307→   307→                  <span class="ep-line"></span>
+   308→   308→                  <span class="ep-date">14 · 06 · 2026</span>
+   309→   309→                </div>
+   310→   310→              </div>
+   311→   311→            </div>
+   312→   312→          </div>
+   313→   313→        </div>
+   314→   314→        <div class="showcase-copy reveal">
+   315→   315→          <h3>Customise in 2 minutes</h3>
+   316→   316→          <p>
+   317→   317→            Pick your fonts, change the colors, upload your photos. Add the event
+   318→   318→            info your guests need — schedule, location, contact, accommodations —
+   319→   319→            drag, drop, done.
+   320→   320→          </p>
+   321→   321→        </div>
+   322→   322→      </div>
+   323→   323→
+   324→   324→      <!-- Row 3 — Custom questions -->
+   325→   325→      <div class="container showcase">
+   326→   326→        <div class="showcase-media reveal">
+   327→   327→          <div class="mock" role="img" aria-label="RSVP form with meal choices and plus-one stepper">
+   328→   328→            <div class="qform">
+   329→   329→              <p class="q-title">Will you join us?</p>
+   330→   330→              <label class="pill pill-on"><i class="radio-dot"></i> Joyfully accept</label>
+   331→   331→              <label class="pill"><i class="radio-dot"></i> Regretfully decline</label>
+   332→   332→              <p class="q-title">Menu selection</p>
+   333→   333→              <div class="menu-row"><span>Herb chicken</span><span>Seared fish</span><span class="on">Garden vegetarian</span></div>
+   334→   334→              <div class="stepper"><span>Plus-ones</span><button type="button" aria-label="minus">&#8722;</button><b>1</b><button type="button" aria-label="plus">+</button></div>
+   335→   335→            </div>
+   336→   336→          </div>
+   337→   337→        </div>
+   338→   338→        <div class="showcase-copy reveal">
+   339→   339→          <h3>Custom questions &amp; sub-events</h3>
+   340→   340→          <p>
+   341→   341→            Ask your guests what matters to you: menu selection, dietary needs,
+   342→   342→            song requests, plus-ones — and add sub-events like the rehearsal
+   343→   343→            dinner or the day-after brunch.
+   344→   344→          </p>
+   345→   345→        </div>
+   346→   346→      </div>
+   347→   347→
+   348→   348→      <!-- Row 4 — Event address -->
+   349→   349→      <div class="container showcase rev">
+   350→   350→        <div class="showcase-media reveal">
+   351→   351→          <div class="mock" role="img" aria-label="Browser address bar showing a personal event link">
+   352→   352→            <div class="urlbar">
+   353→   353→              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>
+   354→   354→              <span class="url">amelia-noah.<b>ever-rsvp.com</b></span>
+   355→   355→              <span class="badge-private">
+   356→   356→                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>
+   357→   357→                Private
+   358→   358→              </span>
+   359→   359→            </div>
+   360→   360→            <p class="urlnote">Guests only need one link — no app, no account.</p>
+   361→   361→          </div>
+   362→   362→        </div>
+   363→   363→        <div class="showcase-copy reveal">
+   364→   364→          <h3>Choose your event address</h3>
+   365→   365→          <p>
+   366→   366→            Create a personal address for your page, protect it with a password,
+   367→   367→            or restrict replies to your guest list only. Your event stays yours.
+   368→   368→          </p>
+   369→   369→        </div>
+   370→   370→      </div>
+   371→   371→
+   372→   372→      <!-- Row 5 — Payments -->
+   373→   373→      <div class="container showcase">
+   374→   374→        <div class="showcase-media reveal">
+   375→   375→          <div class="mock" role="img" aria-label="Payment card with ticket, donation and registry options">
+   376→   376→            <div class="paycard">
+   377→   377→              <div class="pay-row"><span class="pay-ic ticket"></span><div><b>Wedding dinner ticket</b><small>$45 · 84 sold</small></div><span class="pay-link">Buy</span></div>
+   378→   378→              <div class="pay-row"><span class="pay-ic heart"></span><div><b>Honeymoon fund</b><small>$1,260 raised of $2,000</small></div><span class="pay-link">Give</span></div>
+   379→   379→              <div class="pay-row"><span class="pay-ic gift"></span><div><b>Gift registry</b><small>Linked store list</small></div><span class="pay-link">View</span></div>
+   380→   380→            </div>
+   381→   381→          </div>
+   382→   382→        </div>
+   383→   383→        <div class="showcase-copy reveal">
+   384→   384→          <h3>Accept payments &amp; gifts</h3>
+   385→   385→          <p>
+   386→   386→            Sell tickets, collect donations or share your registry directly on
+   387→   387→            your event page. Easy to set up, convenient for your guests.
+   388→   388→          </p>
+   389→   389→        </div>
+   390→   390→      </div>
+   391→   391→
+   392→   392→      <!-- Row 6 — Dashboard -->
+   393→   393→      <div class="container showcase rev">
+   394→   394→        <div class="showcase-media reveal">
+   395→   395→          <div class="mock" role="img" aria-label="Guest dashboard with response chart and counters">
+   396→   396→            <div class="dash">
+   397→   397→              <div class="dash-chart">
+   398→   398→                <svg viewBox="0 0 42 42" aria-hidden="true">
+   399→   399→                  <circle class="donut-bg" cx="21" cy="21" r="15.9"/>
+   400→   400→                  <circle class="donut seg-a" cx="21" cy="21" r="15.9"/>
+   401→   401→                  <circle class="donut seg-b" cx="21" cy="21" r="15.9"/>
+   402→   402→                  <text x="21" y="24" text-anchor="middle">65%</text>
+   403→   403→                </svg>
+   404→   404→                <ul class="legend">
+   405→   405→                  <li><i class="a"></i>Attending · 121</li>
+   406→   406→                  <li><i class="b"></i>Pending · 42</li>
+   407→   407→                  <li><i class="c"></i>Declined · 23</li>
+   408→   408→                </ul>
+   409→   409→              </div>
+   410→   410→              <div class="dash-stats">
+   411→   411→                <div><b data-count="186">0</b><span>Guests invited</span></div>
+   412→   412→                <div><b data-count="164">0</b><span>Replies received</span></div>
+   413→   413→                <div><b data-count="91" data-suffix="%">0</b><span>Opened</span></div>
+   414→   414→              </div>
+   415→   415→            </div>
+   416→   416→          </div>
+   417→   417→        </div>
+   418→   418→        <div class="showcase-copy reveal">
+   419→   419→          <h3>A dashboard that does the work</h3>
+   420→   420→          <p>
+   421→   421→            See who is coming at a glance, manage every answer, get notified with
+   422→   422→            each new reply, and export your lists to Excel, Numbers or Google
+   423→   423→            Sheets. Take a peek at the
+   424→   424→            <button class="inline-link" type="button" data-demo-toast="The dashboard demo opens in the full product — this preview shows the public site design.">dashboard demo</button>.
+   425→   425→          </p>
+   426→   426→        </div>
+   427→   427→      </div>
+   428→   428→    </section>
+   429→   429→
+   430→   430→    <!-- ======================= TESTIMONIALS ======================= -->
+   431→   431→    <section class="testimonials" id="testimonials">
+   432→   432→      <div class="container">
+   433→   433→        <h2 class="section-title center reveal">They used it, they loved it</h2>
+   434→   434→
+   435→   435→        <div class="carousel reveal" id="carousel" aria-roledescription="carousel" aria-label="Customer reviews">
+   436→   436→          <div class="carousel-track">
+   437→   437→            <figure class="slide" role="group" aria-label="Review 1 of 4">
+   438→   438→              <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+   439→   439→              <blockquote>We wanted an RSVP page that felt as considered as our paper invitations. Setting it up took one quiet evening, and replies started arriving the same week. The guest lists downloaded perfectly for our caterer.</blockquote>
+   440→   440→              <figcaption>Amélie <span>· London</span></figcaption>
+   441→   441→            </figure>
+   442→   442→            <figure class="slide" role="group" aria-label="Review 2 of 4">
+   443→   443→              <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+   444→   444→              <blockquote>No ads, no sign-ups for guests, nothing fussy. My grandmother replied from her phone without calling me once — and honestly, that alone was worth every cent.</blockquote>
+   445→   445→              <figcaption>Priya <span>· Toronto</span></figcaption>
+   446→   446→            </figure>
+   447→   447→            <figure class="slide" role="group" aria-label="Review 3 of 4">
+   448→   448→              <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+   449→   449→              <blockquote>The custom questions saved us. Menu choices, plus-ones, song requests — everything arrived tidy and organized in the dashboard instead of scattered across ten group chats.</blockquote>
+   450→   450→              <figcaption>Marcus &amp; Dane <span>· Austin</span></figcaption>
+   451→   451→            </figure>
+   452→   452→            <figure class="slide" role="group" aria-label="Review 4 of 4">
+   453→   453→              <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+   454→   454→              <blockquote>I compared every RSVP tool I could find. This was the only one that looked genuinely elegant and charged once, upfront. Our page felt like us — calm, simple, pretty.</blockquote>
+   455→   455→              <figcaption>Sofia <span>· Sydney</span></figcaption>
+   456→   456→            </figure>
+   457→   457→          </div>
+   458→   458→
+   459→   459→          <div class="carousel-nav">
+   460→   460→            <button class="c-arrow" type="button" data-dir="-1" aria-label="Previous review">&#8249;</button>
+   461→   461→            <div class="c-dots" role="tablist" aria-label="Choose review"></div>
+   462→   462→            <button class="c-arrow" type="button" data-dir="1" aria-label="Next review">&#8250;</button>
+   463→   463→          </div>
+   464→   464→        </div>
+   465→   465→      </div>
+   466→   466→    </section>
+   467→   467→
+   468→   468→    <!-- ======================= PRESS STRIP ======================= -->
+   469→   469→    <section class="press" aria-label="Featured in">
+   470→   470→      <div class="container">
+   471→   471→        <p class="press-label">Ever RSVP has been seen on…</p>
+   472→   472→        <ul class="press-row">
+   473→   473→          <li>The Wedding Edit</li>
+   474→   474→          <li>Maison Bride</li>
+   475→   475→          <li>Soirée Journal</li>
+   476→   476→          <li>Vows &amp; Venues</li>
+   477→   477→          <li>The Party Post</li>
+   478→   478→          <li>Eventful</li>
+   479→   479→        </ul>
+   480→   480→      </div>
+   481→   481→    </section>
+   482→   482→
+   483→   483→    <!-- ======================= WHY CHOOSE ======================= -->
+   484→   484→    <section class="why" id="why">
+   485→   485→      <div class="container">
+   486→   486→        <p class="kicker center reveal">Why choose Ever RSVP?</p>
+   487→   487→        <h2 class="section-title center reveal">Unlike any other RSVP page</h2>
+   488→   488→        <div class="why-grid">
+   489→   489→          <div class="why-cell reveal">
+   490→   490→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.6l2.5 5.1 5.6.8-4 4 .9 5.6-5-2.7-5 2.7.9-5.6-4-4 5.6-.8z"/></svg></span>
+   491→   491→            <h3>Beautiful themes</h3>
+   492→   492→            <p>Elegant templates by professional designers — photography included.</p>
+   493→   493→          </div>
+   494→   494→          <div class="why-cell reveal">
+   495→   495→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 12h2M10 12h10M4 17h10M18 17h2"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="17" r="2"/></svg></span>
+   496→   496→            <h3>Fully customizable</h3>
+   497→   497→            <p>Start from a template or design your own to match your invitations.</p>
+   498→   498→          </div>
+   499→   499→          <div class="why-cell reveal">
+   500→   500→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.2" y="5.6" width="17.6" height="12.8" rx="2"/><path d="M3.2 9.6h17.6M6.6 14.8h4"/></svg></span>
+   501→   501→            <h3>Transparent pricing</h3>
+   502→   502→            <p>$25 once. No subscription, no add-on fees, no charge for extra guests.</p>
+   503→   503→          </div>
+   504→   504→          <div class="why-cell reveal">
+   505→   505→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.5 18h3"/></svg></span>
+   506→   506→            <h3>Works everywhere</h3>
+   507→   507→            <p>Looks lovely on your computer, tablet and smartphone alike.</p>
+   508→   508→          </div>
+   509→   509→          <div class="why-cell reveal">
+   510→   510→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></span>
+   511→   511→            <h3>Private &amp; secure</h3>
+   512→   512→            <p>Encrypted data, optional page password, guest-list only replies.</p>
+   513→   513→          </div>
+   514→   514→          <div class="why-cell reveal">
+   515→   515→            <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z"/></svg></span>
+   516→   516→            <h3>Event specialists</h3>
+   517→   517→            <p>Weddings, showers, birthdays, galas — we speak fluent celebration.</p>
+   518→   518→          </div>
+   519→   519→        </div>
+   520→   520→      </div>
+   521→   521→    </section>
+   522→   522→
+   523→   523→    <!-- ======================= FAQ ======================= -->
+   524→   524→    <section class="faq" id="faq">
+   525→   525→      <div class="container faq-inner">
+   526→   526→        <p class="kicker center reveal">F.A.Q.</p>
+   527→   527→        <h2 class="section-title center reveal">Good questions, short answers</h2>
+   528→   528→
+   529→   529→        <div class="accordion reveal">
+   530→   530→          <div class="acc-item">
+   531→   531→            <button class="acc-btn" type="button" aria-expanded="false">
+   532→   532→              <span>How long does it take to set up?</span>
+   533→   533→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   534→   534→            </button>
+   535→   535→            <div class="acc-panel"><p>Most hosts publish their page in under ten minutes: pick a design, add your details, share the link. You can change anything later.</p></div>
+   536→   536→          </div>
+   537→   537→          <div class="acc-item">
+   538→   538→            <button class="acc-btn" type="button" aria-expanded="false">
+   539→   539→              <span>Do my guests need an account or an app?</span>
+   540→   540→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   541→   541→            </button>
+   542→   542→            <div class="acc-panel"><p>No. Guests open your personal link and reply in less than a minute — no registration, no download, no fuss.</p></div>
+   543→   543→          </div>
+   544→   544→          <div class="acc-item">
+   545→   545→            <button class="acc-btn" type="button" aria-expanded="false">
+   546→   546→              <span>What does the $25 include?</span>
+   547→   547→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   548→   548→            </button>
+   549→   549→            <div class="acc-panel"><p>Everything: all designs, unlimited guests, custom questions, sub-events, the dashboard, exports and email support. One payment — no renewals, ever.</p></div>
+   550→   550→          </div>
+   551→   551→          <div class="acc-item">
+   552→   552→            <button class="acc-btn" type="button" aria-expanded="false">
+   553→   553→              <span>Can I try it before paying?</span>
+   554→   554→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   555→   555→            </button>
+   556→   556→            <div class="acc-panel"><p>Yes. Build your entire page for free and preview it as often as you like — you only pay when you are ready to publish.</p></div>
+   557→   557→          </div>
+   558→   558→          <div class="acc-item">
+   559→   559→            <button class="acc-btn" type="button" aria-expanded="false">
+   560→   560→              <span>Can we keep our event private?</span>
+   561→   561→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   562→   562→            </button>
+   563→   563→            <div class="acc-panel"><p>Of course. Add a password to your page, or allow replies only from guests on your list. All data is encrypted.</p></div>
+   564→   564→          </div>
+   565→   565→          <div class="acc-item">
+   566→   566→            <button class="acc-btn" type="button" aria-expanded="false">
+   567→   567→              <span>Can I change the design after publishing?</span>
+   568→   568→              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+   569→   569→            </button>
+   570→   570→            <div class="acc-panel"><p>Anytime. Switch templates, colors and photos whenever you like — your guest replies stay safe.</p></div>
+   571→   571→          </div>
+   572→   572→        </div>
+   573→   573→      </div>
+   574→   574→    </section>
+   575→   575→
+   576→   576→    <!-- ======================= CTA BAND ======================= -->
+   577→   577→    <section class="cta-band" id="cta">
+   578→   578→      <div class="container cta-inner reveal">
+   579→   579→        <h2>Ready to gather your favorite people?</h2>
+   580→   580→        <p>Your beautiful RSVP page is ten minutes away — and your guests will love it.</p>
+   581→   581→        <a href="create.html" class="btn btn-light btn-lg">Get started — $25</a>
+   582→   582→      </div>
+   583→   583→    </section>
+   584→   584→  </main>
+   585→   585→
+   586→   586→  <!-- ======================= FOOTER ======================= -->
+   587→   587→  <footer class="site-footer">
+   588→   588→    <div class="container footer-grid">
+   589→   589→      <div class="f-brand">
+   590→   590→        <a class="logo logo-light" href="#top">EVER&nbsp;<span>RSVP</span></a>
+   591→   591→        <p>Elegant online RSVP pages for weddings and events. Set up in minutes, loved by guests.</p>
+   592→   592→        <div class="socials">
+   593→   593→          <a href="#top" aria-label="Instagram" data-demo-toast="Social links are placeholders in this demo."><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r="1" fill="currentColor" stroke="none"/></svg></a>
+   594→   594→          <a href="#top" aria-label="Facebook" data-demo-toast="Social links are placeholders in this demo."><svg viewBox="0 0 24 24"><path d="M14 8.5V7c0-.8.5-1.2 1.2-1.2H16V3.2h-2.1C11.6 3.2 10.5 4.9 10.5 7v1.5H8.5V11h2v7h3.5v-7h2.2l.4-2.5H14z"/></svg></a>
+   595→   595→          <a href="#top" aria-label="Pinterest" data-demo-toast="Social links are placeholders in this demo."><svg viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0-3.1 16.4c0-.7-.1-1.8 0-2.5l1-4.2s-.3-.5-.3-1.3c0-1.2.7-2.1 1.6-2.1.8 0 1.1.6 1.1 1.3 0 .8-.5 2-.8 3.1-.2 1 .5 1.6 1.4 1.6 1.7 0 3-1.8 3-4.4 0-2.3-1.6-3.9-4-3.9a4.2 4.2 0 0 0-4.4 4.2c0 .8.3 1.7.7 2.2l.1.3-.3 1.1c0 .2-.1.2-.3.1-1.1-.5-1.8-2.2-1.8-3.7 0-3 2.2-5.7 6.2-5.7 3.3 0 5.8 2.3 5.8 5.4 0 3.3-2 5.9-4.9 5.9-1 0-1.9-.5-2.2-1.1l-.6 2.3c-.2.8-.8 1.9-1.2 2.5A8.5 8.5 0 1 0 12 3.5z"/></svg></a>
+   596→   596→          <a href="#top" aria-label="X" data-demo-toast="Social links are placeholders in this demo."><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+   597→   597→        </div>
+   598→   598→      </div>
+   599→   599→
+   600→   600→      <nav class="f-col" aria-label="Product">
+   601→   601→        <h4>Product</h4>
+   602→   602→        <a href="#overview">Overview</a>
+   603→   603→        <a href="#designs">Designs</a>
+   604→   604→        <a href="#why">Pricing</a>
+   605→   605→        <button class="f-link" type="button" data-demo-modal>Event page demo</button>
+   606→   606→        <button class="f-link" type="button" data-demo-toast="The dashboard demo opens in the full product — this preview shows the public site design.">Dashboard demo</button>
+   607→   607→      </nav>
+   608→   608→
+   609→   609→      <nav class="f-col" aria-label="Support">
+   610→   610→        <h4>Support</h4>
+   611→   611→        <a href="#faq">F.A.Q.</a>
+   612→   612→        <a href="mailto:hello@ever-rsvp.com">Contact us</a>
+   613→   613→        <button class="f-link" type="button" data-demo-toast="Legal pages are placeholders in this design demo.">Privacy policy</button>
+   614→   614→        <button class="f-link" type="button" data-demo-toast="Legal pages are placeholders in this design demo.">Terms of service</button>
+   615→   615→      </nav>
+   616→   616→
+   617→   617→      <div class="f-col f-news">
+   618→   618→        <h4>Stay in touch</h4>
+   619→   619→        <p>Planning tips &amp; new designs, twice a month. No spam.</p>
+   620→   620→        <form class="news-form" novalidate>
+   621→   621→          <label class="sr-only" for="news-email">E-mail address</label>
+   622→   622→          <input id="news-email" type="email" placeholder="Your e-mail" autocomplete="email" />
+   623→   623→          <button class="btn btn-primary" type="submit">Subscribe</button>
+   624→   624→        </form>
+   625→   625→      </div>
+   626→   626→    </div>
+   627→   627→
+   628→   628→    <div class="footer-bottom">
+   629→   629→      <div class="container fb-inner">
+   630→   630→        <p>© <span id="year">2026</span> Ever RSVP. All rights reserved.</p>
+   631→   631→        <p>Made with care for your big day.</p>
+   632→   632→      </div>
+   633→   633→    </div>
+   634→   634→  </footer>
+   635→   635→
+   636→   636→  <!-- ======================= DEMO RSVP MODAL ======================= -->
+   637→   637→  <div class="modal-overlay" id="demo-modal" hidden>
+   638→   638→    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="demo-title">
+   639→   639→      <button class="modal-close" type="button" aria-label="Close demo">&times;</button>
+   640→   640→
+   641→   641→      <div class="modal-stage" id="modal-form-stage">
+   642→   642→        <p class="demo-tag">Event page demo</p>
+   643→   643→        <h3 class="m-names" id="demo-title">Amelia &amp; Noah</h3>
+   644→   644→        <p class="m-meta">Sunday, June 14th 2026 · Rosewood Barn, Kent</p>
+   645→   645→        <span class="m-divider" aria-hidden="true">✦</span>
+   646→   646→
+   647→   647→        <form class="rsvp-form" id="rsvp-form" novalidate>
+   648→   648→          <div class="field">
+   649→   649→            <label for="rsvp-name">Your name(s)</label>
+   650→   650→            <input id="rsvp-name" type="text" placeholder="e.g. The Johnson family" required />
+   651→   651→          </div>
+   652→   652→
+   653→   653→          <div class="field">
+   654→   654→            <span class="field-label" id="attend-label">Will you attend?</span>
+   655→   655→            <div class="attend-row" role="radiogroup" aria-labelledby="attend-label">
+   656→   656→              <label class="pill pill-lg"><input type="radio" name="attend" value="yes" checked /><i class="radio-dot"></i> Joyfully accept</label>
+   657→   657→              <label class="pill pill-lg"><input type="radio" name="attend" value="no" /><i class="radio-dot"></i> Regretfully decline</label>
+   658→   658→            </div>
+   659→   659→          </div>
+   660→   660→
+   661→   661→          <div class="field two-col">
+   662→   662→            <div>
+   663→   663→              <label for="rsvp-guests">Guests in your party</label>
+   664→   664→              <div class="stepper real">
+   665→   665→                <button type="button" class="st-btn" data-step="-1" aria-label="Fewer guests">&#8722;</button>
+   666→   666→                <b id="rsvp-guests-val">2</b>
+   667→   667→                <input type="hidden" id="rsvp-guests" value="2" />
+   668→   668→                <button type="button" class="st-btn" data-step="1" aria-label="More guests">+</button>
+   669→   669→              </div>
+   670→   670→            </div>
+   671→   671→            <div>
+   672→   672→              <label for="rsvp-menu">Menu preference</label>
+   673→   673→              <select id="rsvp-menu">
+   674→   674→                <option>Herb-roasted chicken</option>
+   675→   675→                <option>Seared sea bass</option>
+   676→   676→                <option>Garden vegetarian</option>
+   677→   677→              </select>
+   678→   678→            </div>
+   679→   679→          </div>
+   680→   680→
+   681→   681→          <div class="field">
+   682→   682→            <label for="rsvp-song">A song that gets you dancing <small>(optional)</small></label>
+   683→   683→            <input id="rsvp-song" type="text" placeholder="Artist — Title" />
+   684→   684→          </div>
+   685→   685→
+   686→   686→          <p class="form-error" role="alert" hidden>Please tell us your name first.</p>
+   687→   687→          <button class="btn btn-primary btn-block btn-lg" type="submit">Send my reply</button>
+   688→   688→          <p class="demo-note">Demo only — replies are stored on this device.</p>
+   689→   689→        </form>
+   690→   690→      </div>
+   691→   691→
+   692→   692→      <div class="modal-stage" id="modal-done-stage" hidden>
+   693→   693→        <span class="done-check" aria-hidden="true">
+   694→   694→          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+   695→   695→        </span>
+   696→   696→        <h3 class="m-names">Thank you!</h3>
+   697→   697→        <p class="m-meta" id="done-msg">Your reply has been saved.</p>
+   698→   698→        <p class="done-quote">“We can’t wait to celebrate with you.”</p>
+   699→   699→        <div class="done-actions">
+   700→   700→          <button class="btn btn-ghost" type="button" id="edit-reply">Edit my reply</button>
+   701→   701→          <button class="btn btn-primary" type="button" id="reset-demo">Reset the demo</button>
+   702→   702→        </div>
+   703→   703→      </div>
+   704→   704→    </div>
+   705→   705→  </div>
+   706→   706→
+   707→   707→  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+   708→   708→
+   709→   709→  <button class="to-top" id="to-top" type="button" aria-label="Back to top" hidden>
+   710→   710→    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg>
+   711→   711→  </button>
+   712→   712→
+   713→   713→  <script src="js/app.js"></script>
+   714→   714→</body>
+   715→   715→</html>
+   716→   716→

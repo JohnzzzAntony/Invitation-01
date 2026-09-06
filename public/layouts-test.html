@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Layout QA harness — internal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&family=Pacifico&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/ly-royal.css" />
+  <link rel="stylesheet" href="css/ly-bloom.css" />
+  <link rel="stylesheet" href="css/ly-fiesta.css" />
+  <link rel="stylesheet" href="css/ly-play.css" />
+  <link rel="stylesheet" href="css/ly-cinema.css" />
+  <link rel="stylesheet" href="css/ly-nest.css" />
+  <link rel="stylesheet" href="css/ly-lumen.css" />
+  <link rel="stylesheet" href="css/ly-noir.css" />
+  <style>
+    body { background: #e8ecef; margin: 0; padding: 24px; font-family: Lato, sans-serif; }
+    .qa-note { font: 14px/1.5 Lato, sans-serif; color: #45525c; max-width: 900px; margin: 0 auto 8px; }
+    .qa-row { display: flex; gap: 24px; align-items: flex-start; justify-content: center; flex-wrap: wrap; padding: 24px 0; border-bottom: 1px dashed #b9c4cb; }
+    .qa-full { max-width: 1080px; margin: 0 auto; }
+    .qa-mini { width: 300px; flex: none; }
+    h2.qa-h { font: 600 18px Lato, sans-serif; color: #12303a; text-align: center; width: 100%; margin: 8px 0 0; }
+  </style>
+</head>
+<body>
+  <p class="qa-note">Internal QA harness — renders every registered layout in full and mini form for every theme of that layout. Not linked from the site; noindex.</p>
+  <div id="qa-root"></div>
+  <script src="js/templates.js"></script>
+  <script src="js/layouts/royal.js"></script>
+  <script src="js/layouts/bloom.js"></script>
+  <script src="js/layouts/fiesta.js"></script>
+  <script src="js/layouts/play.js"></script>
+  <script src="js/layouts/cinema.js"></script>
+  <script src="js/layouts/nest.js"></script>
+  <script src="js/layouts/lumen.js"></script>
+  <script src="js/layouts/noir.js"></script>
+  <script>
+    (function () {
+      var root = document.getElementById('qa-root');
+      var layouts = window.EVER_layouts();
+      layouts.forEach(function (ly) {
+        var h = document.createElement('h2');
+        h.className = 'qa-h';
+        h.textContent = 'Layout: ' + ly.id + ' — ' + ly.label;
+        root.appendChild(h);
+        var themes = window.EVER_THEMES.filter(function (t) { return (t.layout || 'royal') === ly.id; });
+        themes.forEach(function (t) {
+          var row = document.createElement('div');
+          row.className = 'qa-row';
+          var full = document.createElement('div');
+          full.className = 'qa-full';
+          var data = window.EVER_siteDefaults(t.id);
+          var site = window.EVER_renderSite(data, { interactive: true });
+          site.__wsData = data;
+          window.EVER_bindSite(site);
+          window.EVER_tickCountdowns(site);
+          setInterval(function () { window.EVER_tickCountdowns(site); }, 1000);
+          full.appendChild(site);
+          var cap = document.createElement('p');
+          cap.className = 'qa-note';
+          cap.textContent = t.name + ' (' + t.id + ' · full)';
+          full.insertBefore(cap, full.firstChild);
+          row.appendChild(full);
+          var miniWrap = document.createElement('div');
+          miniWrap.className = 'qa-mini';
+          miniWrap.appendChild(window.EVER_renderSiteMini(t, data, {}));
+          var cap2 = document.createElement('p');
+          cap2.className = 'qa-note';
+          cap2.textContent = t.name + ' · mini';
+          miniWrap.appendChild(cap2);
+          row.appendChild(miniWrap);
+          root.appendChild(row);
+        });
+      });
+      if (!layouts.length) {
+        root.innerHTML = '<p class="qa-note">No layouts registered — check script paths.</p>';
+      }
+    })();
+  </script>
+</body>
+</html>

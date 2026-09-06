@@ -2755,6 +2755,10 @@ a.pv-chip:hover { color: var(--pv-accent); border-color: var(--pv-accent); }
 .f-paris { font-family: 'Parisienne', cursive; }
 .f-corm  { font-family: 'Cormorant Garamond', serif; font-style: italic; }
 .f-jost  { font-family: 'Jost', sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.f-pfd   { font-family: 'Playfair Display', serif; letter-spacing: .02em; }
+.f-cinzel{ font-family: 'Cinzel', serif; letter-spacing: .14em; text-transform: uppercase; }
+.f-play  { font-family: 'Pacifico', cursive; }
+.f-baloo { font-family: 'Baloo 2', cursive; letter-spacing: .01em; }
 .ws-body-jost { font-family: 'Jost', sans-serif; }
 
 .ws {
@@ -3002,9 +3006,11 @@ a.pv-chip:hover { color: var(--pv-accent); border-color: var(--pv-accent); }
 .wsm .ws-ic { display: inline-flex; width: 13px; height: 13px; color: var(--ws-gold); vertical-align: -2px; }
 .wsm .ws-ic svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; }
 .wsm-hero { position: relative; color: #fff; padding: 26px 12px 20px; overflow: hidden; }
-.wsm-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,18,12,.72), rgba(10,18,12,.58)); }
+.wsm-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,18,12,.38), rgba(10,18,12,.5)); }
 .wsm-hero > img.wsm-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .wsm-hero > * { position: relative; }
+/* dark themes (light ink) need a touch more shade for text pop */
+.wsm .ws-noir.wsm-noir::after, .wsm.ws-noir::after { background: linear-gradient(180deg, rgba(5,5,8,.5), rgba(5,5,8,.62)); }
 .wsm-mono {
   position: absolute; top: 8px; left: 8px; font-family: 'Cormorant Garamond', serif; font-size: 9px;
   letter-spacing: .18em; border: 1px solid rgba(255,255,255,.6); padding: 2px 5px;
@@ -3373,3 +3379,58 @@ body { animation: page-in .45s ease both; }
 
 /* ---- editor: invalid link field hint -------------------------------------- */
 .ed-invalid { border-color: #b3563f !important; box-shadow: 0 0 0 3px rgba(179, 86, 63, .12); }
+
+/* === v4 multi-event catalog ==============================================
+   Occasion subheadings, event/category badges on design cards, checkout
+   summary meta line, designer layout select. Uses existing tokens only. */
+.tpl-grid .tpl-group-title {
+  grid-column: 1 / -1;
+  margin: 22px 0 -8px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.tpl-grid .tpl-group-title:first-child { margin-top: 0; }
+.tpl-group-tag {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+
+/* Event + style category badges on design cards */
+.tpl-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+.tpl-ev {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: var(--teal-tint);
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Checkout summary: occasion · category line under the mini preview */
+.summary-preview { flex-direction: column; align-items: center; }
+.summary-design-meta {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-align: center;
+}
+
+/* Designer modal: layout select */
+#dsn-layout { cursor: pointer; }

@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Ever RSVP — shared template catalog & event-website renderer
-   Format (per reference): Hero → Countdown & details → Our story →
-   Gallery → Events → Venue & map → RSVP → Contact/footer.
-   Loaded by create.html, checkout.html, editor.html (+ designer.js).
+   Ever RSVP — core engine v4: multi-layout template catalog
+   8 layouts (royal, bloom, fiesta, play, cinema, nest, lumen, noir) x
+   27 premium themes across 7 event types. Layouts live in js/layouts/*.js
+   and register themselves via EVER_registerLayout (see docs/LAYOUT-SPEC.md).
    ========================================================================== */
 (function () {
   'use strict';
@@ -31,7 +31,20 @@
     share:    '<svg viewBox="0 0 24 24"><circle cx="6.5" cy="12" r="2.3"/><circle cx="17" cy="6.5" r="2.3"/><circle cx="17" cy="17.5" r="2.3"/><path d="m8.6 10.9 6.3-3.2M8.6 13.1l6.3 3.2"/></svg>',
     heart:    '<svg viewBox="0 0 24 24"><path d="M12 20s-7.2-4.6-7.2-9.8A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.2 2.6C19.2 15.4 12 20 12 20z"/></svg>',
     camera:   '<svg viewBox="0 0 24 24"><path d="M4 8.5h3l1.6-2.3h6.8L17 8.5h3v10H4z"/><circle cx="12" cy="13.2" r="3.2"/></svg>',
-    chevron:  '<svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg>'
+    chevron:  '<svg viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></svg>',
+    gift:     '<svg viewBox="0 0 24 24"><rect x="4" y="9.5" width="16" height="11" rx="1.5"/><path d="M3.5 6.5h17v3h-17zM12 6.5V20.5M12 6.5s-1-3.5-3.5-3.5a1.9 1.9 0 0 0 0 3.5zM12 6.5s1-3.5 3.5-3.5a1.9 1.9 0 0 1 0 3.5z"/></svg>',
+    cake:     '<svg viewBox="0 0 24 24"><path d="M4 20.5h16M5.5 20.5v-6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v6M9.5 12.5V10M14.5 12.5V10M12 12V9"/><path d="M12 7.2a1.4 1.4 0 1 1 0-2.8 1.4 1.4 0 0 1 0 2.8z"/></svg>',
+    game:     '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.3" fill="currentColor" stroke="none"/></svg>',
+    home:     '<svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5M6 10v10h12V10M10 20v-6h4v6"/></svg>',
+    key:      '<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="m11 11 9 9M17 17l2.2-2.2M14 14l2.2-2.2"/></svg>',
+    cross:    '<svg viewBox="0 0 24 24"><path d="M12 4v16M7.5 9h9"/></svg>',
+    star:     '<svg viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>',
+    moon:     '<svg viewBox="0 0 24 24"><path d="M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5z"/></svg>',
+    sun:      '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></svg>',
+    leaf:     '<svg viewBox="0 0 24 24"><path d="M19 5c-8 0-13 4-13 11 0 1.5.3 2.6.7 3C8 13 11 10.5 15.5 9.5 11 12 8.2 15 7.2 19c.7.3 1.6.5 2.8.5 7 0 9-7.5 9-14.5z"/></svg>',
+    baby:     '<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6.5"/><path d="M9.6 9h.01M14.4 9h.01M9.8 12.4a3.2 3.2 0 0 0 4.4 0M12 16.5V21M9 21h6"/></svg>',
+    spark:    '<svg viewBox="0 0 24 24"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/></svg>',
+    glass:    '<svg viewBox="0 0 24 24"><path d="M8 3h8l-1 6a3 3 0 0 1-6 0zM12 12v8M8.5 20h7"/></svg>'
   };
 
   /* ------------------------------------------------------------------ *
@@ -45,63 +58,46 @@
     { id: 'dance',    src: 'assets/ws-dance.jpg',    label: 'First dance' },
     { id: 'decor',    src: 'assets/ws-decor.jpg',    label: 'Reception decor' },
     { id: 'shoes',    src: 'assets/hero.jpg',        label: 'Bridal style' },
-    { id: 'band',     src: 'assets/cta-band.jpg',    label: 'Celebration' }
+    { id: 'band',     src: 'assets/cta-band.jpg',    label: 'Celebration' },
+    { id: 'balloons', src: 'assets/ev-balloons.jpg', label: 'Balloons & confetti' },
+    { id: 'neon',     src: 'assets/ev-neon.jpg',     label: 'Neon party' },
+    { id: 'glam',     src: 'assets/ev-glam.jpg',     label: 'Glam party table' },
+    { id: 'tropical', src: 'assets/ev-tropical.jpg', label: 'Tropical pool party' },
+    { id: 'anniv',    src: 'assets/ev-anniv.jpg',    label: 'Anniversary table' },
+    { id: 'silver',   src: 'assets/ev-silver.jpg',   label: 'Silver celebration' },
+    { id: 'home',     src: 'assets/ev-home.jpg',     label: 'New home porch' },
+    { id: 'cottage',  src: 'assets/ev-cottage.jpg',  label: 'Cottage garden' },
+    { id: 'baptism',  src: 'assets/ev-baptism.jpg',  label: 'Christening candles' },
+    { id: 'baby',     src: 'assets/ev-baby.jpg',     label: 'Baby shower' },
+    { id: 'gala',     src: 'assets/ev-gala.jpg',     label: 'Gala ballroom' },
+    { id: 'star',     src: 'assets/ev-star.jpg',     label: 'Star party' }
   ];
 
   /* ------------------------------------------------------------------ *
-   *  Design catalog — one format, many designs.                         *
-   *  vars drive the whole site through CSS custom properties.           *
+   *  Event types                                                        *
    * ------------------------------------------------------------------ */
-  var THEMES = [
-    { id: 'emerald',  name: 'Emerald & Gold', category: 'Classic',
-      dark: '#17301f', deep: '#10241724', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628', soft: '#efe7d2',
-      nameFont: 'vibes', ornament: 'floral' },
-    { id: 'maroon',   name: 'Royal Maroon', category: 'Classic',
-      dark: '#47161f', deep: '#47161f24', gold: '#d4a95c', bg: '#faf5ec', ink: '#43302c', soft: '#f0e2d4',
-      nameFont: 'vibes', ornament: 'floral' },
-    { id: 'blush',    name: 'Blush Rose', category: 'Floral',
-      dark: '#5c3a40', deep: '#5c3a4024', gold: '#b98a8e', bg: '#faf3ef', ink: '#54423f', soft: '#f2e2dc',
-      nameFont: 'paris', ornament: 'floral' },
-    { id: 'navy',     name: 'Midnight Navy', category: 'Classic',
-      dark: '#1b2a41', deep: '#1b2a4124', gold: '#c8a96a', bg: '#f6f4ee', ink: '#39404d', soft: '#e4e2d8',
-      nameFont: 'corm', ornament: 'lines' },
-    { id: 'sage',     name: 'Sage Garden', category: 'Floral',
-      dark: '#3f5142', deep: '#3f514224', gold: '#9a7b4f', bg: '#f5f6f0', ink: '#3d4438', soft: '#e2e8da',
-      nameFont: 'corm', ornament: 'lines' },
-    { id: 'champagne',name: 'Champagne Ivory', category: 'Elegant',
-      dark: '#6b5d4a', deep: '#6b5d4a24', gold: '#b0955c', bg: '#faf7f0', ink: '#4a4234', soft: '#efe6d4',
-      nameFont: 'corm', ornament: 'geo' },
-    { id: 'terracotta', name: 'Terracotta Sun', category: 'Modern',
-      dark: '#703826', deep: '#70382624', gold: '#c97a4a', bg: '#fbf2ea', ink: '#4f362a', soft: '#f2ddcc',
-      nameFont: 'jost', ornament: 'geo' },
-    { id: 'lavender', name: 'Lavender Mist', category: 'Modern',
-      dark: '#443a63', deep: '#443a6324', gold: '#9a7bc9', bg: '#f7f4fa', ink: '#453e58', soft: '#e7e0f2',
-      nameFont: 'paris', ornament: 'geo' },
-    { id: 'noir',     name: 'Ivory Noir', category: 'Elegant',
-      dark: '#1b1a17', deep: '#1b1a1724', gold: '#c2a05e', bg: '#faf9f5', ink: '#33302a', soft: '#e9e5da',
-      nameFont: 'paris', ornament: 'lines' },
-    { id: 'rose',     name: 'Rose Gold', category: 'Modern',
-      dark: '#5a3230', deep: '#5a323024', gold: '#c68d78', bg: '#fbf4f0', ink: '#4b3431', soft: '#f2e1d9',
-      nameFont: 'vibes', ornament: 'geo' },
-    { id: 'pearl',    name: 'Ocean Pearl', category: 'Elegant',
-      dark: '#1f434c', deep: '#1f434c24', gold: '#7fb0ac', bg: '#f4f8f8', ink: '#2f4a4e', soft: '#dfecec',
-      nameFont: 'paris', ornament: 'lines' },
-    { id: 'marigold', name: 'Marigold Saffron', category: 'Classic',
-      dark: '#7c3f10', deep: '#7c3f1024', gold: '#d99a2b', bg: '#fdf6e7', ink: '#5b3a17', soft: '#f7e7c6',
-      nameFont: 'vibes', ornament: 'floral' },
-    { id: 'frost',    name: 'Nordic Frost', category: 'Modern',
-      dark: '#2d3c4e', deep: '#2d3c4e24', gold: '#8fa9bd', bg: '#f5f7fa', ink: '#36414d', soft: '#e2e8ef',
-      nameFont: 'corm', ornament: 'geo' },
-    { id: 'plum',     name: 'Velvet Plum', category: 'Floral',
-      dark: '#41234a', deep: '#41234a24', gold: '#b087b5', bg: '#f9f4fa', ink: '#442e49', soft: '#ecdfef',
-      nameFont: 'paris', ornament: 'floral' }
-  ];
+  var EVENTS = {
+    wedding:      { label: 'Wedding',              tagline: 'Ceremonies & receptions' },
+    birthday:     { label: 'Birthday',             tagline: 'Every milestone age' },
+    anniversary:  { label: 'Anniversary',          tagline: 'Renew & remember' },
+    housewarming: { label: 'Housewarming',         tagline: 'New address, open doors' },
+    baptism:      { label: 'Baptism & Christening',tagline: 'A blessed beginning' },
+    baby:         { label: 'Baby Shower & Kids',   tagline: 'Welcome little ones' },
+    gala:         { label: 'Gala & Evening',       tagline: 'Formal affairs' }
+  };
 
+  /* ------------------------------------------------------------------ *
+   *  Fonts                                                              *
+   * ------------------------------------------------------------------ */
   var NAME_FONTS = {
-    vibes: { label: 'Script',   cls: 'f-vibes' },
-    paris: { label: 'Paris',    cls: 'f-paris' },
-    corm:  { label: 'Classic',  cls: 'f-corm' },
-    jost:  { label: 'Modern',   cls: 'f-jost' }
+    vibes:  { label: 'Script',    cls: 'f-vibes' },
+    paris:  { label: 'Paris',     cls: 'f-paris' },
+    corm:   { label: 'Classic',   cls: 'f-corm' },
+    jost:   { label: 'Modern',    cls: 'f-jost' },
+    pfd:    { label: 'Editorial', cls: 'f-pfd' },
+    cinzel: { label: 'Grand',     cls: 'f-cinzel' },
+    play:   { label: 'Bubbly',    cls: 'f-play' },
+    baloo:  { label: 'Rounded',   cls: 'f-baloo' }
   };
   var BODY_FONTS = {
     lato: { label: 'Lato',  cls: '' },
@@ -109,6 +105,7 @@
   };
 
   var CUSTOM_KEY = 'ever-rsvp-custom-tpl';
+  var EVENT_KEY  = 'ever-rsvp-event';
 
   /* ------------------------------------------------------------------ *
    *  Helpers                                                            *
@@ -147,12 +144,200 @@
   function monogram(a, b) {
     return (String(a || 'A').trim().charAt(0) + ' \u00b7 ' + String(b || 'R').trim().charAt(0)).toUpperCase();
   }
+  function initials(s) {
+    return String(s || 'E').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase() || 'E';
+  }
   function photoSrc(idOrUrl) {
     if (!idOrUrl) return PHOTOS[0].src;
     if (/^(https?:|data:|\/|assets\/)/.test(idOrUrl)) return idOrUrl;
     for (var i = 0; i < PHOTOS.length; i++) if (PHOTOS[i].id === idOrUrl) return PHOTOS[i].src;
     return PHOTOS[0].src;
   }
+  function directionsUrl(address, city) {
+    return 'https://www.google.com/maps/search/?api=1&query=' +
+      encodeURIComponent(((address || '') + ' ' + (city || '')).trim());
+  }
+  function deepMerge(dst, src) {
+    if (!src || typeof src !== 'object') return dst;
+    for (var k in src) {
+      if (!Object.prototype.hasOwnProperty.call(src, k)) continue;
+      if (src[k] && typeof src[k] === 'object' && !Array.isArray(src[k]) && dst[k] && typeof dst[k] === 'object' && !Array.isArray(dst[k])) {
+        deepMerge(dst[k], src[k]);
+      } else if (src[k] !== undefined) {
+        dst[k] = src[k];
+      }
+    }
+    return dst;
+  }
+  function futureISO(monthsAhead, day) {
+    var d = new Date();
+    d.setDate(day || 24);
+    d.setMonth(d.getMonth() + (monthsAhead || 0));
+    var m = String(d.getMonth() + 1); if (m.length < 2) m = '0' + m;
+    var dd = String(d.getDate()); if (dd.length < 2) dd = '0' + dd;
+    return d.getFullYear() + '-' + m + '-' + dd;
+  }
+  function readJson(key) {
+    try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+    catch (e) { return null; }
+  }
+  function writeJson(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Layout registry                                                    *
+   * ------------------------------------------------------------------ */
+  var LAYOUTS = [];
+  function registerLayout(def) {
+    if (!def || !def.id || !def.render) return;
+    def.sections = def.sections || [];
+    def.basics = def.basics || [];
+    LAYOUTS.push(def);
+  }
+  function layouts() { return LAYOUTS.slice(); }
+  function findLayout(id) {
+    for (var i = 0; i < LAYOUTS.length; i++) if (LAYOUTS[i].id === id) return LAYOUTS[i];
+    return LAYOUTS[0];
+  }
+  function layoutOrder(layout) {
+    return layout.sections.map(function (s) { return s.id; });
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Theme catalog — 27 designs across 8 layouts / 7 event types        *
+   * ------------------------------------------------------------------ */
+  var THEMES = [
+    /* ---- royal — Classic Wedding --------------------------------- */
+    { id: 'emerald', name: 'Emerald & Gold', event: 'wedding', layout: 'royal', category: 'Classic',
+      dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628', soft: '#efe7d2',
+      nameFont: 'vibes', ornament: 'floral',
+      content: { basics: { nameA: 'Ananya', nameB: 'Rohan' } } },
+    { id: 'maroon', name: 'Royal Maroon', event: 'wedding', layout: 'royal', category: 'Classic',
+      dark: '#47161f', gold: '#d4a95c', bg: '#faf5ec', ink: '#43302c', soft: '#f0e2d4',
+      nameFont: 'vibes', ornament: 'floral',
+      content: { basics: { nameA: 'Meera', nameB: 'Arjun' } } },
+    { id: 'blush', name: 'Blush Rose', event: 'wedding', layout: 'royal', category: 'Floral',
+      dark: '#5c3a40', gold: '#b98a8e', bg: '#faf3ef', ink: '#54423f', soft: '#f2e2dc',
+      nameFont: 'paris', ornament: 'floral',
+      content: { basics: { nameA: 'Sophie', nameB: 'James' } } },
+    { id: 'navy', name: 'Midnight Navy', event: 'wedding', layout: 'royal', category: 'Classic',
+      dark: '#1b2a41', gold: '#c8a96a', bg: '#f6f4ee', ink: '#39404d', soft: '#e4e2d8',
+      nameFont: 'corm', ornament: 'lines',
+      content: { basics: { nameA: 'Elena', nameB: 'Marco' } } },
+
+    /* ---- bloom — Garden & Floral Wedding -------------------------- */
+    { id: 'sage', name: 'Sage Garden', event: 'wedding', layout: 'bloom', category: 'Floral',
+      dark: '#3f5142', gold: '#9a7b4f', bg: '#f5f6f0', ink: '#3d4438', soft: '#e2e8da',
+      nameFont: 'corm', ornament: 'lines',
+      content: { basics: { nameA: 'Freya', nameB: 'Oliver' } } },
+    { id: 'champagne', name: 'Champagne Ivory', event: 'wedding', layout: 'bloom', category: 'Elegant',
+      dark: '#6b5d4a', gold: '#b0955c', bg: '#faf7f0', ink: '#4a4234', soft: '#efe6d4',
+      nameFont: 'corm', ornament: 'geo',
+      content: { basics: { nameA: 'Charlotte', nameB: 'Henry' } } },
+    { id: 'lavender', name: 'Lavender Mist', event: 'wedding', layout: 'bloom', category: 'Floral',
+      dark: '#443a63', gold: '#9a7bc9', bg: '#f7f4fa', ink: '#453e58', soft: '#e7e0f2',
+      nameFont: 'paris', ornament: 'geo',
+      content: { basics: { nameA: 'Isla', nameB: 'Noah' } } },
+    { id: 'marigold', name: 'Marigold Saffron', event: 'wedding', layout: 'bloom', category: 'Floral',
+      dark: '#7c3f10', gold: '#d99a2b', bg: '#fdf6e7', ink: '#5b3a17', soft: '#f7e7c6',
+      nameFont: 'vibes', ornament: 'floral',
+      content: { basics: { nameA: 'Priya', nameB: 'Dev' } } },
+
+    /* ---- fiesta — Birthday ---------------------------------------- */
+    { id: 'balloonpop', name: 'Balloon Pop', event: 'birthday', layout: 'fiesta', category: 'Playful',
+      dark: '#e0447c', gold: '#1f9e8e', bg: '#fff7f9', ink: '#4a2c3a', soft: '#ffe3ee',
+      nameFont: 'play', ornament: 'geo',
+      content: { basics: { name: 'Aarav', age: '7' } } },
+    { id: 'neon', name: 'Neon Eighteen', event: 'birthday', layout: 'fiesta', category: 'Glam',
+      dark: '#0d0a16', gold: '#ff4d8d', bg: '#141020', ink: '#f0ebff', soft: '#241c38',
+      nameFont: 'jost', ornament: 'geo',
+      content: { basics: { name: 'Zoe', age: '18' } } },
+    { id: 'glam', name: 'Golden Sixteen', event: 'birthday', layout: 'fiesta', category: 'Glam',
+      dark: '#2d2013', gold: '#d4a852', bg: '#fffaf3', ink: '#4a3a28', soft: '#f5e8d0',
+      nameFont: 'paris', ornament: 'geo',
+      content: { basics: { name: 'Isabella', age: '16' } } },
+    { id: 'tropical', name: 'Tropical Fiesta', event: 'birthday', layout: 'fiesta', category: 'Playful',
+      dark: '#1f5f5b', gold: '#ff7f5c', bg: '#fff8ef', ink: '#4f3826', soft: '#d8f0ea',
+      nameFont: 'play', ornament: 'geo',
+      content: { basics: { name: 'Maya', age: '30' } } },
+    { id: 'fifty', name: 'Golden Fifty', event: 'birthday', layout: 'fiesta', category: 'Elegant',
+      dark: '#33290f', gold: '#b98a2f', bg: '#fbf6ec', ink: '#4c412c', soft: '#f1e6c8',
+      nameFont: 'corm', ornament: 'lines',
+      content: { basics: { name: 'Robert', age: '50' } } },
+
+    /* ---- cinema — Anniversary ------------------------------------- */
+    { id: 'jubilee', name: 'Golden Jubilee', event: 'anniversary', layout: 'cinema', category: 'Elegant',
+      dark: '#2a2310', gold: '#c9a45c', bg: '#faf5ea', ink: '#453a26', soft: '#efe4c8',
+      nameFont: 'pfd', ornament: 'lines',
+      content: { basics: { nameA: 'Grace', nameB: 'Jonathan', years: '50' } } },
+    { id: 'silver', name: 'Silver Years', event: 'anniversary', layout: 'cinema', category: 'Elegant',
+      dark: '#232c36', gold: '#9fb0c0', bg: '#f6f8fa', ink: '#3a4450', soft: '#e2e8ee',
+      nameFont: 'pfd', ornament: 'lines',
+      content: { basics: { nameA: 'Helen', nameB: 'David', years: '25' } } },
+    { id: 'ruby', name: 'Ruby Romance', event: 'anniversary', layout: 'cinema', category: 'Classic',
+      dark: '#3c1420', gold: '#c23b52', bg: '#fbf3f2', ink: '#4c3036', soft: '#f2dcda',
+      nameFont: 'pfd', ornament: 'floral',
+      content: { basics: { nameA: 'Amara', nameB: 'Kwame', years: '40' } } },
+
+    /* ---- nest — Housewarming -------------------------------------- */
+    { id: 'newkeys', name: 'New Keys', event: 'housewarming', layout: 'nest', category: 'Modern',
+      dark: '#2f4a3e', gold: '#c98f4e', bg: '#f8f6f1', ink: '#3f3a30', soft: '#e8e2d4',
+      nameFont: 'corm', ornament: 'lines',
+      content: { basics: { family: 'The Bennetts' },
+        sections: { hero: { photo: 'home' } } } },
+    { id: 'cottage', name: 'Cottage Welcome', event: 'housewarming', layout: 'nest', category: 'Rustic',
+      dark: '#5c4632', gold: '#a4703f', bg: '#faf7ee', ink: '#4a4032', soft: '#ece2cc',
+      nameFont: 'corm', ornament: 'floral',
+      content: { basics: { family: 'The Hartleys' },
+        sections: { hero: { photo: 'cottage' } } } },
+    { id: 'hearth', name: 'Modern Hearth', event: 'housewarming', layout: 'nest', category: 'Minimal',
+      dark: '#1f1e1b', gold: '#b08b5e', bg: '#f7f6f4', ink: '#33312c', soft: '#e8e5de',
+      nameFont: 'jost', ornament: 'geo',
+      content: { basics: { family: 'The Moreaus' },
+        sections: { hero: { photo: 'home' } } } },
+
+    /* ---- lumen — Baptism & Christening ---------------------------- */
+    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'lumen', category: 'Soft',
+      dark: '#6f6851', gold: '#b0a583', bg: '#fbf9f4', ink: '#4c463a', soft: '#efe9da',
+      nameFont: 'paris', ornament: 'floral',
+      content: { basics: { child: 'Theodore' },
+        sections: { hero: { photo: 'baptism' } } } },
+    { id: 'sky', name: 'Sky of Grace', event: 'baptism', layout: 'lumen', category: 'Soft',
+      dark: '#39586e', gold: '#7fa8c9', bg: '#f4f8fb', ink: '#3a4a58', soft: '#dfeaf2',
+      nameFont: 'paris', ornament: 'lines',
+      content: { basics: { child: 'Lily' },
+        sections: { hero: { photo: 'baptism' } } } },
+    { id: 'ivorycross', name: 'Ivory & Gold Cross', event: 'baptism', layout: 'lumen', category: 'Classic',
+      dark: '#5c5140', gold: '#c2a05e', bg: '#fbf8f0', ink: '#4a4234', soft: '#efe7d2',
+      nameFont: 'corm', ornament: 'geo',
+      content: { basics: { child: 'Gabriel' },
+        sections: { hero: { photo: 'baptism' } } } },
+
+    /* ---- play — Baby Shower & Kids -------------------------------- */
+    { id: 'teddy', name: 'Teddy Hug', event: 'baby', layout: 'play', category: 'Soft',
+      dark: '#7a5c44', gold: '#c99a6e', bg: '#faf6ef', ink: '#4a4038', soft: '#efe4d2',
+      nameFont: 'play', ornament: 'floral',
+      content: { basics: { name: 'Bennett' } } },
+    { id: 'sunshine', name: 'Sunshine Sprinkle', event: 'baby', layout: 'play', category: 'Playful',
+      dark: '#d99a2b', gold: '#e8862e', bg: '#fffbea', ink: '#5c4a1f', soft: '#f9edcd',
+      nameFont: 'baloo', ornament: 'geo',
+      content: { basics: { name: 'Sunny' } } },
+    { id: 'star', name: 'Little Star', event: 'baby', layout: 'play', category: 'Playful',
+      dark: '#1e2a4a', gold: '#e3b23c', bg: '#f7f9fd', ink: '#39445c', soft: '#e4e9f5',
+      nameFont: 'baloo', ornament: 'geo',
+      content: { basics: { name: 'Aria' } } },
+
+    /* ---- noir — Gala & Evening ------------------------------------ */
+    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'noir', category: 'Elegant',
+      dark: '#0d0c11', gold: '#c9a45c', bg: '#15141a', ink: '#ece9e2', soft: '#232129',
+      nameFont: 'cinzel', ornament: 'lines',
+      content: { basics: { host: 'The Ashford Society' } } },
+    { id: 'velvet', name: 'Velvet Rope', event: 'gala', layout: 'noir', category: 'Classic',
+      dark: '#4a1420', gold: '#c9905c', bg: '#f9f4f4', ink: '#3e262c', soft: '#efdcd9',
+      nameFont: 'cinzel', ornament: 'geo',
+      content: { basics: { host: 'The Beaumont Committee' } } }
+  ];
 
   /* ------------------------------------------------------------------ *
    *  Templates: builtin + custom                                        *
@@ -170,7 +355,9 @@
     var arr = readCustom();
     t.id = t.id || ('custom-' + Date.now());
     t.custom = true;
-    t.category = 'Custom';
+    t.event = t.event || 'wedding';
+    t.layout = t.layout || 'royal';
+    t.category = t.category || 'Custom';
     var found = false;
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id === t.id) { arr[i] = t; found = true; break; }
@@ -182,123 +369,125 @@
   function deleteCustomTemplate(id) {
     writeCustom(readCustom().filter(function (t) { return t.id !== id; }));
   }
-  function allTemplates() {
-    return THEMES.concat(readCustom());
-  }
+  function allTemplates() { return THEMES.concat(readCustom()); }
   function findTemplate(id) {
     var list = allTemplates();
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
     return list[0];
   }
-
-  /* ------------------------------------------------------------------ *
-   *  Default website content (mirrors the reference layout)             *
-   * ------------------------------------------------------------------ */
-  function futureISO(monthsAhead, day) {
-    var d = new Date();
-    d.setDate(day || 24);
-    d.setMonth(d.getMonth() + (monthsAhead || 0));
-    var m = String(d.getMonth() + 1); if (m.length < 2) m = '0' + m;
-    var dd = String(d.getDate()); if (dd.length < 2) dd = '0' + dd;
-    return d.getFullYear() + '-' + m + '-' + dd;
+  function templateExists(id) {
+    return THEMES.some(function (t) { return t.id === id; }) ||
+      readCustom().some(function (t) { return t.id === id; });
   }
 
-  function siteDefaults() {
-    return {
-      v: 3,
-      templateId: 'emerald',
+  /* ------------------------------------------------------------------ *
+   *  Default site content for a template                                *
+   *  (layout defaults + template content overrides)                     *
+   * ------------------------------------------------------------------ */
+  function siteDefaults(templateId) {
+    var tpl = templateId ? findTemplate(templateId) : THEMES[0];
+    var layout = findLayout(tpl.layout || 'royal');
+    var dflt = layout.defaults ? layout.defaults() : { basics: {}, sections: {} };
+    var d = {
+      v: 4,
+      layoutId: layout.id,
+      templateId: tpl.id,
       nameFont: '',            /* '' = follow the template */
       bodyFont: 'lato',
       accent: 'tpl',           /* 'tpl' or hex */
       btnShape: 'soft',
       spacing: 'normal',
-      basics: {
-        nameA: 'Ananya', nameB: 'Rohan',
-        date: futureISO(3), time: '05:00 PM onwards',
-        venue: 'The Grand Palms',
-        address: 'No. 123, Palm Avenue, Hennur Main Road',
-        city: 'Bengaluru',
-        dress: 'Semi formal \u00b7 Pastel shades',
-        quote: 'Two hearts, one love, a lifetime together.'
-      },
-      order: ['hero', 'countdown', 'story', 'gallery', 'events', 'venue', 'rsvp', 'contact'],
-      sections: {
-        hero: {
-          on: true,
-          kicker1: "You're invited to", kicker2: 'the wedding of',
-          photo: 'couple', btnText: 'Enter invitation'
-        },
-        countdown: {
-          on: true,
-          label: 'Countdown to our big day',
-          quote: 'Two hearts, one love, a lifetime together.'
-        },
-        story: {
-          on: true, title: 'Our story',
-          items: [
-            { photo: 'cafe',     title: 'First met',      date: '14 March 2021', text: 'A chance meeting that started it all.' },
-            { photo: 'proposal', title: 'Fell in love',   date: '20 July 2022',  text: 'We became inseparable and built beautiful memories.' },
-            { photo: 'rings',    title: 'She said yes',   date: '14 February 2025', text: 'The best day of our lives, and the beginning of forever.' },
-            { photo: 'dance',    title: 'Forever starts', date: '24 November 2026', text: "We can't wait to celebrate this special day with you all!" }
-          ]
-        },
-        gallery: {
-          on: true, title: 'Gallery', btn: 'View more photos',
-          items: [
-            { src: 'couple' }, { src: 'cafe' }, { src: 'proposal' },
-            { src: 'dance' }, { src: 'rings' }, { src: 'decor' }
-          ]
-        },
-        events: {
-          on: true, title: 'Events',
-          items: [
-            { icon: 'rings',    name: 'Wedding ceremony', time: '05:00 PM - 06:30 PM', venue: 'The Grand Palms \u00b7 Main lawn' },
-            { icon: 'cocktail', name: 'Cocktails & mocktails', time: '06:30 PM - 07:30 PM', venue: 'The Grand Palms \u00b7 Garden area' },
-            { icon: 'dinner',   name: 'Dinner', time: '07:30 PM - 09:30 PM', venue: 'The Grand Palms \u00b7 Banquet hall' },
-            { icon: 'music',    name: 'Reception party', time: '09:30 PM onwards', venue: 'The Grand Palms \u00b7 Banquet hall' }
-          ]
-        },
-        venue: {
-          on: true,
-          name: 'The Grand Palms',
-          address: 'No. 123, Palm Avenue, Hennur Main Road, Bengaluru - 560043, Karnataka, India',
-          dirUrl: '',
-          mapUrl: 'https://www.openstreetmap.org/export/embed.html?bbox=77.5980%2C13.0180%2C77.6380%2C13.0480&layer=mapnik&marker=13.0330%2C77.6180',
-          items: [
-            { icon: 'car',   label: 'Ample parking' },
-            { icon: 'bell',  label: 'Valet service' },
-            { icon: 'chair', label: 'Wheelchair accessible' },
-            { icon: 'snow',  label: 'AC venue' }
-          ]
-        },
-        rsvp: {
-          on: true,
-          title: 'Kindly RSVP',
-          note: 'Please confirm your presence by',
-          deadline: futureISO(2, 10),
-          showPhone: true,
-          guestsMax: 6,
-          meals: ['Vegetarian', 'Non vegetarian', 'Jain', 'Not sure yet'],
-          showMsg: true,
-          submit: 'Submit RSVP',
-          success: 'Thank you! Your reply has been received — we can\u2019t wait to celebrate with you.'
-        },
-        contact: {
-          on: true,
-          phone: '+91 98765 43210',
-          email: 'ananyaandrohan@gmail.com',
-          whatsapp: 'WhatsApp us',
-          thanks: 'Thank you for being a part of our special day!',
-          social: { wa: true, fb: true, ig: true, share: true },
-          copyright: '',
-          credit: 'Made with \u2665 for our big day'
+      basics: dflt.basics || {},
+      order: layoutOrder(layout),
+      sections: dflt.sections || {}
+    };
+    if (tpl.content) {
+      if (tpl.content.basics) deepMerge(d.basics, tpl.content.basics);
+      if (tpl.content.sections) {
+        for (var k in tpl.content.sections) {
+          if (!d.sections[k]) d.sections[k] = { on: true };
+          deepMerge(d.sections[k], tpl.content.sections[k]);
         }
       }
-    };
+    }
+    return d;
   }
 
   /* ------------------------------------------------------------------ *
-   *  Theme CSS variables                                                *
+   *  State loader (editor) with v1/v2/v3 → v4 migration                 *
+   * ------------------------------------------------------------------ */
+  function loadSiteState(flow) {
+    flow = flow || {};
+    var saved = readJson(EVENT_KEY);
+    var wanted = flow.design || (saved && saved.templateId) || '';
+    if (wanted && !templateExists(wanted)) wanted = '';
+    var d = siteDefaults(wanted || undefined);
+
+    if (!saved || typeof saved !== 'object') return d;
+
+    /* theme-ish top-level fields carry over on every version */
+    ['nameFont', 'bodyFont', 'accent', 'btnShape', 'spacing'].forEach(function (k) {
+      if (saved[k] !== undefined && saved[k] !== null && saved[k] !== '') d[k] = saved[k];
+    });
+
+    var savedLayout = null;
+    if (saved.v === 4 && saved.layoutId && LAYOUTS.some(function (l) { return l.id === saved.layoutId; })) {
+      savedLayout = saved.layoutId;
+    } else if (saved.v === 3) {
+      savedLayout = 'royal'; /* v3 sites used the classic wedding format */
+    }
+
+    if (saved.v === 4) {
+      /* keep user edits; extra section keys are simply ignored by renderers */
+      deepMerge(d, saved);
+      if (saved.order && Array.isArray(saved.order) && saved.order.length) d.order = saved.order.slice();
+    } else if (saved.v === 3) {
+      if (saved.basics) deepMerge(d.basics, saved.basics);
+      if (saved.sections) {
+        for (var k in saved.sections) {
+          if (d.sections[k]) deepMerge(d.sections[k], saved.sections[k]);
+        }
+      }
+      if (Array.isArray(saved.order) && saved.order.length === d.order.length) d.order = saved.order.slice();
+    } else {
+      /* v1/v2 legacy: carry only universal bits */
+      var TMAP = { eucalyptus: 'sage', monogram: 'champagne', 'golden-hour': 'champagne',
+        midnight: 'navy', 'garden-party': 'sage', ocean: 'navy', ivory: 'champagne' };
+      if (saved.sections && saved.sections.rsvp && saved.sections.rsvp.deadline) {
+        d.sections.rsvp.deadline = saved.sections.rsvp.deadline;
+      }
+      if (saved.nameFont === 'classic') d.nameFont = 'corm';
+      if (saved.nameFont === 'romantic') d.nameFont = 'paris';
+      if (saved.nameFont === 'modern') d.nameFont = 'jost';
+      void TMAP;
+    }
+
+    /* the design picked in checkout wins, but keep edits when the layout matches */
+    if (flow.design && templateExists(flow.design) && flow.design !== d.templateId) {
+      var newTpl = findTemplate(flow.design);
+      if (newTpl.layout === d.layoutId) {
+        d.templateId = flow.design; /* keep user edits */
+      } else {
+        d = siteDefaults(flow.design); /* new event type → fresh sample content */
+      }
+    }
+    if (!templateExists(d.templateId)) d.templateId = THEMES[0].id;
+    var tpl = findTemplate(d.templateId);
+    if (!LAYOUTS.some(function (l) { return l.id === d.layoutId; }) || d.layoutId !== (tpl.layout || 'royal')) {
+      /* switching layouts keeps overlapping content keys via deepMerge below */
+      var keep = { basics: d.basics, sections: d.sections };
+      d = siteDefaults(d.templateId);
+      deepMerge(d.basics, keep.basics);
+      for (var sk in keep.sections) {
+        if (d.sections[sk]) deepMerge(d.sections[sk], keep.sections[sk]);
+      }
+    }
+    void savedLayout;
+    return d;
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Theme CSS variables + root elements                                *
    * ------------------------------------------------------------------ */
   function themeVars(tpl, data) {
     var v = {
@@ -310,302 +499,90 @@
     }
     return v;
   }
-  function applyVars(el, vars) {
-    for (var k in vars) el.style.setProperty(k, vars[k]);
+  function applyVars(el, tpl, data) {
+    var v = themeVars(tpl, data);
+    for (var k in v) el.style.setProperty(k, v[k]);
   }
-
-  /* ------------------------------------------------------------------ *
-   *  FULL renderer (editor live preview)                                *
-   * ------------------------------------------------------------------ */
-  function renderSite(data, opts) {
+  function siteRoot(data, tpl, opts) {
     opts = opts || {};
-    data = data || siteDefaults();
-    var tpl = findTemplate(data.templateId);
-    var nf = NAME_FONTS[data.nameFont] || NAME_FONTS[tpl.nameFont] || NAME_FONTS.vibes;
-    var B = data.basics || {};
-    var S = data.sections || {};
+    var layout = findLayout(data.layoutId || tpl.layout || 'royal');
     var el = document.createElement('div');
-    el.className = 'ws ws-orn-' + (tpl.ornament || 'lines') + ' ' + (BODY_FONTS[data.bodyFont] || BODY_FONTS.lato).cls +
+    el.className = 'ws ws-' + layout.id + ' ws-orn-' + (tpl.ornament || 'lines') + ' ' +
+      (BODY_FONTS[data.bodyFont] || BODY_FONTS.lato).cls +
       ' ws-bs-' + (data.btnShape || 'soft') + ' ws-sp-' + (data.spacing || 'normal') +
       (opts.interactive ? ' ws-live' : '');
-    applyVars(el, themeVars(tpl, data));
-    var order = (data.order && data.order.length) ? data.order : siteDefaults().order;
-    var builders = {
-      hero: heroHtml, countdown: countdownHtml, story: storyHtml, gallery: galleryHtml,
-      events: eventsHtml, venue: venueHtml, rsvp: rsvpHtml, contact: contactHtml
-    };
-    var html = '';
-    order.forEach(function (id) {
-      var sec = S[id];
-      if (!sec || !sec.on || !builders[id]) return;
-      html += builders[id](data, tpl, nf);
-    });
-    el.innerHTML = html;
+    applyVars(el, tpl, data);
+    return el;
+  }
+  function miniRoot(tpl, data, layoutId) {
+    var el = document.createElement('div');
+    el.className = 'wsm ws-' + (layoutId || tpl.layout || 'royal') + ' ws-orn-' + (tpl.ornament || 'lines');
+    el.setAttribute('aria-hidden', 'true');
+    applyVars(el, tpl, data);
     return el;
   }
 
-  /* ---- section builders ------------------------------------------- */
-  function heroHtml(d, tpl, nf) {
-    var h = d.sections.hero, B = d.basics;
-    var navLinks = [['story', 'Our story'], ['events', 'Events'], ['gallery', 'Gallery'], ['venue', 'Venue'], ['rsvp', 'RSVP'], ['contact', 'Contact']];
-    var nav = navLinks.map(function (l) {
-      return '<a href="#ws-sec-' + l[0] + '" data-goto="' + l[0] + '">' + esc(l[1]) + '</a>';
-    }).join('');
-    return '' +
-      '<header class="ws-hero" id="ws-sec-hero">' +
-        '<img class="ws-hero-img" src="' + esc(photoSrc(h.photo)) + '" alt="" aria-hidden="true"/>' +
-        '<div class="ws-hero-shade" aria-hidden="true"></div>' +
-        '<span class="ws-orn ws-orn-a" aria-hidden="true"></span><span class="ws-orn ws-orn-b" aria-hidden="true"></span>' +
-        '<div class="ws-hero-bar">' +
-          '<span class="ws-mono">' + esc(monogram(B.nameA, B.nameB)) + '</span>' +
-          '<nav class="ws-nav" aria-label="Event sections">' + nav + '</nav>' +
-        '</div>' +
-        '<div class="ws-hero-inner">' +
-          '<p class="ws-kick">' + esc(h.kicker1) + '<br/>' + esc(h.kicker2) + '</p>' +
-          '<h1 class="ws-names ' + nf.cls + '">' +
-            esc(B.nameA) + ' <span class="ws-amp">\u0026</span><br/>' + esc(B.nameB) + '</h1>' +
-          '<span class="ws-div" aria-hidden="true"><i></i>' + icon('heart', 'ws-div-heart') + '<i></i></span>' +
-          '<p class="ws-hero-date">' + esc(fmtHeroDate(B.date)) + '</p>' +
-          '<a class="ws-btn ws-btn-line" href="#ws-sec-countdown" data-goto="countdown">' + esc(h.btnText || 'Enter invitation') + '</a>' +
-        '</div>' +
-        '<span class="ws-scroll" aria-hidden="true">' + icon('chevron') + '</span>' +
-      '</header>';
+  /* ------------------------------------------------------------------ *
+   *  Shared partials used by layouts                                    *
+   * ------------------------------------------------------------------ */
+  function timerHtml(dateISO) {
+    return '<div class="ws-timer" data-ws-deadline="' + esc(dateISO) + 'T17:00:00" aria-label="Countdown timer">' +
+      '<span class="ws-tbox"><b data-u="d">00</b><i>Days</i></span>' +
+      '<span class="ws-tbox"><b data-u="h">00</b><i>Hours</i></span>' +
+      '<span class="ws-tbox"><b data-u="m">00</b><i>Minutes</i></span>' +
+      '<span class="ws-tbox"><b data-u="s">00</b><i>Seconds</i></span>' +
+    '</div>';
   }
-
-  function countdownHtml(d) {
-    var c = d.sections.countdown, B = d.basics;
-    var cards = [
-      { ic: 'calendar', label: 'Date',  l1: fmtLongDate(B.date), l2: fmtWeekday(B.date) },
-      { ic: 'clock',    label: 'Time',  l1: esc(B.time), l2: '' },
-      { ic: 'pin',      label: 'Venue', l1: esc(B.venue), l2: esc(B.city) },
-      { ic: 'dress',    label: 'Dress code', l1: esc(B.dress), l2: '' }
-    ];
-    var cardsHtml = cards.map(function (c2) {
-      return '<div class="ws-dcard">' + icon(c2.ic) +
-        '<b>' + c2.label + '</b><span>' + c2.l1 + '</span>' + (c2.l2 ? '<span>' + c2.l2 + '</span>' : '') + '</div>';
-    }).join('');
-    return '' +
-      '<section class="ws-sec ws-count" id="ws-sec-countdown">' +
-        '<div class="ws-count-grid">' +
-          '<div class="ws-count-left">' +
-            '<h2 class="ws-title sm">' + esc(c.label) + '</h2>' +
-            '<div class="ws-timer" data-ws-deadline="' + esc(d.basics.date) + 'T17:00:00" aria-label="Countdown timer">' +
-              '<span class="ws-tbox"><b data-u="d">00</b><i>Days</i></span>' +
-              '<span class="ws-tbox"><b data-u="h">00</b><i>Hours</i></span>' +
-              '<span class="ws-tbox"><b data-u="m">00</b><i>Minutes</i></span>' +
-              '<span class="ws-tbox"><b data-u="s">00</b><i>Seconds</i></span>' +
-            '</div>' +
-            '<p class="ws-quote">\u201c' + esc(c.quote) + '\u201d</p>' +
-          '</div>' +
-          '<div class="ws-details">' + cardsHtml +
-            '<a class="ws-btn ws-btn-dark ws-map-link" href="' +
-              esc(safeUrl(d.sections.venue.dirUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((d.sections.venue.address || '') + ' ' + (d.basics.city || '')))) +
-              '" target="_blank" rel="noopener noreferrer">' + icon('pin') + ' View on map</a>' +
-          '</div>' +
-        '</div>' +
-      '</section>';
-  }
-
-  function storyHtml(d) {
-    var s = d.sections.story;
-    var items = (s.items || []).map(function (m, i) {
-      return '<div class="ws-ms">' +
-        '<span class="ws-ms-heart" aria-hidden="true">' + (i > 0 ? icon('heart') : '') + '</span>' +
-        '<span class="ws-ms-photo"><img src="' + esc(photoSrc(m.photo)) + '" alt="' + esc(m.title) + '"/></span>' +
-        '<b>' + esc(m.title) + '</b><i class="ws-ms-date">' + esc(m.date) + '</i>' +
-        '<p>' + esc(m.text) + '</p></div>';
-    }).join('');
-    return '' +
-      '<section class="ws-sec ws-story" id="ws-sec-story">' +
-        '<h2 class="ws-title">' + esc(s.title) + '</h2>' +
-        '<div class="ws-story-row">' + items + '</div>' +
-      '</section>';
-  }
-
-  function galleryHtml(d) {
-    var g = d.sections.gallery;
-    var imgs = (g.items || []).map(function (p) {
-      return '<span class="ws-gcell"><img src="' + esc(photoSrc(p.src)) + '" alt="Event photo" loading="lazy"/></span>';
-    }).join('');
-    return '' +
-      '<section class="ws-sec ws-gallery" id="ws-sec-gallery">' +
-        '<h2 class="ws-title">' + esc(g.title) + '</h2>' +
-        '<div class="ws-gallery-row">' + imgs + '</div>' +
-        (g.btn ? '<a class="ws-btn ws-btn-dark" href="#ws-sec-gallery">' + icon('camera') + ' ' + esc(g.btn) + '</a>' : '') +
-      '</section>';
-  }
-
-  function eventsHtml(d) {
-    var e = d.sections.events;
-    var cards = (e.items || []).map(function (ev) {
-      return '<div class="ws-ecard">' + icon(ev.icon) +
-        '<b>' + esc(ev.name) + '</b><span>' + esc(ev.time) + '</span><span class="ws-ec-venue">' + esc(ev.venue) + '</span></div>';
-    }).join('');
-    return '' +
-      '<section class="ws-sec ws-events" id="ws-sec-events">' +
-        '<h2 class="ws-title">' + esc(e.title) + '</h2>' +
-        '<div class="ws-events-grid">' + cards + '</div>' +
-      '</section>';
-  }
-
-  function venueHtml(d) {
-    var v = d.sections.venue;
-    var amen = (v.items || []).map(function (a) {
-      return '<div class="ws-am">' + icon(a.icon) + '<span>' + esc(a.label) + '</span></div>';
-    }).join('');
-    var mapSrc = safeUrl(v.mapUrl);
-    var map = mapSrc
-      ? '<iframe class="ws-map" src="' + esc(mapSrc) + '" title="Venue map" loading="lazy" referrerpolicy="no-referrer"></iframe>'
-      : '<div class="ws-map ws-map-empty">' + icon('pin') + '<p>Map coming soon</p></div>';
-    return '' +
-      '<section class="ws-sec ws-venue-sec" id="ws-sec-venue">' +
-        '<div class="ws-venue-grid">' +
-          '<div class="ws-venue-panel">' +
-            '<h2 class="ws-title on-dark">' + esc(v.name) + '</h2>' +
-            '<address>' + esc(v.address).replace(/\n/g, '<br/>') + '</address>' +
-            '<div class="ws-am-row">' + amen + '</div>' +
-            '<a class="ws-btn ws-btn-line" target="_blank" rel="noopener noreferrer" href="' +
-              esc(safeUrl(v.dirUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(v.address || ''))) +
-              '">Get directions ' + icon('share') + '</a>' +
-          '</div>' + map +
-        '</div>' +
-      '</section>';
-  }
-
-  function rsvpHtml(d) {
-    var r = d.sections.rsvp, B = d.basics;
+  function rsvpFormHtml(r) {
     var guests = '<option value="">Number of guests</option>';
     for (var i = 1; i <= (parseInt(r.guestsMax, 10) || 6); i++) guests += '<option value="' + i + '">' + i + '</option>';
     var meals = '<option value="">Meal preference</option>';
     (r.meals || []).forEach(function (m) { meals += '<option>' + esc(m) + '</option>'; });
-    return '' +
-      '<section class="ws-sec ws-rsvp" id="ws-sec-rsvp">' +
-        '<div class="ws-rsvp-grid">' +
-          '<div class="ws-rsvp-head">' +
-            '<h2 class="ws-title">' + esc(r.title) + '</h2>' +
-            '<span class="ws-div" aria-hidden="true"><i></i>' + icon('heart', 'ws-div-heart') + '<i></i></span>' +
-            '<p>' + esc(r.note) + '<br/><b>' + esc(fmtLongDate(r.deadline)) + '</b></p>' +
-          '</div>' +
-          '<form class="ws-rsvp-form" novalidate>' +
-            '<div class="ws-frow">' +
-              '<input type="text" name="name" placeholder="Your name" required/>' +
-              (r.showPhone ? '<input type="tel" name="phone" placeholder="Phone number"/>' : '') +
-            '</div>' +
-            '<div class="ws-frow">' +
-              '<select name="guests">' + guests + '</select>' +
-              '<select name="attend" required><option value="">Will you attend?</option><option>Joyfully accept</option><option>Regretfully decline</option></select>' +
-            '</div>' +
-            '<div class="ws-frow">' +
-              '<select name="meal">' + meals + '</select>' +
-            '</div>' +
-            (r.showMsg ? '<textarea name="msg" rows="3" placeholder="Your message (optional)"></textarea>' : '') +
-            '<button class="ws-btn ws-btn-dark ws-submit" type="submit">' + esc(r.submit || 'Submit RSVP') + ' ' + icon('heart') + '</button>' +
-          '</form>' +
-        '</div>' +
-      '</section>';
+    return '<form class="ws-rsvp-form" novalidate>' +
+      '<div class="ws-frow">' +
+        '<input type="text" name="name" placeholder="Your name" required/>' +
+        (r.showPhone ? '<input type="tel" name="phone" placeholder="Phone number"/>' : '') +
+      '</div>' +
+      '<div class="ws-frow">' +
+        '<select name="guests">' + guests + '</select>' +
+        '<select name="attend" required><option value="">Will you attend?</option><option>Joyfully accept</option><option>Regretfully decline</option></select>' +
+      '</div>' +
+      '<div class="ws-frow">' +
+        '<select name="meal">' + meals + '</select>' +
+      '</div>' +
+      (r.showMsg ? '<textarea name="msg" rows="3" placeholder="Your message (optional)"></textarea>' : '') +
+      '<button class="ws-btn ws-btn-dark ws-submit" type="submit">' + esc(r.submit || 'Submit RSVP') + ' ' + icon('heart') + '</button>' +
+    '</form>';
   }
-
-  function contactHtml(d) {
-    var c = d.sections.contact, B = d.basics;
-    var soc = '';
-    if (c.social && c.social.wa) soc += '<a href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">' + icon('whatsapp') + '</a>';
-    if (c.social && c.social.fb) soc += '<a href="#ws-sec-contact" aria-label="Facebook">' + icon('facebook') + '</a>';
-    if (c.social && c.social.ig) soc += '<a href="#ws-sec-contact" aria-label="Instagram">' + icon('instagram') + '</a>';
-    if (c.social && c.social.share) soc += '<a href="#ws-sec-contact" aria-label="Share">' + icon('share') + '</a>';
-    return '' +
-      '<footer class="ws-footer" id="ws-sec-contact">' +
-        '<div class="ws-foot-grid">' +
-          '<div class="ws-foot-col">' +
-            '<h3>Get in touch</h3>' +
-            '<p>For any queries, feel free to reach out.</p>' +
-            '<a class="ws-foot-line" href="tel:' + esc(String(c.phone).replace(/\s/g, '')) + '">' + icon('phone') + esc(c.phone) + '</a>' +
-            '<a class="ws-foot-line" href="mailto:' + esc(c.email) + '">' + icon('mail') + esc(c.email) + '</a>' +
-            '<a class="ws-foot-line" href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener noreferrer">' + icon('whatsapp') + esc(c.whatsapp) + '</a>' +
-          '</div>' +
-          '<div class="ws-foot-col ws-foot-mid">' +
-            '<span class="ws-crest"><i></i>' + esc(monogram(B.nameA, B.nameB)) + '<i></i></span>' +
-            '<p class="ws-thanks">' + esc(c.thanks) + '</p>' +
-          '</div>' +
-          '<div class="ws-foot-col ws-foot-right">' +
-            '<h3>Share the love</h3>' +
-            '<p>Share our invitation with your family and friends</p>' +
-            '<div class="ws-soc">' + soc + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="ws-foot-bar">' +
-          '<span>\u00a9 ' + new Date().getFullYear() + ' ' + esc(B.nameA + ' & ' + B.nameB) + (c.copyright ? ' \u00b7 ' + esc(c.copyright) : '') + '. All rights reserved.</span>' +
-          '<span>' + esc(c.credit) + '</span>' +
-        '</div>' +
-      '</footer>';
+  function mapIframe(url, title) {
+    var src = safeUrl(url);
+    return src
+      ? '<iframe class="ws-map" src="' + esc(src) + '" title="' + esc(title || 'Venue map') + '" loading="lazy" referrerpolicy="no-referrer"></iframe>'
+      : '<div class="ws-map ws-map-empty">' + icon('pin') + '<p>Map coming soon</p></div>';
   }
 
   /* ------------------------------------------------------------------ *
-   *  MINI renderer (design cards + checkout summary)                    *
+   *  Renderers (dispatch to the layout)                                 *
    * ------------------------------------------------------------------ */
+  function renderSite(data, opts) {
+    data = data || siteDefaults();
+    var tpl = findTemplate(data.templateId);
+    var layout = findLayout(data.layoutId || tpl.layout || 'royal');
+    return layout.render(data, tpl, opts || {});
+  }
+
   function renderSiteMini(tpl, data, opts) {
     opts = opts || {};
-    data = data || siteDefaults();
     if (typeof tpl === 'string') tpl = findTemplate(tpl);
+    data = data || siteDefaults(tpl.id);
     data.templateId = tpl.id;
-    var B = data.basics;
-    var nf = NAME_FONTS[data.nameFont] || NAME_FONTS[tpl.nameFont] || NAME_FONTS.vibes;
-    var el = document.createElement('div');
-    el.className = 'wsm ws-orn-' + (tpl.ornament || 'lines');
-    el.setAttribute('aria-hidden', 'true');
-    applyVars(el, themeVars(tpl, data));
-
-    var events = (data.sections.events.items || []).slice(0, opts.short ? 2 : 3).map(function (ev) {
-      return '<span class="wsm-ev">' + icon(ev.icon) + '<b>' + esc(ev.name) + '</b><i>' + esc(ev.time) + '</i></span>';
-    }).join('');
-    var story = (data.sections.story.items || []).slice(0, opts.short ? 0 : 4).map(function (m) {
-      return '<span class="wsm-ms"><img src="' + esc(photoSrc(m.photo)) + '" alt=""/></span>';
-    }).join('');
-    var gal = (data.sections.gallery.items || []).slice(0, 6).map(function (p) {
-      return '<img src="' + esc(photoSrc(p.src)) + '" alt=""/>';
-    }).join('');
-    var amen = (data.sections.venue.items || []).slice(0, 4).map(function (a) {
-      return '<span>' + icon(a.icon) + esc(a.label) + '</span>';
-    }).join('');
-
-    el.innerHTML = '' +
-      '<div class="wsm-hero">' +
-        '<img class="wsm-hero-img" src="' + esc(photoSrc(data.sections.hero.photo)) + '" alt=""/>' +
-        '<span class="wsm-orn wsm-orn-a" aria-hidden="true"></span><span class="wsm-orn wsm-orn-b" aria-hidden="true"></span>' +
-        '<span class="wsm-mono">' + esc(monogram(B.nameA, B.nameB)) + '</span>' +
-        '<span class="wsm-kick">' + esc(data.sections.hero.kicker2) + '</span>' +
-        '<strong class="wsm-names ' + nf.cls + '">' + esc(B.nameA) + ' <i>\u0026</i> ' + esc(B.nameB) + '</strong>' +
-        '<span class="wsm-div"><i></i>' + icon('heart') + '<i></i></span>' +
-        '<span class="wsm-date">' + esc(fmtHeroDate(B.date)) + '</span>' +
-        '<span class="wsm-btn">' + esc(data.sections.hero.btnText || 'Enter invitation') + '</span>' +
-      '</div>' +
-      '<div class="wsm-count">' +
-        '<div class="wsm-timer">' +
-          '<span><b>120</b><i>Days</i></span><span><b>08</b><i>Hours</i></span>' +
-          '<span><b>45</b><i>Mins</i></span><span><b>32</b><i>Secs</i></span>' +
-        '</div>' +
-        '<div class="wsm-dcards">' +
-          '<span>' + icon('calendar') + '<b>Date</b><i>' + esc(fmtLongDate(B.date)) + '</i></span>' +
-          '<span>' + icon('clock') + '<b>Time</b><i>' + esc(B.time) + '</i></span>' +
-          '<span>' + icon('pin') + '<b>Venue</b><i>' + esc(B.venue) + '</i></span>' +
-          '<span>' + icon('dress') + '<b>Dress</b><i>' + esc(B.dress) + '</i></span>' +
-        '</div>' +
-      '</div>' +
-      (opts.short ? '' :
-      '<div class="wsm-story"><span class="wsm-st">' + esc(data.sections.story.title) + '</span>' +
-        '<div class="wsm-ms-row">' + story + '</div></div>') +
-      '<div class="wsm-gallery">' + gal + '</div>' +
-      '<div class="wsm-events"><span class="wsm-st">' + esc(data.sections.events.title) + '</span>' + events + '</div>' +
-      (opts.short ? '' :
-      '<div class="wsm-venue"><b>' + esc(data.sections.venue.name) + '</b>' + amen + '</div>' +
-      '<div class="wsm-rsvp"><b>' + esc(data.sections.rsvp.title) + '</b><span class="wsm-btn wsm-btn-dark">Submit RSVP</span></div>') +
-      '<div class="wsm-foot"><span>' + esc(data.sections.contact.thanks) + '</span>' +
-        '<span class="wsm-crest">' + esc(monogram(B.nameA, B.nameB)) + '</span></div>'
-      ;
-    return el;
+    var layout = findLayout(tpl.layout || data.layoutId || 'royal');
+    if (layout.mini) return layout.mini(data, tpl, opts);
+    return miniRoot(tpl, data, layout.id);
   }
 
   /* ------------------------------------------------------------------ *
-   *  Live behaviours (editor preview): countdown + anchors + RSVP       *
+   *  Live behaviours: countdown + anchors + RSVP + scroll reveal        *
    * ------------------------------------------------------------------ */
   function tickCountdowns(root) {
     var timers = (root || document).querySelectorAll('[data-ws-deadline]');
@@ -663,14 +640,14 @@
       var attend = form.querySelector('[name="attend"]');
       if (name && !name.value.trim()) { name.classList.add('ws-err'); name.focus(); return; }
       if (attend && !attend.value) { attend.classList.add('ws-err'); attend.focus(); return; }
-      var sec = form.closest('.ws-rsvp');
-      var doneMsg = root.__wsData && root.__wsData.sections.rsvp.success;
+      var doneMsg = root.__wsData && root.__wsData.sections && root.__wsData.sections.rsvp &&
+                    root.__wsData.sections.rsvp.success;
       var box = document.createElement('div');
       box.className = 'ws-rsvp-done';
       box.innerHTML = '<span class="ws-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span>' +
         '<b>RSVP received</b><p>' + esc(doneMsg || 'Thank you!') + '</p>';
       form.hidden = true;
-      (form.parentElement || sec).appendChild(box);
+      (form.parentElement || form.closest('.ws-sec') || root).appendChild(box);
     });
     root.addEventListener('input', function (e) {
       if (e.target.classList) e.target.classList.remove('ws-err');
@@ -678,25 +655,50 @@
   }
 
   /* ------------------------------------------------------------------ */
+  window.EVER_EVENTS = EVENTS;
   window.EVER_THEMES = THEMES;
   window.EVER_ICONS = ICONS;
   window.EVER_PHOTOS = PHOTOS;
   window.EVER_NAME_FONTS = NAME_FONTS;
   window.EVER_BODY_FONTS = BODY_FONTS;
+  window.EVER_registerLayout = registerLayout;
+  window.EVER_layouts = layouts;
+  window.EVER_findLayout = findLayout;
+  window.EVER_layoutOrder = layoutOrder;
   window.EVER_siteDefaults = siteDefaults;
+  window.EVER_loadSiteState = loadSiteState;
   window.EVER_renderSite = renderSite;
   window.EVER_renderSiteMini = renderSiteMini;
   window.EVER_allTemplates = allTemplates;
   window.EVER_findTemplate = findTemplate;
+  window.EVER_templateExists = templateExists;
   window.EVER_saveCustomTemplate = saveCustomTemplate;
   window.EVER_deleteCustomTemplate = deleteCustomTemplate;
   window.EVER_readCustomTemplates = readCustom;
   window.EVER_tickCountdowns = tickCountdowns;
   window.EVER_bindSite = bindSite;
   window.EVER_esc = esc;
+  window.EVER_safeUrl = safeUrl;
   window.EVER_photoSrc = photoSrc;
   window.EVER_fmtHeroDate = fmtHeroDate;
   window.EVER_fmtLongDate = fmtLongDate;
+  window.EVER_fmtWeekday = fmtWeekday;
+  window.EVER_dateObj = dateObj;
+  window.EVER_monogram = monogram;
+  window.EVER_initials = initials;
+  window.EVER_directionsUrl = directionsUrl;
+  window.EVER_applyVars = applyVars;
+  window.EVER_siteRoot = siteRoot;
+  window.EVER_miniRoot = miniRoot;
+  window.EVER_timerHtml = timerHtml;
+  window.EVER_rsvpFormHtml = rsvpFormHtml;
+  window.EVER_mapIframe = mapIframe;
+  window.EVER_icon = icon;
+  window.EVER_deepMerge = deepMerge;
+  window.EVER_futureISO = futureISO;
+  window.EVER_readJson = readJson;
+  window.EVER_writeJson = writeJson;
+  window.EVER_EVENT_KEY = EVENT_KEY;
   /* backwards-compatible aliases */
   window.EVER_TEMPLATES = THEMES;
   window.renderSiteMini = function (tpl, data) { return renderSiteMini(tpl, data); };
