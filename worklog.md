@@ -328,3 +328,23 @@ Stage Summary:
 - 8 builtin designs + unlimited user-created designs (name/colors/fonts/ornaments) editable at any time from the design gallery or the editor
 - Every visible field of every section is editable with live preview; state persists (ever-rsvp-event v3, ever-rsvp-flow, ever-rsvp-custom-tpl)
 - Deployment = copy public/ (zero build, zero dependencies beyond Google Fonts CDN)
+
+---
+Task ID: 7
+Agent: orchestrator (Z.ai Code main)
+Task: Stack audit + remove all unused/unwanted scripts, code and files; deliver a minimal, fully explainable codebase
+
+Work Log:
+- Audited the whole tree: product = public/ (pure HTML/CSS/JS); leftovers = the abandoned early full-stack build (src/components 60+ React/shadcn files, src/app/api 23 routes, src/lib zustand/prisma/auth, prisma/ + db/custom.db, tailwind/postcss/components.json configs, tests/, scripts/, examples/, download/, tool-results/ artifacts, 2 stray root JPGs, unreferenced public/logo.svg)
+- Verified public/js has no dead code: identifier-reference scan found every top-level declaration referenced (LOW(2) items = decl + 1 call site); all 6 modules pass node --check
+- Deleted all leftovers listed above; root is now: public/, src/app (2 tiny shell files), configs, README.md, Caddyfile, worklog
+- Rewrote configs to minimal self-documenting versions: package.json (3 runtime deps: next/react/react-dom + dev tooling; scripts dev/lint/build/start + no-op db:push kept for sandbox dev.sh compatibility), next.config.ts (only the "/" → /index.html rewrite, standalone output removed), layout.tsx (metadata only, no fonts/css/toaster), page.tsx (redirect fallback), tsconfig.json (dropped unused @/* paths), eslint.config.mjs (simplified; public/** ignored as plain browser JS, fixed anonymous-default-export warning), .env (comment-only)
+- Pruned node_modules: clean rm -rf node_modules bun.lock && bun install → 1.2 GB/587 pkgs → 557 MB/278 pkgs (floor = Next 16 + React + ESLint toolchain); trusted unrs-resolver postinstall
+- Learned the sandbox reaps background children between tool calls; dev server now runs via a Python double-fork daemon (setsid) — survives across tool calls; also confirmed .zscripts/dev.sh requires a db:push script (kept as documented no-op)
+- Browser E2E after cleanup (agent-browser 1440px): home (zero errors) → Get started → create (8 designs + filters + own-design card) → Emerald & Gold → checkout → pay $25 → editor (EV-290843) → renamed to "Sophie & James" (PREVIEW_UPDATED) → Save (ever-rsvp-event v3 persisted) → Design tab → Midnight Navy switch → saved (templateId navy) → mobile preview frame renders; zero console errors throughout; test localStorage cleared
+- Wrote README.md: plain-language stack table, full file map, page/IIFE pattern, journey diagram, localStorage schema, "one format many designs" explanation, commands, static-deploy guide
+
+Stage Summary:
+- Codebase is minimal and fully explainable: product = 11 hand-readable files in public/ (4 HTML, 1 CSS, 6 JS) with zero runtime dependencies; Next.js is only the preview static server (react stays as its internal peer dep, no React in the product)
+- Full purchase→edit→save→design-switch flow re-verified in a real browser after the purge; lint clean; dev.log clean; all 4 pages 200
+- Deployment remains "copy public/ to any static host" (documented in README)

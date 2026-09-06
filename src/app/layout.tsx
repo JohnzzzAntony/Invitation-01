@@ -1,33 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+/**
+ * Root layout required by the Next.js App Router.
+ *
+ * The real user interface lives in public/*.html (plain HTML/CSS/JS) and is
+ * served by the static file handler BEFORE this React shell ever renders —
+ * see next.config.ts. This file exists only so that `next dev` and
+ * `next build` have a valid app shell; users never see it.
+ */
 export const metadata: Metadata = {
-  title: "Online RSVP — Beautiful event websites & effortless RSVPs",
+  title: "Ever RSVP — Beautiful event websites & effortless RSVPs",
   description:
-    "Create a stunning event website in minutes and manage every guest from one simple dashboard. Invitations, RSVP management, QR codes, analytics and more.",
-  keywords: ["RSVP", "event website", "wedding website", "invitations", "guest management", "event planning"],
-  authors: [{ name: "Online RSVP" }],
-  icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
-  },
-  openGraph: {
-    title: "Online RSVP — Create your perfect event website",
-    description: "Beautiful invitations. Easy RSVPs. Happy guests.",
-    siteName: "Online RSVP",
-    type: "website",
-  },
+    "Create a stunning event website in minutes. Pure HTML/CSS/JS — no framework on the front end.",
 };
 
 export const viewport: Viewport = {
@@ -38,17 +22,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
-      >
-        {children}
-        <Toaster position="top-center" richColors closeButton />
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

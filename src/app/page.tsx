@@ -1,8 +1,10 @@
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
-// The user-facing frontend is a static HTML/CSS/JS app served from /public
-// (see public/index.html). The rewrite in next.config.ts maps "/" to
-// "/index.html"; this page is only a fallback if the rewrite is bypassed.
+/**
+ * Fallback only. The beforeFiles rewrite in next.config.ts serves
+ * public/index.html at "/", so this redirect is never normally reached.
+ * It simply keeps the App Router valid (a root page is required).
+ */
 export default function Home() {
-  redirect('/index.html')
+  redirect("/index.html");
 }
