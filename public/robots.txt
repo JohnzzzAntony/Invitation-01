@@ -1,8 +1,15 @@
+# Ever RSVP — robots.txt
+# Crawl everything useful; keep funnel/app pages out of search results.
+
 User-agent: Googlebot
 Allow: /
+Disallow: /checkout.html
+Disallow: /editor.html
 
 User-agent: Bingbot
 Allow: /
+Disallow: /checkout.html
+Disallow: /editor.html
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +19,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /checkout.html
+Disallow: /editor.html
+
+Sitemap: https://everrsvp.com/sitemap.xml

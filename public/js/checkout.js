@@ -67,6 +67,19 @@
   }
 
   /* ---------- Validation ---------- */
+  /* Luhn checksum (industry-standard card digit validation) */
+  function luhnOk(num) {
+    if (!/^\d{13,16}$/.test(num)) return false;
+    var sum = 0, alt = false;
+    for (var i = num.length - 1; i >= 0; i--) {
+      var d = parseInt(num.charAt(i), 10);
+      if (alt) { d *= 2; if (d > 9) d -= 9; }
+      sum += d;
+      alt = !alt;
+    }
+    return sum % 10 === 0;
+  }
+
   function setError(id, msg) {
     var input = document.getElementById(id);
     var err = input.parentElement.querySelector('.perror') || input.closest('.pfield').querySelector('.perror');
@@ -88,7 +101,7 @@
     var ok = true;
     ok = setError('pay-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Enter a valid e-mail address.') && ok;
     ok = setError('pay-name', name ? '' : 'Enter the name on the card.') && ok;
-    ok = setError('pay-card', card.length === 16 ? '' : 'Card number needs 16 digits.') && ok;
+    ok = setError('pay-card', luhnOk(card) ? '' : 'Enter a valid card number (Luhn check).') && ok;
 
     var expOk = false;
     if (exp.length === 4) {
@@ -121,6 +134,8 @@
       if (label) label.textContent = 'Processing…';
 
       setTimeout(function () {
+        /* Privacy by design: only the order number is persisted — card data is
+           never written to localStorage, cookies or any server. */
         var order = 'EV-' + String(Math.floor(100000 + Math.random() * 900000));
         flow.paid = true;
         flow.order = order;

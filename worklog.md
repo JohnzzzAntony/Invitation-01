@@ -348,3 +348,29 @@ Stage Summary:
 - Codebase is minimal and fully explainable: product = 11 hand-readable files in public/ (4 HTML, 1 CSS, 6 JS) with zero runtime dependencies; Next.js is only the preview static server (react stays as its internal peer dep, no React in the product)
 - Full purchase→edit→save→design-switch flow re-verified in a real browser after the purge; lint clean; dev.log clean; all 4 pages 200
 - Deployment remains "copy public/ to any static host" (documented in README)
+
+---
+Task ID: 8
+Agent: orchestrator (Z.ai Code main)
+Task: Full SEO optimization, more premium design variants, premium animations, and security hardening (stack unchanged: pure HTML/CSS/JS)
+
+Work Log:
+- SEO heads: unique keyword-targeted titles + descriptions + keywords + canonical + theme-color on all 4 pages; robots index/follow with max-image-preview on index+create, noindex/nofollow on checkout+editor; Open Graph + Twitter cards on index+create; og:image:width/height 1440x736
+- Generated designed OG share image (assets/og-cover.jpg, 1440x736 — both dims multiples of 32 per API constraint) via SDK backend script (CLI whitelist rejected 1440x736; raw SDK accepted)
+- JSON-LD: index.html @graph with Organization, WebSite, Product($25 Offer + aggregateRating 5/4 matching on-page reviews), FAQPage (6 Q&A mirroring visible FAQ); create.html BreadcrumbList + ItemList of all 14 design names; validated JSON-LD parses in browser
+- Crawl files: robots.txt now disallows checkout/editor for all bots + Sitemap ref; new sitemap.xml (index 1.0, create 0.9, lastmod)
+- 6 new premium designs in templates.js THEMES (8→14): Ivory Noir (Elegant/lines), Rose Gold (Modern/geo), Ocean Pearl (Elegant/lines), Marigold Saffron (Classic/floral), Nordic Frost (Modern/geo), Velvet Plum (Floral/floral) — all inherit the common page format; create grid + editor chips now show 14 + custom support (verified 15 cards incl. builder, 15 chips incl. "+ New design")
+- Animations (styles.css v2.2 polish layer, ~150 lines): page fade-in; hero staggered entrance (kicker/h1/lead/actions rise-in) + 20s ken-burns on hero image; CTA shimmer sweep; button lift/press micro-interactions; reveal-grid cascades (why/steps); design-card entrance stagger (nth-child 1-15 delays) + icon pop on hover; rendered-site section scroll-reveal (.ws-anim/.ws-in via IntersectionObserver in bindSite — JS-added classes so crawlers/no-JS see everything); checkout success panel pop + circle check-draw; global prefers-reduced-motion kill-switch
+- Security headers via next.config.ts headers(): CSP (self+inline scripts for JSON-LD, Google Fonts style/font allowlist, img self/data/https for user photos, frame-src OpenStreetMap only, frame-ancestors none, object-src none, form-action self, upgrade-insecure-requests), X-Content-Type-Options nosniff, X-Frame-Options DENY, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy (camera/mic/geo/payment/usb off), HSTS 2y preload — all verified via curl -I
+- App hardening: new safeUrl() scheme whitelist in templates.js applied to both dirUrl links + venue map iframe src (blocks javascript:/data: URLs); rel noopener→noopener noreferrer on all external links; iframe referrerpolicy no-referrer; editor.js blur-validation on *Url fields with .ed-invalid visual warning (CSS added)
+- Payment security: full Luhn checksum in checkout.js (replaces 16-digit length check; verified 1234... rejected with message, 4242... accepted), card data confirmed never persisted (comment added), checkout demo note updated to suggest 4242 test card
+- Perf: fetchpriority=high on hero img
+- Verification: curl -I all 6 headers present; browser E2E (fresh daemon; agent-browser had stale-session timeouts — fixed by close+pkill+relaunch on 127.0.0.1): home title/JSON-LD/canonical/kenburns+rise-in computed styles OK, 15 cards, Luhn reject/accept, payment → editor EV-570891, 7 sections with IO reveal (3/7 in-view after scroll), OSM iframe loads under CSP with zero console errors, Ivory Noir applied (--ws-dark #1b1a17), desktop+mobile screenshots clean; lint clean; node --check all 6 JS; dev.log clean; test localStorage cleared
+- README: added section 6 (SEO: per-page table, structured data, crawl files, CWV, go-live domain checklist) and section 7 (Security: header table, escaping/whitelisting, payment privacy + real-payments note); file map updated (14 designs, sitemap/og entries)
+
+Stage Summary:
+- Site is SEO-ready: rich metadata, schema.org structured data, sitemap/robots, social share image, CWV basics — replace everrsvp.com placeholder with the real domain at launch
+- 14 premium designs all sharing the reference format, every one fully editable; user custom designs unchanged
+- Premium motion layer everywhere (landing, gallery, checkout, editor, rendered sites) with zero-JS and reduced-motion fallbacks
+- Hardened: CSP + 5 more headers verified live, XSS-safe rendering (esc + safeUrl), Luhn checkout, card data never stored
+- Full funnel re-verified in browser post-changes with zero console errors

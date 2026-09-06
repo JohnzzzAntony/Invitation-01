@@ -32,16 +32,17 @@ TypeScript/ESLint tooling. That's all.
 ```
 public/                     ← THE ENTIRE PRODUCT (deploy this folder)
 ├── index.html              Landing page (hero, features, designs, FAQ, demo modal)
-├── create.html             Design gallery: 8 designs + "Create your own design"
+├── create.html             Design gallery: 14 designs + "Create your own design"
 ├── checkout.html           One-time $25 payment page (order summary + card form)
 ├── editor.html             The builder: left panel of controls + live preview
-├── styles.css              The whole design system (~3,900 lines, one file)
-├── robots.txt              Search-engine rules
-├── assets/                 9 JPG photos used by the designs
+├── styles.css              The whole design system (~3,400 lines, one file)
+├── robots.txt              Search-engine rules (funnel pages disallowed)
+├── sitemap.xml             XML sitemap (indexable pages only)
+├── assets/                 10 JPGs — 9 site photos + og-cover.jpg (social share)
 └── js/                     6 vanilla-JS modules, each one job:
     ├── app.js              Shared UI: toast, mobile menu, reveal animations,
     │                       carousel, FAQ accordion, demo modal, footer year
-    ├── templates.js        The design engine: 8 built-in designs of ONE common
+    ├── templates.js        The design engine: 14 built-in designs of ONE common
     │                       format, custom-design CRUD (localStorage), the full
     │                       site renderer (EVER_renderSite) + mini renderer
     │                       (EVER_renderSiteMini) + sample content + countdowns
@@ -141,3 +142,83 @@ bun run start   # serve the production build
 
 The Next.js wrapper is **not** needed in production — it exists only so this
 sandbox's preview panel (port 3000) can serve the site.
+
+---
+
+## 6. SEO (built in)
+
+Every page carries unique, keyword-targeted metadata:
+
+| Page | Title | Indexable |
+|---|---|---|
+| `index.html` | "Wedding Website Builder with Online RSVP \| Ever RSVP" | ✅ canonical `https://everrsvp.com/` |
+| `create.html` | "Wedding & Event Website Templates — 14 Designs" | ✅ canonical `.../create.html` |
+| `checkout.html` | "Secure checkout" | ❌ `noindex, nofollow` (funnel page) |
+| `editor.html` | "Website builder" | ❌ `noindex, nofollow` (app page) |
+
+Included on the indexable pages:
+
+- **Meta**: unique title + description (~150 chars) + keywords, `robots` with
+  `max-image-preview:large`, canonical URL, `theme-color`
+- **Open Graph + Twitter cards** with a designed share image
+  (`assets/og-cover.jpg`, 1440×736) — controls how links preview on
+  Facebook/WhatsApp/LinkedIn/X
+- **JSON-LD structured data**:
+  - `index.html` → `Organization`, `WebSite`, `Product` with `$25 Offer` +
+    `aggregateRating`, and a `FAQPage` mirroring the on-page FAQ (rich
+    result / FAQ-snippet eligibility)
+  - `create.html` → `BreadcrumbList` + `ItemList` of all 14 design names
+- **Crawl**: `robots.txt` (allows content, disallows funnel pages, sitemap
+  ref) and `sitemap.xml` (indexable pages with priorities)
+- **Core Web Vitals**: hero image `fetchpriority="high"`, below-fold images
+  `loading="lazy"`, `font-display:swap` via Google Fonts, no render-blocking
+  scripts (all JS is at `</body>`), ~2 MB total page weight
+
+**Before going live:** replace the placeholder domain `https://everrsvp.com`
+(canonical, OG URLs, sitemap, robots) with your real domain — it appears in
+4 files: both HTML heads, `robots.txt`, `sitemap.xml`. Then submit the
+sitemap in Google Search Console.
+
+## 7. Security (built in)
+
+**Server headers** (defined once in `next.config.ts`; reproduce on your
+production host if not using Next.js):
+
+| Header | Protection |
+|---|---|
+| `Content-Security-Policy` | Scripts confined to self/inline — no third-party or eval'd code; iframes restricted to OpenStreetMap (the map embed); `frame-ancestors 'none'` blocks clickjacking; `object-src 'none'` blocks plugin payloads |
+| `X-Frame-Options: DENY` | Legacy clickjacking guard |
+| `X-Content-Type-Options: nosniff` | Stops MIME-sniffing attacks |
+| `Referrer-Policy: strict-origin-when-cross-origin` | No full-URL leakage to third parties |
+| `Permissions-Policy` | Camera/mic/geolocation/payment/USB disabled |
+| `Strict-Transport-Security` | Forces HTTPS in production (HSTS, 2y, preload) |
+
+**Application hardening** (all user-editable content):
+
+- Every user string rendered through `esc()` (HTML-entity escaping) — no
+  raw `innerHTML` interpolation of user data anywhere
+- `safeUrl()` scheme whitelist on every owner-typed link: only
+  `https://` / `http://` / in-page anchors survive — `javascript:` and
+  `data:` URLs are dropped before reaching `href` or the map `<iframe>`
+  (double-enforced: renderer + editor field validation with visual warning)
+- External links carry `rel="noopener noreferrer"` (tab-nabbing protection)
+- Map iframe carries `referrerpolicy="no-referrer"`
+
+**Payment privacy & validation:**
+
+- **Card data is never persisted** — not to localStorage, cookies or any
+  server. Only the generated order number survives the checkout
+- Full **Luhn checksum validation** on the card number, plus expiry/CVC
+  format checks
+- Input `maxlength` + `inputmode="numeric"` on all card fields,
+  correct `autocomplete` tokens (cc-number/cc-exp/cc-csc)
+
+> **Going live with real payments:** this checkout is a front-end demo.
+> Wire it to a hosted payment page (e.g. Stripe Checkout redirect) — card
+> data then never touches your origin at all and you stay out of PCI scope
+> (SAQ-A). The form structure is ready; replace the `setTimeout` in
+> `checkout.js` with a redirect to your provider's hosted session.
+
+**Data storage:** all content lives in the browser's `localStorage` — there
+is no server database, no accounts, and no personal data leaves the device.
+All `JSON.parse` calls are try/catch-wrapped and fall back to safe defaults.

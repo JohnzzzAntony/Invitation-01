@@ -76,7 +76,25 @@
       nameFont: 'jost', ornament: 'geo' },
     { id: 'lavender', name: 'Lavender Mist', category: 'Modern',
       dark: '#443a63', deep: '#443a6324', gold: '#9a7bc9', bg: '#f7f4fa', ink: '#453e58', soft: '#e7e0f2',
-      nameFont: 'paris', ornament: 'geo' }
+      nameFont: 'paris', ornament: 'geo' },
+    { id: 'noir',     name: 'Ivory Noir', category: 'Elegant',
+      dark: '#1b1a17', deep: '#1b1a1724', gold: '#c2a05e', bg: '#faf9f5', ink: '#33302a', soft: '#e9e5da',
+      nameFont: 'paris', ornament: 'lines' },
+    { id: 'rose',     name: 'Rose Gold', category: 'Modern',
+      dark: '#5a3230', deep: '#5a323024', gold: '#c68d78', bg: '#fbf4f0', ink: '#4b3431', soft: '#f2e1d9',
+      nameFont: 'vibes', ornament: 'geo' },
+    { id: 'pearl',    name: 'Ocean Pearl', category: 'Elegant',
+      dark: '#1f434c', deep: '#1f434c24', gold: '#7fb0ac', bg: '#f4f8f8', ink: '#2f4a4e', soft: '#dfecec',
+      nameFont: 'paris', ornament: 'lines' },
+    { id: 'marigold', name: 'Marigold Saffron', category: 'Classic',
+      dark: '#7c3f10', deep: '#7c3f1024', gold: '#d99a2b', bg: '#fdf6e7', ink: '#5b3a17', soft: '#f7e7c6',
+      nameFont: 'vibes', ornament: 'floral' },
+    { id: 'frost',    name: 'Nordic Frost', category: 'Modern',
+      dark: '#2d3c4e', deep: '#2d3c4e24', gold: '#8fa9bd', bg: '#f5f7fa', ink: '#36414d', soft: '#e2e8ef',
+      nameFont: 'corm', ornament: 'geo' },
+    { id: 'plum',     name: 'Velvet Plum', category: 'Floral',
+      dark: '#41234a', deep: '#41234a24', gold: '#b087b5', bg: '#f9f4fa', ink: '#442e49', soft: '#ecdfef',
+      nameFont: 'paris', ornament: 'floral' }
   ];
 
   var NAME_FONTS = {
@@ -98,6 +116,12 @@
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  /* Security: only http(s) links and in-page anchors may be used in href/iframe
+     sources the owner can type into — blocks javascript:/data:/vbscript: URLs.  */
+  function safeUrl(u) {
+    var s = String(u || '').trim();
+    return /^(https:\/\/|http:\/\/|#[a-z0-9_-]*)/i.test(s) ? s : '';
   }
   function icon(name, cls) {
     return '<span class="ws-ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true">' +
@@ -375,8 +399,8 @@
           '</div>' +
           '<div class="ws-details">' + cardsHtml +
             '<a class="ws-btn ws-btn-dark ws-map-link" href="' +
-              esc(d.sections.venue.dirUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((d.sections.venue.address || '') + ' ' + (d.basics.city || '')))) +
-              '" target="_blank" rel="noopener">' + icon('pin') + ' View on map</a>' +
+              esc(safeUrl(d.sections.venue.dirUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((d.sections.venue.address || '') + ' ' + (d.basics.city || '')))) +
+              '" target="_blank" rel="noopener noreferrer">' + icon('pin') + ' View on map</a>' +
           '</div>' +
         '</div>' +
       '</section>';
@@ -429,8 +453,9 @@
     var amen = (v.items || []).map(function (a) {
       return '<div class="ws-am">' + icon(a.icon) + '<span>' + esc(a.label) + '</span></div>';
     }).join('');
-    var map = v.mapUrl
-      ? '<iframe class="ws-map" src="' + esc(v.mapUrl) + '" title="Venue map" loading="lazy"></iframe>'
+    var mapSrc = safeUrl(v.mapUrl);
+    var map = mapSrc
+      ? '<iframe class="ws-map" src="' + esc(mapSrc) + '" title="Venue map" loading="lazy" referrerpolicy="no-referrer"></iframe>'
       : '<div class="ws-map ws-map-empty">' + icon('pin') + '<p>Map coming soon</p></div>';
     return '' +
       '<section class="ws-sec ws-venue-sec" id="ws-sec-venue">' +
@@ -439,8 +464,8 @@
             '<h2 class="ws-title on-dark">' + esc(v.name) + '</h2>' +
             '<address>' + esc(v.address).replace(/\n/g, '<br/>') + '</address>' +
             '<div class="ws-am-row">' + amen + '</div>' +
-            '<a class="ws-btn ws-btn-line" target="_blank" rel="noopener" href="' +
-              esc(v.dirUrl || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(v.address || ''))) +
+            '<a class="ws-btn ws-btn-line" target="_blank" rel="noopener noreferrer" href="' +
+              esc(safeUrl(v.dirUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(v.address || ''))) +
               '">Get directions ' + icon('share') + '</a>' +
           '</div>' + map +
         '</div>' +
@@ -483,7 +508,7 @@
   function contactHtml(d) {
     var c = d.sections.contact, B = d.basics;
     var soc = '';
-    if (c.social && c.social.wa) soc += '<a href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener" aria-label="WhatsApp">' + icon('whatsapp') + '</a>';
+    if (c.social && c.social.wa) soc += '<a href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">' + icon('whatsapp') + '</a>';
     if (c.social && c.social.fb) soc += '<a href="#ws-sec-contact" aria-label="Facebook">' + icon('facebook') + '</a>';
     if (c.social && c.social.ig) soc += '<a href="#ws-sec-contact" aria-label="Instagram">' + icon('instagram') + '</a>';
     if (c.social && c.social.share) soc += '<a href="#ws-sec-contact" aria-label="Share">' + icon('share') + '</a>';
@@ -495,7 +520,7 @@
             '<p>For any queries, feel free to reach out.</p>' +
             '<a class="ws-foot-line" href="tel:' + esc(String(c.phone).replace(/\s/g, '')) + '">' + icon('phone') + esc(c.phone) + '</a>' +
             '<a class="ws-foot-line" href="mailto:' + esc(c.email) + '">' + icon('mail') + esc(c.email) + '</a>' +
-            '<a class="ws-foot-line" href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener">' + icon('whatsapp') + esc(c.whatsapp) + '</a>' +
+            '<a class="ws-foot-line" href="https://wa.me/' + esc(String(c.phone).replace(/\D/g, '')) + '" target="_blank" rel="noopener noreferrer">' + icon('whatsapp') + esc(c.whatsapp) + '</a>' +
           '</div>' +
           '<div class="ws-foot-col ws-foot-mid">' +
             '<span class="ws-crest"><i></i>' + esc(monogram(B.nameA, B.nameB)) + '<i></i></span>' +
@@ -603,6 +628,20 @@
   function bindSite(root) {
     if (!root || root.__wsBound) return;
     root.__wsBound = true;
+    /* gentle scroll-reveal for site sections (JS-added class: no-JS visitors
+       never see hidden content; honours prefers-reduced-motion) */
+    var reduceMotion = false;
+    try { reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* ignore */ }
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+      var secs = root.querySelectorAll('.ws-sec, .ws-footer');
+      Array.prototype.forEach.call(secs, function (sec) { sec.classList.add('ws-anim'); });
+      var secIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('ws-in'); secIO.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      Array.prototype.forEach.call(secs, function (sec) { secIO.observe(sec); });
+    }
     /* smooth anchor scrolling inside the preview */
     root.addEventListener('click', function (e) {
       var a = e.target.closest ? e.target.closest('[data-goto]') : null;

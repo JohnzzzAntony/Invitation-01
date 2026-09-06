@@ -279,7 +279,18 @@
     } else if (f.type === 'icon') {
       wrap.querySelector('select').addEventListener('change', function (e) { onInput(e.target.value); });
     } else if (f.type !== 'check') {
-      wrap.querySelector('input').addEventListener('input', function (e) { onInput(e.target.value); });
+      var txt = wrap.querySelector('input');
+      txt.addEventListener('input', function (e) { onInput(e.target.value); });
+      /* UX guard for link fields: flag anything that is not an http(s) URL.
+         (The renderer also enforces this — see safeUrl() in templates.js.) */
+      if (/Url$/.test(f.k || '')) {
+        txt.addEventListener('blur', function () {
+          var v = txt.value.trim();
+          var bad = v !== '' && !/^(https?:\/\/|#[a-z0-9_-]*)/i.test(v);
+          txt.classList.toggle('ed-invalid', bad);
+          txt.title = bad ? 'Use a full link starting with https://' : '';
+        });
+      }
     }
     return wrap;
   }
