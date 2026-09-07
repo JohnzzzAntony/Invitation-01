@@ -24,6 +24,10 @@ const eslintConfig = [
       "mini-services/**",
       "upload/**",
       "public/**",
+      /* Vendor source archive for the Muhibbi template (its CSS is compiled
+         into public/css/mu.css by .zscripts/scope-css.mjs; none of its
+         jQuery is shipped). Not our code — not ours to lint. */
+      "Layouts/**",
     ],
   },
 ];

@@ -26,7 +26,7 @@
 
   var DEFAULTS = {
     id: '', name: '',
-    layout: 'royal', event: 'wedding', category: 'Custom',
+    layout: 'poetic', event: 'wedding', category: 'Custom',
     dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628', soft: '#efe7d2',
     nameFont: 'vibes', ornament: 'floral'
   };
@@ -98,7 +98,7 @@
     for (var i = 0; i < list.length; i++) {
       out.push({ id: list[i].id, label: list[i].label || list[i].id });
     }
-    if (!out.length) out.push({ id: 'royal', label: 'Classic Wedding' }); /* layouts not loaded */
+    if (!out.length) out.push({ id: 'poetic', label: 'Poetic Portrait' }); /* layouts not loaded */
     return out;
   }
 
@@ -138,7 +138,7 @@
      previews with sensible wording for its event type. */
   function sampleData() {
     var d = window.EVER_siteDefaults ? window.EVER_siteDefaults() : { basics: {}, sections: {} };
-    var ly = window.EVER_findLayout ? window.EVER_findLayout(state.layout || 'royal') : null;
+    var ly = window.EVER_findLayout ? window.EVER_findLayout(state.layout || 'poetic') : null;
     if (ly) {
       var dflt = ly.defaults ? ly.defaults() : { basics: {}, sections: {} };
       d.layoutId = ly.id;
@@ -153,7 +153,7 @@
   function previewTemplate() {
     return {
       id: '__preview__', name: state.name || 'My design', custom: true, category: 'Custom',
-      event: state.event || 'wedding', layout: state.layout || 'royal',
+      event: state.event || 'wedding', layout: state.layout || 'poetic',
       dark: state.dark, gold: state.gold, bg: state.bg, ink: state.ink, soft: state.soft,
       nameFont: state.nameFont, ornament: state.ornament
     };

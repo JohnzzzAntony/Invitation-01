@@ -1,0 +1,375 @@
+/* ==========================================================================
+   mu-extra.css — the parts of the Muhibbi design that its jQuery plugins used
+   to provide, rebuilt in plain CSS, plus the preview-root reset.
+   Loaded AFTER css/mu.css. Everything is scoped to `.ws` / `.wsm` so it can
+   never touch the builder chrome.
+   ========================================================================== */
+
+/* ---- preview root -------------------------------------------------------- */
+/* mu.css maps `html`/`body` rules onto `.ws`; this makes the root behave like
+   a document page inside the editor canvas without escaping its container.   */
+.ws {
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+  background-color: var(--ws-bg, #f6f3ee);
+  color: var(--ws-ink, #041117);
+  font-size: 17px;
+}
+.ws img { max-width: 100%; height: auto; }
+.ws a { color: inherit; }
+.ws .container, .ws .container-fluid { width: 100%; }
+
+/* Theme variables the generated CSS expects. `--ws-*` are set per theme by
+   EVER_applyVars; the two derived ones are computed here as sensible
+   fallbacks so a theme only has to define the five core colours.            */
+.ws {
+  --ws-gold-2: var(--ws-soft, #ccbab0);
+  --ws-muted: color-mix(in srgb, var(--ws-ink, #041117) 62%, transparent);
+}
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .ws { --ws-muted: #5c5c5c; }
+}
+
+/* Headings follow the theme's display font choice (set by the layout). */
+.ws h1, .ws h2, .ws h3, .ws h4, .ws h5, .ws h6 { color: var(--ws-dark, #000); }
+
+/* ---- display headings scale to the preview, not the window ---------------
+   The template sizes its hero names in px for its own short sample names
+   ("Sofia & Micheal"), and the preview canvas is narrower than the window, so
+   window-relative units would be wrong too. Container queries let these
+   headings track the width of the site itself, at any canvas size, so a real
+   name — long, hyphenated, two families — always fits.                       */
+.ws { container-type: inline-size; }
+
+.ws .wpo-hero-static .hero-wrapper .content h1,
+.ws .wpo-hero-static-s2 .slide-title h1,
+.ws .wpo-hero-static-s3 .hero-right-item .hero-contet h2,
+.ws .wpo-hero-static-s4 .hero-contet .text-item h1,
+.ws .wpo-hero-static-s5 .hero-bottom-item h2,
+.ws .wpo-hero-static-s6 .hero-left h1,
+.ws .wpo-hero-static-s7 .hero-text h1,
+.ws .wpo-hero-static-s8 .hero-text h1,
+.ws .wpo-hero-static-s9 .hero-text h1,
+.ws .wpo-hero-static-s10 .slide-title h1,
+.ws .wpo-hero-static-s10 .hero-item h2 {
+  font-size: clamp(30px, 8.5cqw, 180px);
+  line-height: 1.02;
+  overflow-wrap: break-word;
+}
+/* Some heroes set the names in a narrow column or inside an ornamental
+   frame; those need a tighter cap so a name never breaks mid-word. */
+.ws .wpo-hero-static-s10 .hero-item h2 { font-size: clamp(26px, 5.5cqw, 125px); }
+.ws .wpo-hero-static-s3 .hero-right-item .hero-contet h2 {
+  font-size: clamp(24px, 4.2cqw, 70px);
+  line-height: 1.1;
+}
+/* s8 sits inside the arch, s9 inside the floral frame. */
+.ws .wpo-hero-static-s8 .hero-text h1,
+.ws .wpo-hero-static-s9 .hero-text h1 {
+  font-size: clamp(26px, 4.6cqw, 96px);
+  line-height: 1.12;
+}
+/* Section titles are ours to fill too — keep them from overrunning. */
+.ws .wpo-section-title h2,
+.ws .wpo-section-title-s2 h2,
+.ws .quote-title h2 {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* ---- header -------------------------------------------------------------- */
+/* Bootstrap makes `.navbar > .container-fluid` a flex container, so the row
+   has to claim the full line or it shrinks to its own content. */
+.ws .wpo-site-header .navigation > .container-fluid { width: 100%; }
+.ws .mu-head-row {
+  flex: 1 1 100%;
+  width: 100%;
+  position: relative;          /* anchors the mobile dropdown to the header */
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between;
+  padding: 14px 0;
+  min-width: 0;
+}
+.ws .mu-head-row > * { min-width: 0; }
+.ws .mu-brand {
+  font-family: "Derivia", serif;
+  font-size: 30px;
+  letter-spacing: .06em;
+  color: var(--ws-gold, #73543b);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ws .wpo-site-header .site-navbar.mu-nav .nav {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ws .wpo-site-header .site-navbar.mu-nav .nav a {
+  font-size: 15px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ws-ink, #041117);
+  padding: 6px 0;
+  position: relative;
+}
+.ws .wpo-site-header .site-navbar.mu-nav .nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 100%; bottom: 0;
+  height: 1px;
+  background: var(--ws-gold, #73543b);
+  transition: right .3s ease;
+}
+.ws .wpo-site-header .site-navbar.mu-nav .nav a:hover { color: var(--ws-gold, #73543b); }
+.ws .wpo-site-header .site-navbar.mu-nav .nav a:hover::after { right: 0; }
+.ws .mu-menu-btn { display: none; }
+.ws .menu-close { display: none; }
+
+@media (max-width: 991px) {
+  .ws .mu-head-row { gap: 10px; }
+  .ws .mu-menu-btn { display: block; flex: none; order: -1; }
+  .ws .navbar-toggler.open-btn {
+    background: none; border: 0; padding: 6px 4px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .ws .navbar-toggler .icon-bar {
+    display: block; width: 22px; height: 2px; background: var(--ws-ink, #041117);
+  }
+  /* The panel drops out of the header row it is positioned against. */
+  .ws .wpo-site-header .site-navbar.mu-nav {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 30;
+    background: var(--ws-bg, #f6f3ee);
+    border-bottom: 1px solid var(--ws-gold-2);
+    padding: 20px 20px 22px;
+    display: none;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .12);
+  }
+  .ws .wpo-site-header .site-navbar.mu-nav.is-open { display: block; }
+  .ws .wpo-site-header .site-navbar.mu-nav .nav { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .ws .menu-close {
+    display: block; position: absolute; top: 8px; right: 12px;
+    background: none; border: 0; font-size: 18px; cursor: pointer; color: var(--ws-ink);
+    padding: 4px;
+  }
+  .ws .mu-brand { font-size: 22px; }
+}
+
+/* ---- slider (Owl Carousel replacement) ----------------------------------- */
+.ws .mu-slider { position: relative; }
+.ws .mu-slider-view { overflow: hidden; }
+.ws .mu-slider-track {
+  display: flex;
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+  will-change: transform;
+}
+.ws .mu-slide { flex: 0 0 33.3333%; padding: 0 12px; min-width: 0; }
+.ws .mu-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--ws-gold-2);
+  background: #fff; color: var(--ws-gold, #73543b);
+  cursor: pointer; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .3s ease, color .3s ease, opacity .3s ease;
+}
+.ws .mu-arrow:hover { background: var(--ws-gold, #73543b); color: #fff; }
+.ws .mu-arrow[disabled] { opacity: .25; cursor: default; }
+.ws .mu-arrow[disabled]:hover { background: #fff; color: var(--ws-gold, #73543b); }
+.ws .mu-prev { left: -6px; }
+.ws .mu-next { right: -6px; }
+.ws .mu-dots {
+  display: flex; justify-content: center; gap: 8px; margin-top: 28px;
+}
+.ws .mu-dot {
+  width: 8px; height: 8px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--ws-gold, #73543b); background: transparent; cursor: pointer;
+  transition: width .3s ease, background .3s ease;
+}
+.ws .mu-dot.is-on { width: 24px; border-radius: 4px; background: var(--ws-gold, #73543b); }
+@media (max-width: 767px) {
+  .ws .mu-arrow { display: none; }
+}
+
+/* Full-bleed hero sliders fill their section and carry dots only. */
+.ws .mu-hero-slider,
+.ws .mu-hero-slider .mu-slider-view,
+.ws .mu-hero-slider .mu-slider-track,
+.ws .mu-hero-slider .mu-slide { height: 100%; width: 100%; }
+.ws .mu-hero-slider .mu-slide { padding: 0; }
+.ws .mu-hero-slider .mu-dots {
+  position: absolute; left: 0; right: 0; bottom: 26px; margin: 0; z-index: 6;
+}
+.ws .mu-hero-slider .mu-dot { border-color: #fff; }
+.ws .mu-hero-slider .mu-dot.is-on { background: #fff; }
+.ws .mu-hero-slider .mu-arrow { background: rgba(255, 255, 255, .85); border-color: transparent; }
+.ws .slide-inner {
+  height: 100%; width: 100%;
+  background-size: cover; background-position: center;
+  display: flex; align-items: center;
+}
+.ws .mu-slider.is-single .mu-slide { flex: 0 0 100%; }
+
+/* ---- lightbox (fancybox replacement) ------------------------------------- */
+.ws .mu-lightbox {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(4, 17, 23, .88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 5vh 5vw; cursor: zoom-out;
+  animation: mu-fade .25s ease;
+}
+.ws .mu-lightbox img {
+  max-width: 100%; max-height: 90vh; object-fit: contain;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+}
+.ws .mu-lb-close {
+  position: absolute; top: 18px; right: 24px;
+  background: none; border: 0; color: #fff; font-size: 40px; line-height: 1; cursor: pointer;
+}
+@keyframes mu-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---- countdown ----------------------------------------------------------- */
+.ws .mu-timer-wrap { text-align: center; }
+.ws .mu-timer-label {
+  display: block; margin-bottom: 18px;
+  font-size: 14px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ws-gold, #73543b);
+}
+.ws .ws-timer {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 14px;
+}
+.ws .ws-tbox {
+  min-width: 96px; padding: 18px 10px;
+  border: 1px solid var(--ws-gold-2);
+  background: rgba(255, 255, 255, .55);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ws .ws-tbox b {
+  font-family: "Derivia", serif; font-size: 34px; line-height: 1;
+  color: var(--ws-gold, #73543b); font-weight: 400;
+}
+.ws .ws-tbox i {
+  font-style: normal; font-size: 12px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--ws-muted);
+}
+
+/* Countdown band — an Ever RSVP section drawn with the template's tokens. */
+.ws .mu-count-band {
+  background: var(--ws-soft, #e6dcd0);
+  text-align: center;
+}
+.ws .mu-count-quote {
+  margin: 30px auto 0;
+  max-width: 640px;
+  font-family: "Derivia", serif;
+  font-size: 24px;
+  line-height: 1.5;
+  color: var(--ws-dark, #2f2422);
+}
+.ws .mu-inline-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ws-gold, #73543b);
+  border-bottom: 1px solid currentColor;
+}
+
+/* ---- RSVP form ----------------------------------------------------------- */
+.ws .ws-rsvp-form .form-field { margin-bottom: 20px; }
+.ws .ws-rsvp-form input,
+.ws .ws-rsvp-form select,
+.ws .ws-rsvp-form textarea {
+  width: 100%; padding: 14px 18px;
+  border: 1px solid var(--ws-gold-2);
+  background: rgba(255, 255, 255, .6);
+  color: var(--ws-ink, #041117);
+  font-size: 16px; font-family: inherit;
+  border-radius: 0;
+}
+.ws .ws-rsvp-form input:focus,
+.ws .ws-rsvp-form select:focus,
+.ws .ws-rsvp-form textarea:focus {
+  outline: none; border-color: var(--ws-gold, #73543b);
+}
+.ws .ws-rsvp-form .ws-err { border-color: #b3563f; box-shadow: 0 0 0 3px rgba(179, 86, 63, .12); }
+.ws .ws-rsvp-form .submit-area { text-align: center; margin-top: 10px; }
+.ws .ws-rsvp-done {
+  text-align: center; padding: 40px 20px;
+  border: 1px solid var(--ws-gold-2); background: rgba(255, 255, 255, .6);
+}
+.ws .ws-rsvp-done .ws-done-ic svg {
+  width: 46px; height: 46px; fill: none;
+  stroke: var(--ws-gold, #73543b); stroke-width: 1.4;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.ws .ws-rsvp-done b {
+  display: block; margin: 14px 0 6px;
+  font-family: "Derivia", serif; font-size: 26px; font-weight: 400;
+  color: var(--ws-dark, #2f2422);
+}
+
+/* ---- button shape / spacing / body-font controls -------------------------- */
+.ws-bs-pill .theme-btn, .ws-bs-pill .ws-rsvp-form button { border-radius: 999px; }
+.ws-bs-soft .theme-btn, .ws-bs-soft .ws-rsvp-form button { border-radius: 6px; }
+.ws-bs-square .theme-btn, .ws-bs-square .ws-rsvp-form button { border-radius: 0; }
+.ws-sp-cozy .ws-sec { padding-top: 60px; padding-bottom: 60px; }
+.ws-sp-airy .ws-sec { padding-top: 140px; padding-bottom: 140px; }
+.ws-body-jost { font-family: "Jost", "Lato", sans-serif; }
+
+/* The wishes attribution is a flex row; stop it shrinking names below their
+   own width (the template's sample names were shorter than real ones). */
+.ws .testimonial-text ul { flex-wrap: wrap; }
+.ws .testimonial-text li { flex: none; }
+
+/* ---- generic helpers used by the layouts --------------------------------- */
+.ws .mu-social { display: flex; gap: 12px; list-style: none; padding: 0; margin: 18px 0 0; }
+.ws .mu-social a {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--ws-gold-2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ws-gold, #73543b);
+  transition: background .3s ease, color .3s ease;
+}
+.ws .mu-social a:hover { background: var(--ws-gold, #73543b); color: #fff; }
+.ws .mu-zoom { position: relative; display: block; overflow: hidden; }
+.ws .mu-zoom img { width: 100%; display: block; transition: transform .6s ease; }
+.ws .mu-zoom:hover img { transform: scale(1.06); }
+.ws .mu-empty {
+  padding: 60px 20px; text-align: center; color: var(--ws-muted);
+  border: 1px dashed var(--ws-gold-2);
+}
+
+/* ---- map ----------------------------------------------------------------- */
+.ws .ws-map { width: 100%; min-height: 380px; border: 0; display: block; }
+.ws .ws-map-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; background: var(--ws-soft, #e6dcd0); color: var(--ws-muted);
+}
+.ws .ws-map-empty svg { width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* ==========================================================================
+   Mini previews (design gallery cards, checkout summary)
+   A mini is the real layout rendered small: the inner `.ws` root is scaled so
+   the thumbnail is always an accurate picture of the design.
+   ========================================================================== */
+.wsm {
+  position: relative;
+  overflow: hidden;
+  background: var(--ws-bg, #f6f3ee);
+  aspect-ratio: 4 / 5;
+}
+.wsm .wsm-scale {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1280px;
+  transform-origin: top left;
+  pointer-events: none;
+}
+.wsm.wsm-short { aspect-ratio: 16 / 10; }

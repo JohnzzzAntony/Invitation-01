@@ -73,9 +73,20 @@
   /* ------------------------------------------------------------------ *
    *  Preview                                                            *
    * ------------------------------------------------------------------ */
+  /* The element that actually scrolls the preview (see editor.html: the
+     canvas frame is full-height, its wrapper is the scroll port). */
+  function previewScroller() {
+    return document.querySelector('.ed-canvas-wrap') || document.getElementById('canvas-frame');
+  }
+
   function render() {
     var canvas = document.getElementById('canvas');
     if (!canvas || !window.EVER_renderSite) return;
+    /* Every keystroke rebuilds the preview; without this the reader would be
+       thrown back to the top of the page mid-edit. */
+    var frame = previewScroller();
+    var keepTop = frame ? frame.scrollTop : 0;
+
     canvas.innerHTML = '';
     var site = window.EVER_renderSite(state, { interactive: true });
     site.__wsData = state;
@@ -84,6 +95,19 @@
     window.EVER_tickCountdowns(site);
     clearInterval(pvTimer);
     pvTimer = setInterval(function () { window.EVER_tickCountdowns(canvas); }, 1000);
+
+    if (frame && keepTop) frame.scrollTop = keepTop;
+  }
+
+  /* Scroll the preview to a section — the ◎ button on each sidebar group. */
+  function scrollPreviewTo(sid) {
+    var frame = previewScroller();
+    var target = document.getElementById('ws-sec-' + sid);
+    if (!frame || !target) return;
+    var top = target.getBoundingClientRect().top - frame.getBoundingClientRect().top + frame.scrollTop - 8;
+    window.EVER_scrollElTo(frame, top);
+    target.classList.add('ed-flash');
+    setTimeout(function () { target.classList.remove('ed-flash'); }, 900);
   }
 
   function refresh() {
@@ -145,14 +169,17 @@
       });
       ctl = '<select id="' + id + '">' + sopts + '</select>';
     } else if (type === 'photo') {
-      var popts = '<option value="">Choose photo…</option>';
+      var isUrl = value && String(value).indexOf('/') > -1;
+      var popts = '<option value="">None — hide this image</option>';
       window.EVER_PHOTOS.forEach(function (p) {
         popts += '<option value="' + p.id + '"' + (value === p.id ? ' selected' : '') + '>' + esc(p.label) + '</option>';
       });
-      var isUrl = value && String(value).indexOf('/') > -1;
       ctl = '<div class="ed-photo-row">' +
           '<select data-role="pick">' + popts + '</select>' +
           '<input type="text" data-role="url" placeholder="…or paste image URL" value="' + (isUrl ? esc(value) : '') + '"/>' +
+        '</div>' +
+        '<div class="ed-photo-preview">' +
+          (value ? '<img src="' + esc(window.EVER_photoSrc(value)) + '" alt=""/>' : '') +
         '</div>';
     } else if (type === 'icon') {
       var iopts = '';
@@ -161,8 +188,13 @@
       });
       ctl = '<select id="' + id + '">' + iopts + '</select>';
     } else if (type === 'color') {
-      var hex = /^#[0-9a-fA-F]{6}$/.test(String(value || '')) ? value : '#c9a45c';
-      ctl = '<input id="' + id + '" type="color" value="' + esc(hex) + '"/>';
+      /* An empty value means "follow the theme", which a native colour input
+         cannot express — hence the reset button beside it. */
+      var set = /^#[0-9a-fA-F]{6}$/.test(String(value || ''));
+      ctl = '<div class="ed-color-row">' +
+          '<input id="' + id + '" type="color" value="' + esc(set ? value : '#c9a45c') + '"/>' +
+          '<button type="button" data-role="clear"' + (set ? '' : ' disabled') + '>Use theme</button>' +
+        '</div>';
     } else { /* text */
       ctl = '<input id="' + id + '" type="text" placeholder="' + esc(f.ph || '') + '" value="' + esc(value == null ? '' : value) + '"/>';
     }
@@ -175,18 +207,35 @@
     } else if (type === 'photo') {
       var pick = wrap.querySelector('[data-role="pick"]');
       var url = wrap.querySelector('[data-role="url"]');
+      var shot = wrap.querySelector('.ed-photo-preview');
+      function showPhoto(v) {
+        shot.innerHTML = v ? '<img src="' + esc(window.EVER_photoSrc(v)) + '" alt=""/>' : '';
+      }
       pick.addEventListener('change', function () {
-        if (!pick.value) return;
         url.value = '';
-        onInput(pick.value);
+        showPhoto(pick.value);
+        onInput(pick.value);      /* '' clears the image — see the None option */
       });
-      url.addEventListener('input', function () { onInput(url.value.trim()); });
+      url.addEventListener('input', function () {
+        var v = url.value.trim();
+        if (v) pick.value = '';
+        showPhoto(v);
+        onInput(v);
+      });
     } else if (type === 'select' || type === 'icon') {
       var sel = wrap.querySelector('select');
       sel.addEventListener('change', function (e) { onInput(e.target.value); });
     } else if (type === 'color') {
-      var col = wrap.querySelector('input');
-      col.addEventListener('input', function () { onInput(col.value); });
+      var col = wrap.querySelector('input[type="color"]');
+      var clr = wrap.querySelector('[data-role="clear"]');
+      col.addEventListener('input', function () {
+        clr.disabled = false;
+        onInput(col.value);
+      });
+      clr.addEventListener('click', function () {
+        clr.disabled = true;
+        onInput('');
+      });
     } else if (type !== 'check') {
       var txt = wrap.querySelector('input');
       txt.addEventListener('input', function (e) { onInput(e.target.value); });
@@ -265,6 +314,7 @@
       var sum = document.createElement('summary');
       sum.innerHTML = '<span>' + esc(meta.label) + '</span>' +
         '<span class="sec-tools">' +
+          '<button type="button" data-tool="goto" aria-label="Scroll the preview to ' + esc(meta.label) + '">&#9678;</button>' +
           '<button type="button" data-tool="up" aria-label="Move ' + esc(meta.label) + ' up">&#8593;</button>' +
           '<button type="button" data-tool="down" aria-label="Move ' + esc(meta.label) + ' down">&#8595;</button>' +
           '<button type="button" data-tool="eye" aria-label="Show or hide ' + esc(meta.label) + '" aria-pressed="' + !!sec.on + '">&#128065;</button>' +
@@ -302,6 +352,9 @@
             state.order.splice(i, 1);
             state.order.splice(i + 1, 0, sid);
             buildGroups();
+          } else if (tool === 'goto') {
+            scrollPreviewTo(sid);
+            return;                 /* nothing changed — no re-render needed */
           }
           refresh();
         });
@@ -330,6 +383,7 @@
         '<span>' +
           '<button type="button" data-op="up" aria-label="Move up" ' + (idx === 0 ? 'disabled' : '') + '>&#8593;</button>' +
           '<button type="button" data-op="down" aria-label="Move down" ' + (idx === arr.length - 1 ? 'disabled' : '') + '>&#8595;</button>' +
+          '<button type="button" data-op="copy" aria-label="Duplicate">&#10697;</button>' +
           '<button type="button" data-op="del" aria-label="Remove">&#10005;</button>' +
         '</span>';
       li.appendChild(head);
@@ -348,6 +402,11 @@
           if (op === 'del') arr.splice(idx, 1);
           if (op === 'up' && idx > 0) arr.splice(idx - 1, 0, arr.splice(idx, 1)[0]);
           if (op === 'down' && idx < arr.length - 1) arr.splice(idx + 1, 0, arr.splice(idx, 1)[0]);
+          if (op === 'copy') {
+            var clone;
+            try { clone = JSON.parse(JSON.stringify(arr[idx])); } catch (err) { clone = blank(); }
+            arr.splice(idx + 1, 0, clone);
+          }
           buildGroups();
           refresh();
         });
@@ -395,18 +454,18 @@
      Different layout: rebuild content over the new layout's defaults —
      universal fields and keys the NEW layout knows survive via deepMerge,
      event-type-specific keys do not leak across (e.g. birthday `name`
-     would otherwise hijack the royal publish slug) — and the sidebar
+     would otherwise hijack another layout's publish slug) — and the sidebar
      rebuilds for the new field specs. */
-  var UNIVERSAL_BASICS = ['nameA', 'nameB', 'date', 'time', 'venue', 'city',
+  var UNIVERSAL_BASICS = ['nameA', 'nameB', 'brand', 'date', 'time', 'venue', 'city',
     'address', 'dress', 'phone', 'email'];
 
   function applyTemplate(t) {
     var cur = window.EVER_findTemplate(state.templateId);
-    if (cur && cur.layout === t.layout && window.EVER_findLayout(t.layout || 'royal').id === state.layoutId) {
+    if (cur && cur.layout === t.layout && window.EVER_findLayout(t.layout).id === state.layoutId) {
       state.templateId = t.id;
     } else {
       var next = window.EVER_siteDefaults(t.id);
-      var nl = window.EVER_findLayout(t.layout || 'royal');
+      var nl = window.EVER_findLayout(t.layout);
       var keep = {};
       (nl.basics || []).forEach(function (f) { keep[String(f.k).split('.')[0]] = true; });
       UNIVERSAL_BASICS.forEach(function (k) { keep[k] = true; });
@@ -425,7 +484,7 @@
         if (state[p] !== undefined) next[p] = state[p];
       });
       next.templateId = t.id;
-      next.layoutId = window.EVER_findLayout(t.layout || 'royal').id;
+      next.layoutId = window.EVER_findLayout(t.layout).id;
       state = next;
     }
     buildSidebar();

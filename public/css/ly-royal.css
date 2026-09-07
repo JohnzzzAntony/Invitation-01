@@ -1,8 +1,0 @@
-/* ==========================================================================
-   Ever RSVP — layout: royal (Classic Wedding)
-   This layout is the reference format and is fully styled by the shared
-   .ws-* / .wsm-* rules in styles.css. Layout-specific refinements only.
-   ========================================================================== */
-
-/* royal hero keeps its photo slightly lower-contrast under the shade */
-.ws-royal .ws-hero-shade { background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.18) 40%, rgba(0,0,0,.55)); }

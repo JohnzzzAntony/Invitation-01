@@ -43,7 +43,7 @@
         return window.EVER_renderSiteMini(t, null, { short: true });
       }
     } catch (e) { /* fall through to the palette-only shell */ }
-    if (window.EVER_miniRoot) return window.EVER_miniRoot(t, null, t.layout || 'royal');
+    if (window.EVER_miniRoot) return window.EVER_miniRoot(t, null, t.layout);
     return document.createElement('div');
   }
 
