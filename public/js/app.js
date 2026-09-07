@@ -87,54 +87,34 @@
     if (link && mobileMenu && !mobileMenu.hidden) closeMenu();
   });
 
-  /* ---------------- Login dropdown ---------------- */
-  var loginToggle = $('.login-toggle');
-  var loginPanel = $('#login-panel');
-  var loginError = $('.login-error');
+  /* ---------------- "Continue editing" ----------------
+     There are no accounts: an event lives in this browser's localStorage
+     (see js/templates.js). So instead of a sign-in that leads nowhere, the
+     header offers to resume a saved event, and says so plainly when there
+     is none to resume. */
+  var EVENT_KEY = 'ever-rsvp-event';
 
-  function closeLogin() {
-    if (!loginToggle || !loginPanel) return;
-    loginPanel.hidden = true;
-    loginToggle.setAttribute('aria-expanded', 'false');
+  function hasSavedEvent() {
+    try {
+      var raw = localStorage.getItem(EVENT_KEY);
+      if (!raw) return false;
+      var state = JSON.parse(raw);
+      return !!(state && typeof state === 'object');
+    } catch (err) {
+      return false;   /* corrupt or blocked storage — treat as "nothing saved" */
+    }
   }
 
-  if (loginToggle && loginPanel) {
-    loginToggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var open = !loginPanel.hidden;
-      loginPanel.hidden = open;
-      loginToggle.setAttribute('aria-expanded', String(!open));
-      if (!open) $('#login-email').focus();
-    });
-    document.addEventListener('click', function (e) {
-      if (!loginPanel.hidden && !loginPanel.contains(e.target) && e.target !== loginToggle) closeLogin();
-    });
-  }
-
-  var loginForm = $('.login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var email = $('#login-email').value.trim();
-      var pass = $('#login-pass').value;
-      if (!loginError) return;
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        loginError.textContent = 'Please enter a valid e-mail address.';
-        loginError.hidden = false;
-        return;
+  $$('[data-resume]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (hasSavedEvent()) {
+        window.location.href = 'editor.html';
+      } else {
+        toast('No saved event on this device yet — pick a design to start one.');
+        setTimeout(function () { window.location.href = 'create.html'; }, 1400);
       }
-      if (!pass) {
-        loginError.textContent = 'Please enter your password.';
-        loginError.hidden = false;
-        return;
-      }
-      loginError.hidden = true;
-      loginForm.reset();
-      closeLogin();
-      toast('Design demo only — no account is required to explore.');
     });
-  }
+  });
 
   /* ---------------- Active nav link ---------------- */
   var navLinks = $$('.nav-link[href^="#"]');

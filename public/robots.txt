@@ -5,11 +5,13 @@ User-agent: Googlebot
 Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
+Disallow: /layouts-test.html
 
 User-agent: Bingbot
 Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
+Disallow: /layouts-test.html
 
 User-agent: Twitterbot
 Allow: /
@@ -21,5 +23,6 @@ User-agent: *
 Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
+Disallow: /layouts-test.html
 
-Sitemap: https://everrsvp.com/sitemap.xml
+Sitemap: https://your-domain.example/sitemap.xml

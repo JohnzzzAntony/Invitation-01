@@ -19,15 +19,12 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "skills/**",
-      ".zscripts/**",
-      "mini-services/**",
-      "upload/**",
+      "scripts/**",
       "public/**",
       /* Vendor source archive for the Muhibbi template (its CSS is compiled
-         into public/css/mu.css by .zscripts/scope-css.mjs; none of its
+         into public/css/mu.css by scripts/scope-css.mjs; none of its
          jQuery is shipped). Not our code — not ours to lint. */
-      "Layouts/**",
+      "vendor/**",
     ],
   },
 ];

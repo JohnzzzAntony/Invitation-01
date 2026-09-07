@@ -1,44 +1,54 @@
 # LAYOUT-SPEC — Ever RSVP multi-layout engine (v4)
 
 Read this fully before writing any layout or editor code. The reference
-implementation is `public/js/layouts/royal.js` — mirror its structure.
+implementation is `public/js/layouts/poetic.js` — mirror its structure. Every
+layout is a port of one page from the Muhibbi wedding template
+(`vendor/muhibbi-template/demo/index*.html`, source archive only — never deployed); they share
+markup/behaviour helpers from `public/js/mu.js` and styling from
+`public/css/mu.css` (generated) + `public/css/mu-extra.css` (hand-written).
 
 ## Goal
 
-Every template is built from ONE of 8 **layouts** (genuinely different page
-structures) + a **theme** (palette / fonts / ornament) + **content defaults**
-specific to its event type (wedding, birthday, anniversary, housewarming,
-baptism, baby & kids, gala…). The editor renders its sidebar groups
-dynamically from the layout's field specs, so every field of every layout is
-fully customizable with zero editor changes.
+Every template is built from ONE of 10 **layouts** (genuinely different page
+structures, each a Muhibbi home-page port) + a **theme** (palette / fonts /
+ornament) + **content defaults** specific to its event type (wedding,
+birthday, anniversary, housewarming, baptism, baby & kids, gala…). The editor
+renders its sidebar groups dynamically from the layout's field specs, so every
+field of every layout is fully customizable with zero editor changes.
 
 ## File layout
 
 ```
-public/js/templates.js        core (registry, state v4, helpers, THEMES, dispatch)
-public/js/layouts/royal.js    classic wedding  (reference implementation)
-public/js/layouts/bloom.js    garden / floral wedding
-public/js/layouts/fiesta.js   birthday (all ages)
-public/js/layouts/play.js     baby shower & kids parties
-public/js/layouts/cinema.js   anniversary (cinematic)
-public/js/layouts/nest.js     housewarming
-public/js/layouts/lumen.js    baptism & christening
-public/js/layouts/noir.js     gala & formal evening
-public/css/ly-royal.css       one CSS file per layout (same base name as the JS file)
-public/css/ly-*.css           …loaded by editor.html, create.html, checkout.html
+public/js/templates.js         core (registry, state v4, helpers, THEMES, dispatch)
+public/js/mu.js                shared runtime: header, slider, RSVP form/section,
+                                footer, mini-preview scaler, per-section style fields
+public/js/layouts/poetic.js    Main Wedding Home       (reference implementation)
+public/js/layouts/herald.js    Announcement Home 1
+public/js/layouts/atrium.js    Announcement Home 2
+public/js/layouts/editorial.js Announcement Home 3
+public/js/layouts/calm.js      Korean Wedding Home
+public/js/layouts/terra.js     African Wedding Home
+public/js/layouts/serene.js    Indo & Malay Wedding Home
+public/js/layouts/mandala.js   Indian Wedding Home
+public/js/layouts/crescent.js  Muslim Wedding Home
+public/js/layouts/heritage.js  Senior Wedding Home
+public/css/mu.css              GENERATED (scripts/scope-css.mjs) — the whole
+                                Muhibbi design system, every selector scoped to `.ws`
+public/css/mu-extra.css        hand-written companion: slider/menu/lightbox behaviour
+                                CSS, theme-variable fallbacks, responsive fixes
 ```
 
-Load order (already wired in the HTML): `templates.js` → `layouts/*.js` →
-page script. Layout files must not run renders at load time; they only call
-`EVER_registerLayout(def)`.
+Load order (already wired in the HTML): `templates.js` → `mu.js` →
+`layouts/*.js` → page script. Layout files must not run renders at load time;
+they only call `EVER_registerLayout(def)`.
 
 ## Layout definition contract
 
 ```js
 window.EVER_registerLayout({
-  id: 'royal',                       // unique, also CSS namespace prefix
-  label: 'Classic Wedding',          // shown in the designer modal
-  events: ['wedding'],               // event-type ids (see event registry)
+  id: 'poetic',                      // unique, also CSS namespace prefix
+  label: 'Poetic Portrait',          // shown in the designer modal
+  events: ['wedding', 'anniversary'],// event-type ids (see event registry)
   basics: [ /* Basics field specs (see "Field spec" below) */ ],
   sections: [ /* ordered SectionSpec list */ ],
   defaults: function () {            // FULL default state for this layout
@@ -86,7 +96,7 @@ Dotted keys (`'social.wa'`) are supported for nested values.
 ```js
 {
   v: 4,
-  layoutId: 'royal',          // which layout renders this site
+  layoutId: 'poetic',         // which layout renders this site
   templateId: 'emerald',      // theme id (builtin or custom-*)
   nameFont: '',               // '' = follow theme
   bodyFont: 'lato',
@@ -175,7 +185,7 @@ classes as `wsm-<layoutId>-*`.
 ```js
 { id: 'emerald', name: 'Emerald & Gold',
   event: 'wedding',            // event-type id (chip on create page)
-  layout: 'royal',             // layout id
+  layout: 'poetic',            // layout id
   category: 'Classic',         // style chip inside the event group
   dark: '#17301f', gold: '#c9a45c', bg: '#f7f3e8', ink: '#3c3628',
   soft: '#efe7d2', nameFont: 'vibes', ornament: 'floral',

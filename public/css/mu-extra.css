@@ -79,6 +79,12 @@
 }
 
 /* ---- header -------------------------------------------------------------- */
+/* mu.css positions .navbar-header for the template's OWN off-canvas mobile
+   nav (`left: 60px`, floats). Ours is a simple flex row (.mu-head-row), so
+   cancel that positioning before it shoves the wordmark off centre. */
+@media (max-width: 991px) {
+  .ws .navbar-header { position: static; left: auto; text-align: left; }
+}
 /* Bootstrap makes `.navbar > .container-fluid` a flex container, so the row
    has to claim the full line or it shrinks to its own content. */
 .ws .wpo-site-header .navigation > .container-fluid { width: 100%; }
@@ -142,12 +148,19 @@
     display: block; width: 22px; height: 2px; background: var(--ws-ink, #041117);
   }
   /* The panel drops out of the header row it is positioned against. */
+  /* mu.css also styles `.site-navbar` as ITS OWN (unused) off-canvas panel —
+     fixed position, opacity:0/visibility:hidden by default — for the jQuery
+     menu we don't ship. Its rule and this one have equal specificity, so
+     without `.mu-nav` on every property it fights for, source order alone
+     would decide the winner. Restate every property it sets. */
   .ws .wpo-site-header .site-navbar.mu-nav {
     position: absolute; top: 100%; left: 0; right: 0; z-index: 30;
+    width: auto; height: auto;
     background: var(--ws-bg, #f6f3ee);
     border-bottom: 1px solid var(--ws-gold-2);
     padding: 20px 20px 22px;
     display: none;
+    opacity: 1; visibility: visible;
     box-shadow: 0 18px 40px rgba(0, 0, 0, .12);
   }
   .ws .wpo-site-header .site-navbar.mu-nav.is-open { display: block; }
@@ -327,6 +340,23 @@
    own width (the template's sample names were shorter than real ones). */
 .ws .testimonial-text ul { flex-wrap: wrap; }
 .ws .testimonial-text li { flex: none; }
+
+/* The s4/s5 gallery mosaic lays three flex columns side by side (two stacked
+   photos either side of a single captioned tile). The template never made
+   this responsive below tablet width — the middle column has no explicit
+   basis, so on a phone it gets squeezed to a sliver instead of wrapping.
+   Stack the columns below 576px, matching the breakpoint that already
+   thumb-stacks Bootstrap's own 4-across `.grid` cells. */
+@media (max-width: 575px) {
+  .ws .wpo-gallery-section-s4 .gallery-grids,
+  .ws .wpo-gallery-section-s5 .gallery-grids {
+    flex-direction: column;
+  }
+  .ws .wpo-gallery-section-s4 .gallery-grids .grid,
+  .ws .wpo-gallery-section-s5 .gallery-grids .grid {
+    width: 100%;
+  }
+}
 
 /* ---- generic helpers used by the layouts --------------------------------- */
 .ws .mu-social { display: flex; gap: 12px; list-style: none; padding: 0; margin: 18px 0 0; }

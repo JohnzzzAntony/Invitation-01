@@ -2,13 +2,18 @@
   "name": "ever-rsvp",
   "version": "1.0.0",
   "private": true,
-  "description": "Ever RSVP — a pure HTML/CSS/JS event website builder. Next.js is only a static file server for the sandbox preview; the product itself has zero runtime dependencies.",
+  "description": "Ever RSVP — a pure HTML/CSS/JS event website builder. Next.js is only a static file server for local dev; the product itself has zero runtime dependencies.",
   "scripts": {
-    "dev": "next dev -p 3000 2>&1 | tee dev.log",
-    "lint": "eslint .",
+    "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "db:push": "echo 'No database: this is a static site, all data lives in localStorage.'"
+    "lint": "eslint .",
+    "check:js": "node scripts/check-public-js.mjs",
+    "check": "bun run lint && bun run check:js",
+    "domain": "node scripts/set-domain.mjs",
+    "gen:headers": "node scripts/gen-deploy-headers.mjs",
+    "gen:css": "node scripts/scope-css.mjs",
+    "gen:photos": "node scripts/gen-photos.mjs"
   },
   "dependencies": {
     "next": "^16.1.1",

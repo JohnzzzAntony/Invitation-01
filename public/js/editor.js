@@ -680,7 +680,7 @@
       badge.textContent = 'Published';
       badge.classList.add('published');
       var urlEl = document.getElementById('pub-url');
-      if (urlEl) urlEl.textContent = flow.slug + '.ever-rsvp.com';
+      if (urlEl) urlEl.textContent = flow.slug + '.your-domain.example';
       document.getElementById('pub-overlay').hidden = false;
       document.body.classList.add('modal-open');
     });
