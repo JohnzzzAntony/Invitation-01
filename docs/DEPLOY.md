@@ -1,4 +1,4 @@
-# Deploying Ever RSVP
+# Deploying Invitara
 
 The product is `public/` — plain HTML, CSS and JavaScript with no build step.
 Deploying means putting that folder on a static host. Next.js is the local dev

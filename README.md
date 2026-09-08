@@ -1,4 +1,4 @@
-# Ever RSVP — Event Website Builder
+# Invitara — Event Website Builder
 
 A minimalist event-invitation builder. A customer picks one of **27 premium
 designs** — 10 bespoke page layouts across 7 occasion types (weddings,

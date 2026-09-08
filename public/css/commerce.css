@@ -854,3 +854,13 @@ main > .flow-steps li.done { color: var(--ink); }
   border-radius: 4px;
 }
 .ws-rsvp-done h4 { font-size: 22px; margin-bottom: 6px; }
+
+/* Brand strapline under the footer wordmark */
+.f-tagline {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: #9fb0b7;
+  margin: 6px 0 10px;
+  letter-spacing: .01em;
+}

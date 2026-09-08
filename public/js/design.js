@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — design detail page (?id=<themeId>)
+   Invitara — design detail page (?id=<themeId>)
    Shows one design's preview, sections, plans and price, and starts a new
    invitation project bound to it. Live demo renders the real layout with the
    theme's sample content at three viewport sizes.
@@ -27,7 +27,7 @@
   var EVENTS = window.EVER_EVENTS || {};
   var eventLabel = (EVENTS[tpl.event] && EVENTS[tpl.event].label) || 'Event';
 
-  document.title = tpl.name + ' — ' + eventLabel + ' invitation design | Ever RSVP';
+  document.title = tpl.name + ' — ' + eventLabel + ' invitation design | Invitara';
 
   /* ---------------- Copy ---------------- */
   /* Written from the design's own facts rather than stored per theme, so a
@@ -44,6 +44,64 @@
       ' invitation with ' + list + ', in a layout built to read beautifully on a phone. ' +
       'Every word, photo and colour is yours to change.';
   }
+
+  /* ---------------- SEO ----------------
+     Every design lives at design.html?id=<theme>, so the static canonical in
+     the HTML would make all 27 compete for one URL. Point each one at its own
+     address and give it its own Open Graph card and Product data. */
+  function seo() {
+    var origin = window.location.origin +
+      window.location.pathname.replace(/[^/]*$/, '');
+    var url = origin + 'design.html?id=' + encodeURIComponent(tpl.id);
+    var desc = description();
+
+    function meta(sel, attr, value) {
+      var el = document.querySelector(sel);
+      if (el) el.setAttribute(attr, value);
+    }
+
+    meta('link[rel="canonical"]', 'href', url);
+    meta('meta[name="description"]', 'content', desc);
+    meta('meta[property="og:url"]', 'content', url);
+    meta('meta[property="og:title"]', 'content',
+      tpl.name + ' — ' + eventLabel + ' invitation design');
+    meta('meta[property="og:description"]', 'content', desc);
+
+    /* Product + breadcrumb, so a design can win a rich result of its own. */
+    var ld = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Product',
+          name: tpl.name + ' — ' + eventLabel + ' invitation design',
+          description: desc,
+          category: eventLabel,
+          brand: { '@type': 'Brand', name: 'Invitara' },
+          url: url,
+          offers: {
+            '@type': 'Offer',
+            price: String(C.startingPrice(tpl)),
+            priceCurrency: C.CURRENCY,
+            availability: 'https://schema.org/InStock',
+            url: url
+          }
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: origin },
+            { '@type': 'ListItem', position: 2, name: 'Designs', item: origin + 'create.html' },
+            { '@type': 'ListItem', position: 3, name: tpl.name, item: url }
+          ]
+        }
+      ]
+    };
+    var s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.textContent = JSON.stringify(ld);
+    document.head.appendChild(s);
+  }
+  seo();
 
   document.getElementById('crumb-name').textContent = tpl.name;
   document.getElementById('detail-name').textContent = tpl.name;

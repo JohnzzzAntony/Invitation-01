@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — pricing page
+   Invitara — pricing page
    Renders the three plan cards, the feature comparison matrix and the
    optional add-ons, all from the single definitions in commerce.js so the
    page can never drift from what the editor actually enforces.

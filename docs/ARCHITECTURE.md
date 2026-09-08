@@ -1,6 +1,6 @@
 # Architecture
 
-How Ever RSVP is put together, and why it is put together that way.
+How Invitara is put together, and why it is put together that way.
 
 Companion documents:
 - [LAYOUT-SPEC.md](LAYOUT-SPEC.md) — the frozen v4 contract every layout module implements
@@ -57,7 +57,7 @@ public/                  ← THE PRODUCT. This folder is the deployable.
                            theme-variable plumbing, responsive fixes
   js/                      One job per module (see §3)
   mu/                      Muhibbi fonts + ~160 photos
-  assets/                  Ever RSVP's own 21 JPGs, incl. og-cover.jpg
+  assets/                  Invitara's own 21 JPGs, incl. og-cover.jpg
   robots.txt, sitemap.xml, _headers
 
 config/

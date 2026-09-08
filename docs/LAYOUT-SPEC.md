@@ -1,4 +1,4 @@
-# LAYOUT-SPEC — Ever RSVP multi-layout engine (v4)
+# LAYOUT-SPEC — Invitara multi-layout engine (v4)
 
 Read this fully before writing any layout or editor code. The reference
 implementation is `public/js/layouts/poetic.js` — mirror its structure. Every

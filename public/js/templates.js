@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — core engine v4: multi-layout template catalog
+   Invitara — core engine v4: multi-layout template catalog
    10 layouts (poetic, herald, atrium, editorial, calm, terra, serene,
    mandala, crescent, heritage) x 27 premium themes across 7 event types.
    Each layout is a port of one Muhibbi invitation home page; they live in
@@ -216,7 +216,7 @@
     { id: 'mu-cta', src: 'mu/images/cta.jpg', label: 'Invitation band' },
     { id: 'mu-contact', src: 'mu/images/contact-bg.jpg', label: 'Contact backdrop' },
     { id: 'mu-soft', src: 'mu/images/pricing/bg.jpg', label: 'Soft backdrop' },
-    /* Ever RSVP occasion photography — public/assets. */
+    /* Invitara occasion photography — public/assets. */
     { id: 'couple', src: 'assets/ws-couple.jpg', label: 'Couple portrait' },
     { id: 'cafe', src: 'assets/ws-cafe.jpg', label: 'First meeting' },
     { id: 'proposal', src: 'assets/ws-proposal.jpg', label: 'The proposal' },
@@ -827,9 +827,22 @@
     });
   }
 
-  function bindSite(root) {
+  /**
+   * Wire a rendered site: scroll-reveal, in-page nav, the RSVP demo, and the
+   * layout behaviours in js/mu.js (sliders, mobile menu, lightbox).
+   *
+   * Sliders in particular MUST be bound — bindSliders() is what sizes each
+   * slide to one-per-view. An unbound hero slider lays every slide out side
+   * by side, which is what a published page looked like before invite.js
+   * started calling this.
+   *
+   * opts.rsvpDemo  false on the published page, where a guest's reply is sent
+   *                to the host by js/invite.js instead of being faked.
+   */
+  function bindSite(root, opts) {
     if (!root || root.__wsBound) return;
     root.__wsBound = true;
+    opts = opts || {};
     /* gentle scroll-reveal for site sections (JS-added class: no-JS visitors
        never see hidden content; honours prefers-reduced-motion) */
     var reduceMotion = false;
@@ -844,36 +857,44 @@
       }, { threshold: 0.12 });
       Array.prototype.forEach.call(secs, function (sec) { secIO.observe(sec); });
     }
-    /* smooth anchor scrolling inside the preview */
+    /* Smooth in-page nav. In the editor the site sits inside a scrolling
+       canvas; on a published page the window is the scroller, so fall back to
+       the document element rather than an ancestor that never scrolls. */
     root.addEventListener('click', function (e) {
       var a = e.target.closest ? e.target.closest('[data-goto]') : null;
       if (!a || !root.contains(a)) return;
       e.preventDefault();
       var target = root.querySelector('#ws-sec-' + a.getAttribute('data-goto'));
-      var wrap = root.closest('.ed-canvas-wrap') || document.getElementById('canvas-frame') || root.parentElement;
-      if (target && wrap) {
+      if (!target) return;
+      var wrap = root.closest('.ed-canvas-wrap') || document.getElementById('canvas-frame');
+      if (wrap) {
         var top = target.getBoundingClientRect().top - wrap.getBoundingClientRect().top + wrap.scrollTop - 10;
         scrollElTo(wrap, top);
+      } else {
+        var doc = document.scrollingElement || document.documentElement;
+        scrollElTo(doc, target.getBoundingClientRect().top + doc.scrollTop - 10);
       }
     });
-    /* RSVP demo submit */
-    root.addEventListener('submit', function (e) {
-      var form = e.target.closest ? e.target.closest('.ws-rsvp-form') : null;
-      if (!form || !root.contains(form)) return;
-      e.preventDefault();
-      var name = form.querySelector('[name="name"]');
-      var attend = form.querySelector('[name="attend"]');
-      if (name && !name.value.trim()) { name.classList.add('ws-err'); name.focus(); return; }
-      if (attend && !attend.value) { attend.classList.add('ws-err'); attend.focus(); return; }
-      var doneMsg = root.__wsData && root.__wsData.sections && root.__wsData.sections.rsvp &&
-                    root.__wsData.sections.rsvp.success;
-      var box = document.createElement('div');
-      box.className = 'ws-rsvp-done';
-      box.innerHTML = '<span class="ws-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span>' +
-        '<b>RSVP received</b><p>' + esc(doneMsg || 'Thank you!') + '</p>';
-      form.hidden = true;
-      (form.parentElement || form.closest('.ws-sec') || root).appendChild(box);
-    });
+    /* RSVP demo submit — skipped where a real reply path exists (invite.js) */
+    if (opts.rsvpDemo !== false) {
+      root.addEventListener('submit', function (e) {
+        var form = e.target.closest ? e.target.closest('.ws-rsvp-form') : null;
+        if (!form || !root.contains(form)) return;
+        e.preventDefault();
+        var name = form.querySelector('[name="name"]');
+        var attend = form.querySelector('[name="attend"]');
+        if (name && !name.value.trim()) { name.classList.add('ws-err'); name.focus(); return; }
+        if (attend && !attend.value) { attend.classList.add('ws-err'); attend.focus(); return; }
+        var doneMsg = root.__wsData && root.__wsData.sections && root.__wsData.sections.rsvp &&
+                      root.__wsData.sections.rsvp.success;
+        var box = document.createElement('div');
+        box.className = 'ws-rsvp-done';
+        box.innerHTML = '<span class="ws-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></span>' +
+          '<b>RSVP received</b><p>' + esc(doneMsg || 'Thank you!') + '</p>';
+        form.hidden = true;
+        (form.parentElement || form.closest('.ws-sec') || root).appendChild(box);
+      });
+    }
     root.addEventListener('input', function (e) {
       if (e.target.classList) e.target.classList.remove('ws-err');
     }, true);

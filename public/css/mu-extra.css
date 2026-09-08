@@ -170,7 +170,16 @@
     background: none; border: 0; font-size: 18px; cursor: pointer; color: var(--ws-ink);
     padding: 4px;
   }
-  .ws .mu-brand { font-size: 22px; }
+  /* The brand sits at the row's right edge on mobile; without a gutter its
+     last glyph is clipped by the header's overflow. Cap it too, so a long
+     wordmark truncates instead of shoving the burger off-row. */
+  .ws .mu-brand {
+    font-size: 22px;
+    padding-right: 16px;
+    max-width: 62vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /* ---- slider (Owl Carousel replacement) ----------------------------------- */

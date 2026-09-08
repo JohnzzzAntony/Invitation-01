@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — site interactions
+   Invitara — site interactions
    Vanilla JS, no dependencies.
    ========================================================================== */
 (function () {

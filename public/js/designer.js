@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — "Create your own design" builder modal (v4, layout-aware).
+   Invitara — "Create your own design" builder modal (v4, layout-aware).
    Pick one of the 8 registered layouts; the event type follows the layout
    automatically; palette, name fonts (8) and ornaments apply to the live
    mini preview rendered through EVER_renderSiteMini with the chosen layout.

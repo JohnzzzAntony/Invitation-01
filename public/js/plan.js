@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — plan selection (?p=<projectId>)
+   Invitara — plan selection (?p=<projectId>)
    The customer's design is already fixed; here they pick the plan and any
    extras. Every price on the page comes from EVER_C.quote(), so the summary
    can never disagree with checkout.

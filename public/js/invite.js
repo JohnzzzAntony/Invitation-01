@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — published invitation (the page guests open)
+   Invitara — published invitation (the page guests open)
 
    There is no server, so the invitation travels inside the link: publish
    encodes {state, theme, slug} into the URL hash and this page decodes it.
@@ -38,8 +38,20 @@
   } catch (e) {
     return fail();
   }
+  site.__wsData = state;
   root.appendChild(site);
+
+  /* Bind the layout's behaviours. This is what sizes each slider slide to
+     one-per-view, opens the mobile menu and the photo lightbox — without it
+     a hero slider lays all its slides out side by side. rsvpDemo is off
+     because a guest's reply is sent to the host below, not faked. */
+  if (window.EVER_bindSite) window.EVER_bindSite(site, { rsvpDemo: false });
   if (window.EVER_tickCountdowns) window.EVER_tickCountdowns(root);
+
+  /* Countdowns must keep ticking on a page nobody is editing. */
+  setInterval(function () {
+    if (window.EVER_tickCountdowns) window.EVER_tickCountdowns(root);
+  }, 1000);
 
   /* ---------------- Title & share preview ---------------- */
   var b = state.basics || {};

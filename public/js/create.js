@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — design marketplace (step 1)
+   Invitara — design marketplace (step 1)
    27 themes across 10 layouts and 7 occasions, plus user-created designs.
    Filters: occasion chips + search, style, price band and plan. Each card
    shows its price, plan and editor level, and offers "View design" (detail

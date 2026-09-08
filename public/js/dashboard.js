@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — customer dashboard
+   Invitara — customer dashboard
    Project cards (edit / preview / share) and the billing & orders list.
    Everything is read through commerce.js; this file only renders.
    ========================================================================== */

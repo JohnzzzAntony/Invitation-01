@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — checkout (step 4)
+   Invitara — checkout (step 4)
    Itemised order summary from EVER_C.quote(), card validation, and a
    simulated payment that records a real order and advances the project's
    state through PAYMENT_PENDING -> PAID.

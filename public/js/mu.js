@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — Muhibbi shared layout runtime
+   Invitara — Muhibbi shared layout runtime
    --------------------------------------------------------------------------
    The ten layouts in js/layouts/*.js are ports of the Muhibbi template's ten
    invitation home pages. They all reuse the same header, section title,

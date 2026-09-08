@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — commerce domain
+   Invitara — commerce domain
    Owns everything the rendering engine deliberately does not: plans, feature
    permissions, theme pricing, projects, the purchase state machine and orders.
 

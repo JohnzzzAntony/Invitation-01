@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — homepage "Pick a design" (§7)
+   Invitara — homepage "Pick a design" (§7)
 
    Deliberately light: the landing page loads templates.js + commerce.js only,
    NOT the ten layout modules or the 850 KB Muhibbi stylesheet. Each card
