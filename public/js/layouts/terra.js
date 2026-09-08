@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: terra  (Muhibbi "African Wedding Home", index-6.html)
+   Invitara — layout: terra  (Muhibbi "African Wedding Home", index-6.html)
    --------------------------------------------------------------------------
    Warm, bold design: full-bleed hero slider with the names set against a
    flourish, two tall portraits framing a shared message card, a wide gallery

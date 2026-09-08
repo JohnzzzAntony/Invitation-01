@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: crescent  (Muhibbi "Muslim Wedding Home", index-9.html)
+   Invitara — layout: crescent  (Muhibbi "Muslim Wedding Home", index-9.html)
    --------------------------------------------------------------------------
    Ornamental, symmetrical design: a framed hero with an invocation image, a
    date line and an address, a circular countdown, two host texts around a

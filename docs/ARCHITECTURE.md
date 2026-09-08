@@ -127,7 +127,65 @@ The rule: builder chrome never writes a `.ws` selector; layout CSS never writes
 an unscoped one. This is what lets the editor render a live event site inside
 its own UI without either stylesheet corrupting the other.
 
-## 5. Data model
+## 5. Responsive system
+
+Mobile is the base case; larger screens are progressive enhancement.
+
+### Breakpoints
+
+CSS cannot read a custom property inside `@media`, so the four tiers are
+documented constants in `styles.css` `:root` and every query uses them:
+
+| Tier | Query | Range |
+|---|---|---|
+| Phone | *(base — no query)* | under 640px |
+| Tablet | `min-width: 640px` | 640–1023px |
+| Laptop | `min-width: 1024px` | 1024–1439px |
+| Desktop | `min-width: 1440px` | 1440px and up |
+
+Grids follow one ladder: **1-up → 2-up at tablet → 3-up at laptop**, used by
+`.tpl-grid`, `.pick-grid`, `.dash-grid`, `.addon-grid` and `.plan-grid`.
+
+Some `max-width` queries remain from the original desktop-first CSS. They are
+phone overrides of older rules, not a second system — new rules use
+`min-width`.
+
+### Fluid scale
+
+Between breakpoints, card chrome interpolates with `clamp()` rather than
+stepping, so a 360px phone, a 768px tablet and a 1600px monitor each get
+sizing that suits them:
+
+| Token | Phone → desktop |
+|---|---|
+| `--gutter` | 16px → 24px |
+| `--card-pad` | 14px → 22px |
+| `--card-pad-lg` | 18px → 30px |
+| `--card-gap` | 12px → 24px |
+| `--card-title` | 17px → 22px |
+| `--card-text` | 13px → 14.5px |
+| `--card-meta` | 11px → 12.5px |
+
+`.container` is `min(1140px, 100% - 2 × --gutter)`, widening to 1240px at the
+desktop tier so a large monitor is not reading a narrow column.
+
+The design thumbnail `.wsm` crops shorter on small screens — `5/4` on a phone,
+`4/4.4` on tablet, `4/5` from laptop — because at phone width the card spans
+the whole column and a portrait crop would make one card fill the screen.
+
+### Themes
+
+The ten invitation layouts are re-checked at 360 / 768 / 1024 / 1920 after any
+CSS change: no horizontal overflow, no clipped text, document width never
+exceeding the viewport. Their hero names scale with **container queries**
+(`clamp(30px, 8.5cqw, 180px)` in `mu-extra.css`), so they track the width of
+the site itself rather than the window — correct both in the editor's narrow
+canvas and on a published full-width page.
+
+`css/mu.css` is generated and its media queries come from the vendor template;
+responsive corrections belong in `css/mu-extra.css`, which loads after it.
+
+## 6. Data model
 
 Everything is in `localStorage`, on the customer's device.
 
@@ -150,7 +208,7 @@ its `state` into it, and autosave mirrors it back. That is what let the whole
 commerce layer be added without touching how `editor.js` reads or writes
 content.
 
-## 6. The user journey
+## 7. The user journey
 
 ```
 index.html ──Pick a design──► create.html ──► design.html ──Use this design──┐
@@ -172,7 +230,7 @@ index.html ──Pick a design──► create.html ──► design.html ──
 the editor, several open the dashboard, none sends you to the marketplace with
 an explanation. There is no login because there are no accounts.
 
-## 7. One engine, ten structures
+## 8. One engine, ten structures
 
 A **layout** is a genuinely different page structure — its own section list,
 editor field specs and defaults. All ten are ports of the Muhibbi wedding
@@ -189,7 +247,7 @@ rules, the quality bar for adding a layout — is in
 [LAYOUT-SPEC.md](LAYOUT-SPEC.md). It is frozen: implement against it rather
 than extending it.
 
-## 8. Commerce: plans, pricing and projects
+## 9. Commerce: plans, pricing and projects
 
 All of it lives in `public/js/commerce.js`, published as `window.EVER_C`.
 `templates.js` stays a pure rendering engine — no price or plan concept leaks
@@ -237,7 +295,7 @@ prompt, because a customer should be able to see what a higher plan buys.
 > boundary and must not be treated as one. Adding a server means moving
 > `quote()` and `can()` behind an API and re-checking both on write.
 
-## 9. Publishing and sharing
+## 10. Publishing and sharing
 
 There is no server, so a published invitation travels **inside its own URL**:
 `publish()` assigns a slug, then `inviteUrl()` base64-encodes the invitation
@@ -255,7 +313,7 @@ WhatsApp or e-mail message addressed to the host using the contact details the
 host entered — one tap for the guest, and the host receives it. Aggregated RSVP
 counts in a dashboard need a backend and are not in this build.
 
-## 10. Security posture
+## 11. Security posture
 
 **Response headers** live in `config/security-headers.mjs` and are applied by
 `next.config.ts` in dev and by the generated `_headers` / `netlify.toml` /
@@ -276,7 +334,7 @@ and sets `frame-ancestors 'none'`.
 - Card data is never persisted anywhere — not localStorage, not cookies, not a
   server. Only the order number survives checkout
 
-## 11. Verification
+## 12. Verification
 
 There is no test suite, because there is no build step and no server logic to
 test. Verification is:
@@ -289,7 +347,7 @@ bun run dev        # then exercise the pages in a browser
 `public/layouts-test.html` renders every layout × theme combination on one page
 — the fastest way to eyeball a change across all 27 designs.
 
-## 12. Regenerating derived files
+## 13. Regenerating derived files
 
 Four files in `public/` are generated. Re-run the generator; never hand-edit.
 

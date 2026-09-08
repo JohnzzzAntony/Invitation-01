@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — minimalist marketing site
+   Invitara — minimalist marketing site
    Pure CSS, no frameworks. Teal + white + serif headings.
    ========================================================================== */
 
@@ -25,6 +25,33 @@
   --shadow:     0 12px 34px rgba(23, 152, 184, 0.10);
   --shadow-sm:  0 4px 14px rgba(49, 67, 76, 0.08);
   --header-h:   68px;
+
+  /* ---------- Breakpoints ----------
+     Plain CSS cannot read a custom property inside @media, so these are the
+     documented constants every media query in the system must use. Four
+     tiers, mobile first:
+
+       (base)              phone      < 640px
+       min-width:  640px   tablet     640-1023px
+       min-width: 1024px   laptop     1024-1439px
+       min-width: 1440px   desktop    1440px and up
+
+     Legacy max-width queries below 640px are the phone overrides of rules
+     that were written desktop-first; new rules should use min-width.       */
+
+  /* ---------- Fluid scale ----------
+     Cards, gutters and headings interpolate between a phone value and a
+     desktop one instead of stepping at a breakpoint, so a 360px phone, a
+     768px tablet and a 1600px monitor each get sizing that suits them.
+     clamp(min, preferred, max) — the vw term does the interpolating.       */
+  --gutter:       clamp(16px, 5vw, 24px);   /* container side padding      */
+  --card-pad:     clamp(14px, 3.6vw, 22px); /* card inner padding          */
+  --card-pad-lg:  clamp(18px, 4.6vw, 30px); /* roomier cards (plans)       */
+  --card-gap:     clamp(12px, 2.6vw, 24px); /* gap between cards in a grid */
+  --card-radius:  clamp(6px, 1.2vw, 8px);
+  --card-title:   clamp(17px, 4.6vw, 22px); /* card headings               */
+  --card-text:    clamp(13px, 3.4vw, 14.5px);
+  --card-meta:    clamp(11px, 3vw, 12.5px);
 }
 
 /* ---------- Reset & base ---------- */
@@ -72,9 +99,15 @@ button {
 
 section { scroll-margin-top: calc(var(--header-h) + 8px); }
 
+/* Gutters shrink on a phone (16px a side) and open up on a desktop (24px),
+   and the line length is allowed to grow one step on large monitors so a
+   1600px screen is not reading a 1140px column in the middle of nowhere. */
 .container {
-  width: min(1140px, 100% - 48px);
+  width: min(1140px, 100% - (var(--gutter) * 2));
   margin-inline: auto;
+}
+@media (min-width: 1440px) {
+  .container { width: min(1240px, 100% - (var(--gutter) * 2)); }
 }
 
 .center { text-align: center; }
@@ -1329,16 +1362,21 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
 }
 
 /* Template cards */
+/* Mobile first: one column, tightening to a 2-up on tablet and 3-up from
+   laptop. The gap follows the fluid card scale so phones do not waste a
+   third of the screen on whitespace between cards. */
 .tpl-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
+  grid-template-columns: 1fr;
+  gap: var(--card-gap);
 }
+@media (min-width: 640px)  { .tpl-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .tpl-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .tpl-card {
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--card-radius);
   overflow: hidden;
   cursor: pointer;
   transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -1350,21 +1388,25 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
 }
 
 .tpl-preview {
-  padding: 30px 34px;
+  padding: var(--card-pad);
   background: var(--bg-soft);
   display: flex;
   justify-content: center;
 }
 
+/* The card body stacks: title+badges, price, plan, then the actions row.
+   (It was a space-between flex ROW back when the card had only a title and a
+   "use" link; with four blocks that crushed everything onto one line and cut
+   the CTA off on a phone.) */
 .tpl-meta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: var(--card-pad);
   border-top: 1px solid var(--line);
 }
-.tpl-meta h3 { font-size: 20px; margin: 0; }
+.tpl-meta h3 { font-size: var(--card-title); margin: 0; }
 .tpl-cat {
   font-size: 11px;
   font-weight: 700;
@@ -3003,7 +3045,6 @@ a.pv-chip:hover { color: var(--pv-accent); border-color: var(--pv-accent); }
 }
 
 /* preview containers */
-.tpl-preview { padding: 26px 30px; }
 .summary-preview { display: flex; justify-content: center; }
 .summary-preview .wsm { max-width: 210px; }
 

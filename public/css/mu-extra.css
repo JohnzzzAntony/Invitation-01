@@ -280,7 +280,7 @@
   text-transform: uppercase; color: var(--ws-muted);
 }
 
-/* Countdown band — an Ever RSVP section drawn with the template's tokens. */
+/* Countdown band — an Invitara section drawn with the template's tokens. */
 .ws .mu-count-band {
   background: var(--ws-soft, #e6dcd0);
   text-align: center;
@@ -398,12 +398,17 @@
    A mini is the real layout rendered small: the inner `.ws` root is scaled so
    the thumbnail is always an accurate picture of the design.
    ========================================================================== */
+/* Thumbnail crop. A 4:5 portrait reads well at card width on tablet and up,
+   but on a phone the card is the full column, so 4:5 makes one card eat most
+   of the screen. Crop shorter below the tablet breakpoint. */
 .wsm {
   position: relative;
   overflow: hidden;
   background: var(--ws-bg, #f6f3ee);
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 5 / 4;
 }
+@media (min-width: 640px)  { .wsm { aspect-ratio: 4 / 4.4; } }
+@media (min-width: 1024px) { .wsm { aspect-ratio: 4 / 5; } }
 .wsm .wsm-scale {
   position: absolute;
   top: 0; left: 0;

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: calm  (Muhibbi "Korean Wedding Home", index-5.html)
+   Invitara — layout: calm  (Muhibbi "Korean Wedding Home", index-5.html)
    --------------------------------------------------------------------------
    Quiet, paper-like design: "Save the date" hero with three stacked photos
    and a big date, a circular countdown band, a two-up story slider, a mosaic

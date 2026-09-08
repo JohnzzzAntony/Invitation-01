@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: mandala  (Muhibbi "Indian Wedding Home", index-8.html)
+   Invitara — layout: mandala  (Muhibbi "Indian Wedding Home", index-8.html)
    --------------------------------------------------------------------------
    Festive, multi-day design: cross-fading hero photographs behind a floral
    frame, a circular countdown, cut-out host portraits, a masonry gallery, a

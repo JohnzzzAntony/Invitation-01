@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: atrium  (Muhibbi "Announcement Home 2", index-3.html)
+   Invitara — layout: atrium  (Muhibbi "Announcement Home 2", index-3.html)
    --------------------------------------------------------------------------
    Editorial three-column hero, a quote over three host cards, a story slider,
    illustrated detail tiles, an RSVP panel laid over a photograph, and a

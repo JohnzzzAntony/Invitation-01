@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: editorial  (Muhibbi "Announcement Home 3", index-4.html)
+   Invitara — layout: editorial  (Muhibbi "Announcement Home 3", index-4.html)
    --------------------------------------------------------------------------
    Typographic hero with the names set between two flourishes, a framed pull
    quote, a wide centre portrait between two host cards, a horizontal story

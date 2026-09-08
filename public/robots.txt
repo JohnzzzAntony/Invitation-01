@@ -1,4 +1,4 @@
-# Ever RSVP — robots.txt
+# Invitara — robots.txt
 # Crawl everything useful; keep funnel/app pages out of search results.
 
 User-agent: Googlebot

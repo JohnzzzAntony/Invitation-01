@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: heritage  (Muhibbi "Senior Wedding Home", index-10.html)
+   Invitara — layout: heritage  (Muhibbi "Senior Wedding Home", index-10.html)
    --------------------------------------------------------------------------
    Generous, unhurried design for milestone celebrations: a hero slider with
    flourishes around the headline, a wide pull quote flanked by two photos, a

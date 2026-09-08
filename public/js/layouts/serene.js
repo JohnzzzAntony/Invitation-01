@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: serene  (Muhibbi "Indo & Malay Wedding Home", index-7.html)
+   Invitara — layout: serene  (Muhibbi "Indo & Malay Wedding Home", index-7.html)
    --------------------------------------------------------------------------
    Three-panel hero with arched photos, a masonry gallery with a captioned
    centre tile, a wide video band, a three-column story slider, detail tiles,

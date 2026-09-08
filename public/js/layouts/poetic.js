@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: poetic  (Muhibbi "Main Wedding Home", index.html)
+   Invitara — layout: poetic  (Muhibbi "Main Wedding Home", index.html)
    --------------------------------------------------------------------------
    Full-length invitation: cinematic hero with two floating portraits, host
    cards, detail tiles, countdown, gallery slider, wishes slider, video band,

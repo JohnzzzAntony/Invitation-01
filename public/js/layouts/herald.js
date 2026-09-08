@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ever RSVP — layout: herald  (Muhibbi "Announcement Home 1", index-2.html)
+   Invitara — layout: herald  (Muhibbi "Announcement Home 1", index-2.html)
    --------------------------------------------------------------------------
    Announcement-style invitation: full-bleed hero slider, a pull quote, two
    host portraits either side of a crest, a story slider, the RSVP panel,
