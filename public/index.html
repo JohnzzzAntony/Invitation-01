@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>27 Event Website Templates with Online RSVP | Ever RSVP</title>
-  <meta name="description" content="Build an event website guests love — 27 premium designs across 10 bespoke layouts, from weddings to galas. Guests RSVP in a minute. $25 once, no subscription." />
+  <meta name="description" content="Build an event website guests love — 27 premium designs across 10 bespoke layouts, from weddings to galas. Guests RSVP in a minute. From AED 29, paid once — no subscription." />
   <meta name="keywords" content="event website templates, wedding website template, birthday party website, anniversary invitation website, housewarming party website, baptism invitation website, baby shower website, gala invitation website, online RSVP, wedding RSVP tracker" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <link rel="canonical" href="https://your-domain.example/" />
@@ -16,7 +16,7 @@
   <meta property="og:site_name" content="Ever RSVP" />
   <meta property="og:url" content="https://your-domain.example/" />
   <meta property="og:title" content="Ever RSVP — 27 Event Website Templates for Every Occasion" />
-  <meta property="og:description" content="27 premium designs across 10 bespoke layouts — weddings, birthdays, anniversaries, housewarmings, baptisms, baby showers & galas. One simple $25 payment." />
+  <meta property="og:description" content="27 premium designs across 10 bespoke layouts — weddings, birthdays, anniversaries, housewarmings, baptisms, baby showers & galas. Three simple plans from AED 29." />
   <meta property="og:image" content="https://your-domain.example/assets/og-cover.jpg" />
   <meta property="og:image:width" content="1440" />
   <meta property="og:image:height" content="736" />
@@ -25,14 +25,15 @@
   <!-- Twitter card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ever RSVP — 27 Event Website Templates for Every Occasion" />
-  <meta name="twitter:description" content="27 premium designs across 10 bespoke layouts & 7 occasion types. One simple $25 payment — no app, no sign-up for guests." />
+  <meta name="twitter:description" content="27 premium designs across 10 bespoke layouts & 7 occasion types. From AED 29, paid once — no app, no sign-up for guests." />
   <meta name="twitter:image" content="https://your-domain.example/assets/og-cover.jpg" />
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231798b8'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/commerce.css" />
 
   <!-- Structured data: Organization + WebSite -->
   <script type="application/ld+json">
@@ -62,12 +63,14 @@
         "description": "A beautiful event website with online RSVP: 27 premium designs across 10 bespoke layouts and 7 occasion types, unlimited guests, custom questions, guest dashboard and CSV export.",
         "brand": { "@id": "https://your-domain.example/#org" },
         "offers": {
-          "@type": "Offer",
-          "price": "25.00",
-          "priceCurrency": "USD",
+          "@type": "AggregateOffer",
+          "lowPrice": "29",
+          "highPrice": "99",
+          "offerCount": "3",
+          "priceCurrency": "AED",
           "availability": "https://schema.org/InStock",
-          "url": "https://your-domain.example/#pricing",
-          "description": "One-time payment — lifetime access, no subscription."
+          "url": "https://your-domain.example/pricing.html",
+          "description": "One payment per invitation — design price plus your plan. No subscription."
         },
         "aggregateRating": {
           "@type": "AggregateRating",
@@ -91,8 +94,8 @@
           },
           {
             "@type": "Question",
-            "name": "What does the $25 include?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Everything: all 27 designs across 10 bespoke layouts, unlimited guests, custom questions, sub-events, the dashboard, exports and email support. One payment — no renewals, ever." }
+            "name": "What is included in the price?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Your total is the design price plus one plan — Basic from AED 29, Pro from AED 59, Advanced from AED 99. Every plan includes unlimited guests and unlimited RSVP replies, paid once with no renewals." }
           },
           {
             "@type": "Question",
@@ -107,7 +110,7 @@
           {
             "@type": "Question",
             "name": "Can I change the design after publishing?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Anytime. Switch between all 27 designs and 10 layouts, change colors and photos whenever you like — your guest replies stay safe." }
+            "acceptedAnswer": { "@type": "Answer", "text": "You can change every word, photo and colour at any time. The design itself is bought per invitation, so switching to a different design means starting a new invitation with that design." }
           }
         ]
       },
@@ -161,8 +164,10 @@
       </a>
 
       <nav class="main-nav" aria-label="Primary">
-        <a href="#overview" class="nav-link">Overview</a>
-        <a href="#designs" class="nav-link">Designs</a>
+        <a href="#top" class="nav-link">Home</a>
+        <a href="create.html" class="nav-link">Designs</a>
+        <a href="#how" class="nav-link">How it works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
         <a href="#faq" class="nav-link">F.A.Q.</a>
 
         <!-- No accounts exist: an event lives in this browser. This button
@@ -184,8 +189,10 @@
   <!-- Mobile slide-in menu -->
   <div class="mobile-menu" id="mobile-menu" hidden>
     <nav aria-label="Mobile">
-      <a href="#overview">Overview</a>
-      <a href="#designs">Designs</a>
+      <a href="#top">Home</a>
+      <a href="create.html">Designs</a>
+      <a href="#how">How it works</a>
+      <a href="pricing.html">Pricing</a>
       <a href="#faq">F.A.Q.</a>
       <button class="mobile-resume" type="button" data-resume>Continue editing</button>
       <a href="create.html" class="btn btn-primary btn-block">Get started</a>
@@ -201,15 +208,15 @@
       <div class="container hero-inner">
         <div class="hero-copy reveal">
           <p class="kicker">Online RSVP, elegant &amp; easy</p>
-          <h1>Beautiful RSVP websites for weddings &amp; every celebration.</h1>
+          <h1>Create beautiful invitations that feel uniquely yours.</h1>
           <p class="lead">
             Build a lovely event page in minutes, send your online invitations,
             and watch every guest reply arrive in one place.
-            It takes 10&nbsp;minutes to set up and costs <strong>$25 only</strong> — once.
+            It takes 10&nbsp;minutes to set up and starts at <strong>AED&nbsp;29</strong> — paid once.
           </p>
           <div class="hero-actions">
-            <a href="create.html" class="btn btn-primary btn-lg">Get started</a>
-            <a href="#designs" class="arrow-link">Explore the designs <span aria-hidden="true">&#8594;</span></a>
+            <a href="create.html" class="btn btn-primary btn-lg">Create your invitation</a>
+            <a href="#picker" class="arrow-link">Explore the designs <span aria-hidden="true">&#8594;</span></a>
           </div>
         </div>
       </div>
@@ -243,8 +250,8 @@
           <span class="strip-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><rect x="3.2" y="5.6" width="17.6" height="12.8" rx="2"/><path d="M3.2 9.6h17.6M6.6 14.8h4"/></svg>
           </span>
-          <h3>$25 only</h3>
-          <p>No ads. No subscription or recurring fee. Unlimited guests + all features.</p>
+          <h3>From AED 29</h3>
+          <p>No ads. No subscription or recurring fee. Unlimited guests on every plan.</p>
         </div>
       </div>
     </section>
@@ -271,6 +278,27 @@
             <p>Every reply lands in your dashboard, ready to export.</p>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <!-- ======================= PICK A DESIGN (§7) ======================= -->
+    <section class="picker" id="picker">
+      <div class="container">
+        <p class="kicker center reveal">Pick a design</p>
+        <h2 class="section-title center reveal">Start with a design you love</h2>
+        <p class="section-sub center reveal">
+          Start with a professionally designed invitation and make it your own.
+          Every price below includes the design and its entry plan.
+        </p>
+
+        <div class="filter-chips center reveal" id="pick-chips" role="group" aria-label="Filter designs by occasion"></div>
+
+        <div class="pick-grid" id="pick-grid"></div>
+
+        <div class="picker-more reveal">
+          <a href="create.html" class="btn btn-primary btn-lg">See all 27 designs</a>
+          <a href="pricing.html" class="arrow-link">Compare the plans <span aria-hidden="true">&#8594;</span></a>
+        </div>
       </div>
     </section>
 
@@ -515,7 +543,7 @@
           <div class="why-cell reveal">
             <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.2" y="5.6" width="17.6" height="12.8" rx="2"/><path d="M3.2 9.6h17.6M6.6 14.8h4"/></svg></span>
             <h3>Transparent pricing</h3>
-            <p>$25 once. No subscription, no add-on fees, no charge for extra guests.</p>
+            <p>Design price plus one plan, paid once. No subscription, no charge for extra guests.</p>
           </div>
           <div class="why-cell reveal">
             <span class="strip-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.5 18h3"/></svg></span>
@@ -559,10 +587,10 @@
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
-              <span>What does the $25 include?</span>
+              <span>What is included in the price?</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-            <div class="acc-panel"><p>Everything: all 27 designs across 10 bespoke layouts, unlimited guests, custom questions, sub-events, the dashboard, exports and email support. One payment — no renewals, ever.</p></div>
+            <div class="acc-panel"><p>Your total is the design price plus one plan — Basic from AED&nbsp;29, Pro from AED&nbsp;59, Advanced from AED&nbsp;99. Every plan includes unlimited guests and unlimited RSVP replies, paid once with no renewals. <a href="pricing.html">Compare the plans</a>.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
@@ -583,7 +611,7 @@
               <span>Can I change the design after publishing?</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </button>
-            <div class="acc-panel"><p>Anytime. Switch between all 27 designs and 10 layouts, change colors and photos whenever you like — your guest replies stay safe.</p></div>
+            <div class="acc-panel"><p>You can change every word, photo and colour at any time. The design itself is bought per invitation, so switching to a different design means starting a new invitation with that design.</p></div>
           </div>
         </div>
       </div>
@@ -594,7 +622,7 @@
       <div class="container cta-inner reveal">
         <h2>Ready to gather your favorite people?</h2>
         <p>Your beautiful RSVP page is ten minutes away — and your guests will love it.</p>
-        <a href="create.html" class="btn btn-light btn-lg">Get started — $25</a>
+        <a href="create.html" class="btn btn-light btn-lg">Get started — from AED 29</a>
       </div>
     </section>
   </main>
@@ -610,10 +638,10 @@
       <nav class="f-col" aria-label="Product">
         <h4>Product</h4>
         <a href="#overview">Overview</a>
-        <a href="#designs">Designs</a>
-        <a href="#why">Pricing</a>
+        <a href="create.html">Designs</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="dashboard.html">My invitations</a>
         <button class="f-link" type="button" data-demo-modal>Event page demo</button>
-        <a href="create.html">Get started</a>
       </nav>
 
       <nav class="f-col" aria-label="Support">
@@ -720,6 +748,9 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg>
   </button>
 
+  <script src="js/templates.js"></script>
+  <script src="js/commerce.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/picker.js"></script>
 </body>
 </html>

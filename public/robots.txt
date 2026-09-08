@@ -6,12 +6,18 @@ Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
 Disallow: /layouts-test.html
+Disallow: /plan.html
+Disallow: /dashboard.html
+Disallow: /invite.html
 
 User-agent: Bingbot
 Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
 Disallow: /layouts-test.html
+Disallow: /plan.html
+Disallow: /dashboard.html
+Disallow: /invite.html
 
 User-agent: Twitterbot
 Allow: /
@@ -24,5 +30,8 @@ Allow: /
 Disallow: /checkout.html
 Disallow: /editor.html
 Disallow: /layouts-test.html
+Disallow: /plan.html
+Disallow: /dashboard.html
+Disallow: /invite.html
 
 Sitemap: https://your-domain.example/sitemap.xml

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>27 Event Website Templates for Every Occasion | Ever RSVP</title>
-  <meta name="description" content="Browse 27 premium event website templates across 10 layouts — weddings, birthdays, anniversaries, baptisms, baby showers & galas. Preview live, publish for $25." />
+  <meta name="description" content="Browse 27 premium event website templates across 10 layouts — weddings, birthdays, anniversaries, baptisms, baby showers & galas. Preview live, from AED 29." />
   <meta name="keywords" content="event website templates, wedding website template, birthday party website, anniversary invitation website, housewarming party website, baptism invitation website, baby shower website, gala invitation website, RSVP templates" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://your-domain.example/create.html" />
@@ -23,6 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&family=Pacifico&family=Parisienne&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/commerce.css" />
   <link rel="stylesheet" href="css/mu.css" />
   <link rel="stylesheet" href="css/mu-extra.css" />
 
@@ -86,8 +87,10 @@
 
       <ol class="flow-steps" aria-label="Your progress">
         <li class="active" aria-current="step"><span>1</span> Design</li>
-        <li><span>2</span> Payment</li>
-        <li><span>3</span> Editor</li>
+        <li><span>2</span> Plan</li>
+        <li><span>3</span> Customise</li>
+        <li><span>4</span> Checkout</li>
+        <li><span>5</span> Publish</li>
       </ol>
 
       <a class="arrow-link back-home" href="index.html"><span aria-hidden="true">&#8592;</span> Back to site</a>
@@ -97,18 +100,45 @@
   <main id="main">
     <section class="flow-head">
       <div class="container">
-        <p class="kicker center reveal">Step 1 of 3</p>
-        <h1 class="flow-title reveal">Pick your occasion</h1>
-        <p class="flow-sub reveal">Weddings, birthdays, anniversaries, housewarmings, baptisms, baby showers and galas — every occasion has its own bespoke layout, and every design is fully customizable: colors, fonts, sections and wording, all editable in the editor.</p>
+        <p class="kicker center reveal">Step 1 of 5</p>
+        <h1 class="flow-title reveal">Pick a design</h1>
+        <p class="flow-sub reveal">Start with a professionally designed invitation and make it your own. Every occasion has its own bespoke layout, and every word, photo and colour is editable.</p>
+
+        <div class="market-search reveal">
+          <label class="sr-only" for="tpl-search">Search designs</label>
+          <input type="search" id="tpl-search" placeholder="Search designs — “rose”, “gala”, “minimal”…" autocomplete="off" />
+        </div>
 
         <div class="filter-chips reveal" id="event-chips" role="group" aria-label="Filter designs by occasion"></div>
+
+        <div class="market-filters reveal">
+          <label>
+            <span>Style</span>
+            <select id="f-style"><option value="">All styles</option></select>
+          </label>
+          <label>
+            <span>Price</span>
+            <select id="f-price">
+              <option value="">Any price</option>
+              <option value="lo">Under AED 65</option>
+              <option value="mid">AED 65–100</option>
+              <option value="hi">AED 100+</option>
+            </select>
+          </label>
+          <label>
+            <span>Plan</span>
+            <select id="f-plan"><option value="">Any plan</option></select>
+          </label>
+          <button type="button" class="f-reset" id="f-reset">Reset</button>
+        </div>
       </div>
     </section>
 
     <section class="flow-body">
       <div class="container">
+        <p class="tpl-count" id="tpl-count" aria-live="polite"></p>
         <div class="tpl-grid" id="tpl-grid" aria-label="Design templates"></div>
-        <p class="tpl-empty" id="tpl-empty" hidden>No designs in this style yet — try another filter.</p>
+        <p class="tpl-empty" id="tpl-empty" hidden>No designs match these filters — try widening them.</p>
       </div>
     </section>
   </main>
@@ -136,6 +166,7 @@
   <script src="js/layouts/mandala.js"></script>
   <script src="js/layouts/crescent.js"></script>
   <script src="js/layouts/heritage.js"></script>
+  <script src="js/commerce.js"></script>
   <script src="js/designer.js"></script>
   <script src="js/app.js"></script>
   <script src="js/create.js"></script>

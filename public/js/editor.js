@@ -61,13 +61,176 @@
     state = window.EVER_loadSiteState(readJson(FLOW_KEY) || {});
   }
 
+  /* ---- Autosave (§25) --------------------------------------------- *
+     Debounced so a burst of keystrokes writes once, and mirrored onto the
+     active project so the dashboard, checkout and publish all see the same
+     content. The status line says "Saving…" then "Saved" so a customer can
+     see their work is safe.                                              */
+  function saveStatus(text) {
+    var el = document.getElementById('ed-save');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('on', !!text);
+  }
+
+  function persist() {
+    writeJson(window.EVER_EVENT_KEY, state);
+    if (window.EVER_C) window.EVER_C.syncActiveState();
+  }
+
+  /* Two timers: one debounces the write, one clears the "Saved" label. They
+     are separate variables because setTimeout returns a plain number in the
+     browser — it cannot carry a property. */
+  var statusTimer = null;
+
+  function markSaved() {
+    saveStatus('Saved');
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(function () { saveStatus(''); }, 2000);
+  }
+
   function autosave() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(function () { writeJson(window.EVER_EVENT_KEY, state); }, 350);
+    saveStatus('Saving…');
+    saveTimer = setTimeout(function () {
+      persist();
+      markSaved();
+    }, 350);
   }
+
   function saveNow() {
     clearTimeout(saveTimer);
-    writeJson(window.EVER_EVENT_KEY, state);
+    persist();
+    markSaved();
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Plan permissions (§12, §35)                                        *
+   * ------------------------------------------------------------------ *
+   * The customer's plan decides which sections and design controls are
+   * editable. Locked controls stay visible — a customer should see what a
+   * higher plan would give them — but are disabled and carry an upgrade
+   * prompt. Section content already bought stays rendered on the site; only
+   * EDITING it is gated.                                                 */
+
+  /* Section id -> the permission needed to edit it. Anything absent is
+     editable on every plan. */
+  var SECTION_PERM = {
+    gallery:   'editor.gallery',
+    countdown: 'editor.countdown',
+    map:       'editor.map',
+    schedule:  'editor.schedule.multi',
+    video:     'editor.premium',
+    registry:  'editor.premium',
+    stats:     'editor.premium',
+    updates:   'editor.premium',
+    wishes:    'editor.premium'
+  };
+
+  function project() {
+    return window.EVER_C ? window.EVER_C.activeProject() : null;
+  }
+
+  /* No project (someone opened the editor directly) means nothing to gate —
+     the old single-price behaviour, which keeps existing links working. */
+  function planId() {
+    var p = project();
+    return p && p.plan ? p.plan : null;
+  }
+
+  function allow(perm) {
+    var id = planId();
+    if (!id) return true;
+    return window.EVER_C.can(id, perm);
+  }
+
+  /** The cheapest plan granting `perm`, for the upgrade prompt's wording. */
+  function needsPlan(perm) {
+    var p = window.EVER_C ? window.EVER_C.planFor(perm) : null;
+    return p ? p.name : 'Pro';
+  }
+
+  /** Disable a control subtree and stamp it with "🔒 Available in X". */
+  function lock(el, perm) {
+    if (!el || el.classList.contains('ed-locked')) return;
+    el.classList.add('ed-locked');
+    el.querySelectorAll('input, select, textarea, button').forEach(function (c) {
+      c.disabled = true;
+      c.setAttribute('tabindex', '-1');
+    });
+    var note = document.createElement('a');
+    note.className = 'ed-lock-note';
+    note.href = 'pricing.html';
+    note.innerHTML = '<span aria-hidden="true">🔒</span> Available in ' +
+      esc(needsPlan(perm)) + ' — <u>upgrade to unlock</u>';
+    el.appendChild(note);
+  }
+
+  /**
+   * Apply every plan lock. Called after the sidebar and design panel are
+   * (re)built, so the gating lives in one place instead of being threaded
+   * through each builder.
+   */
+  function applyLocks() {
+    if (!planId()) return;
+    var C = window.EVER_C;
+
+    /* --- Sections --- */
+    document.querySelectorAll('#sec-groups .ed-group').forEach(function (det) {
+      var sid = det.getAttribute('data-sec');
+      var perm = SECTION_PERM[sid];
+      if (perm && !allow(perm)) {
+        lock(det.querySelector('.ed-body'), perm);
+        det.classList.add('ed-group-locked');
+      }
+      /* Reordering is layout control; hiding a section is section control. */
+      var tools = det.querySelector('.sec-tools');
+      if (!tools) return;
+      if (!allow('editor.sections.reorder')) {
+        tools.querySelectorAll('[data-tool="up"], [data-tool="down"]').forEach(function (b) {
+          b.disabled = true;
+          b.title = 'Reordering sections is available in ' + needsPlan('editor.sections.reorder');
+        });
+      }
+      if (!allow('editor.sections.toggle')) {
+        var eye = tools.querySelector('[data-tool="eye"]');
+        if (eye) {
+          eye.disabled = true;
+          eye.title = 'Showing and hiding sections is available in ' +
+            needsPlan('editor.sections.toggle');
+        }
+      }
+    });
+
+    /* --- Design panel --- */
+    if (!allow('editor.typography.advanced')) {
+      lock(document.getElementById('font-cards'), 'editor.typography.advanced');
+    }
+    if (!allow('editor.color.advanced')) {
+      /* Basic keeps the theme's own palette swatches; only the free-form
+         colour picker is a Pro control. */
+      document.querySelectorAll('#color-dots input[type="color"]').forEach(function (i) {
+        i.disabled = true;
+        i.title = 'Custom colours are available in ' + needsPlan('editor.color.advanced');
+      });
+    }
+    if (!allow('editor.layout')) {
+      var shape = document.getElementById('shape-row');
+      if (shape) lock(shape.parentElement || shape, 'editor.layout');
+    }
+
+    /* --- Theme switching (§49) --- *
+       A project is bound to one design for life. Switching would change what
+       was paid for, so the picker is replaced by an explanation rather than
+       silently swapping the purchase. */
+    var chips = document.getElementById('tpl-chips');
+    if (chips && C.isPaid(project())) {
+      chips.innerHTML =
+        '<p class="ed-theme-locked">This invitation is built on <strong>' +
+        esc(project().themeName) + '</strong>. A design is bought per invitation, ' +
+        'so it cannot be swapped here — <a href="create.html">start another invitation</a> ' +
+        'to use a different design.</p>';
+    }
   }
 
   /* ------------------------------------------------------------------ *
@@ -309,6 +472,7 @@
 
       var det = document.createElement('details');
       det.className = 'ed-group' + (ui.open[sid] ? ' open' : '') + (sec.on ? '' : ' sec-off');
+      det.setAttribute('data-sec', sid);
       if (ui.open[sid]) det.open = true;
 
       var sum = document.createElement('summary');
@@ -365,6 +529,8 @@
       det.appendChild(body);
       host.appendChild(det);
     });
+
+    applyLocks();
   }
 
   function buildList(body, meta, sec) {
@@ -620,6 +786,8 @@
     var spacing = document.getElementById('ed-spacing');
     spacing.value = state.spacing;
     spacing.onchange = function () { state.spacing = spacing.value; refresh(); };
+
+    applyLocks();
   }
 
   function designerEdit(id) {
@@ -661,7 +829,10 @@
         });
         btn.classList.add('on');
         btn.setAttribute('aria-pressed', 'true');
-        document.getElementById('canvas-frame').classList.toggle('mobile', btn.getAttribute('data-dev') === 'mobile');
+        var dev = btn.getAttribute('data-dev');
+        var frame = document.getElementById('canvas-frame');
+        frame.classList.toggle('mobile', dev === 'mobile');
+        frame.classList.toggle('tablet', dev === 'tablet');
       });
     });
 
@@ -670,33 +841,150 @@
       toast('Saved — your website lives on this device.');
     });
 
-    document.getElementById('publish-btn').addEventListener('click', function () {
-      saveNow();
-      var flow = readJson(FLOW_KEY) || {};
-      flow.published = true;
-      flow.slug = publishSlug();
-      writeJson(FLOW_KEY, flow);
-      var badge = document.getElementById('ed-badge');
-      badge.textContent = 'Published';
-      badge.classList.add('published');
-      var urlEl = document.getElementById('pub-url');
-      if (urlEl) urlEl.textContent = flow.slug + '.your-domain.example';
-      document.getElementById('pub-overlay').hidden = false;
-      document.body.classList.add('modal-open');
-    });
-    document.getElementById('pub-close').addEventListener('click', function () {
-      document.getElementById('pub-overlay').hidden = true;
-      document.body.classList.remove('modal-open');
-    });
+    document.getElementById('publish-btn').addEventListener('click', openPublish);
+
+    var pubClose = document.getElementById('pub-close');
+    if (pubClose) pubClose.addEventListener('click', closePublish);
+    var pubX = document.getElementById('pub-x');
+    if (pubX) pubX.addEventListener('click', closePublish);
+    var pubBack = document.getElementById('pub-back');
+    if (pubBack) pubBack.addEventListener('click', closePublish);
+    var pubGo = document.getElementById('pub-go');
+    if (pubGo) pubGo.addEventListener('click', doPublish);
+
     var copy = document.getElementById('copy-url');
     if (copy) {
       copy.addEventListener('click', function () {
-        var text = document.getElementById('pub-url').textContent;
-        var done = function () { copy.textContent = 'Copied!'; setTimeout(function () { copy.textContent = 'Copy'; }, 1600); };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done);
-        else done();
+        var input = document.getElementById('pub-url');
+        input.select();
+        var done = function () {
+          copy.textContent = 'Copied!';
+          setTimeout(function () { copy.textContent = 'Copy'; }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(input.value).then(done, done);
+        } else {
+          try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+          done();
+        }
       });
     }
+  }
+
+  /* ------------------------------------------------------------------ *
+   *  Publish (§26 validation, §27 publish, §6 share)                    *
+   * ------------------------------------------------------------------ */
+  function overlay() { return document.getElementById('pub-overlay'); }
+
+  function closePublish() {
+    overlay().hidden = true;
+    document.body.classList.remove('modal-open');
+  }
+
+  /**
+   * Stage 1 — run the checklist. Each failing item links to the editor
+   * section that fixes it, per §26.
+   */
+  function openPublish() {
+    saveNow();
+    var C = window.EVER_C;
+    var p = project();
+    var list = document.getElementById('pub-checks');
+    var goBtn = document.getElementById('pub-go');
+
+    document.getElementById('pub-check-stage').hidden = false;
+    document.getElementById('pub-live-stage').hidden = true;
+
+    var checks = C ? C.validate(state) : [];
+    list.innerHTML = '';
+    checks.forEach(function (c) {
+      var li = document.createElement('li');
+      li.className = c.ok ? 'ok' : 'warn';
+      li.innerHTML = '<span aria-hidden="true">' + (c.ok ? '✓' : '⚠') + '</span>' +
+        (c.ok ? esc(c.label) : '<button type="button">' + esc(fixLabel(c)) + '</button>');
+      if (!c.ok) {
+        li.querySelector('button').addEventListener('click', function () {
+          closePublish();
+          focusFix(c);
+        });
+      }
+      list.appendChild(li);
+    });
+
+    var allOk = checks.every(function (c) { return c.ok; });
+    var paid = !p || (C && C.isPaid(p));
+
+    if (!paid) {
+      var li = document.createElement('li');
+      li.className = 'warn';
+      li.innerHTML = '<span aria-hidden="true">⚠</span>' +
+        '<a href="checkout.html">Complete payment to publish</a>';
+      list.appendChild(li);
+    }
+
+    goBtn.disabled = !(allOk && paid);
+    goBtn.textContent = allOk && paid ? 'Publish now' : 'Fix the items above';
+
+    overlay().hidden = false;
+    document.body.classList.add('modal-open');
+  }
+
+  /* A failed item is phrased as the action that clears it. */
+  function fixLabel(c) {
+    if (/switched on$/.test(c.label)) return 'Switch the RSVP section on';
+    return 'Add ' + c.label.charAt(0).toLowerCase() + c.label.slice(1);
+  }
+
+  /* Send the customer to the control that fixes a failed check: a named
+     section if the check belongs to one, otherwise the Basics group. */
+  function focusFix(c) {
+    var target = null;
+    if (c.section) {
+      target = document.querySelector('#sec-groups [data-sec="' + c.section + '"]');
+    }
+    if (!target) target = document.querySelector('#panel-content .ed-group');
+    if (!target) return;
+    document.getElementById('tab-content').click();
+    target.open = true;
+    target.scrollIntoView({ block: 'center' });
+    var input = target.querySelector('input, select, textarea');
+    if (input && !input.disabled) input.focus();
+  }
+
+  /** Stage 2 — publish for real and show the shareable link. */
+  function doPublish() {
+    var C = window.EVER_C;
+    var p = project();
+    saveNow();
+
+    if (!C || !p) {
+      toast('Open an invitation from your dashboard to publish it.');
+      return;
+    }
+
+    var result = C.publish(p.id);
+    if (!result.ok) {
+      toast(result.reason);
+      return;
+    }
+
+    var url = C.inviteUrl(result.project);
+    document.getElementById('pub-url').value = url;
+
+    var b = state.basics || {};
+    var who = (b.nameA && b.nameB) ? b.nameA + ' & ' + b.nameB : (b.title || b.nameA || 'our event');
+    var text = 'You are invited — ' + who;
+
+    document.getElementById('pub-wa').href =
+      'https://wa.me/?text=' + encodeURIComponent(text + '\n' + url);
+    document.getElementById('pub-mail').href =
+      'mailto:?subject=' + encodeURIComponent(text) +
+      '&body=' + encodeURIComponent(text + '\n\n' + url);
+    document.getElementById('pub-open').href = url;
+
+    document.getElementById('pub-check-stage').hidden = true;
+    document.getElementById('pub-live-stage').hidden = false;
+    updateBadge();
   }
 
   /* Publish slug is layout-aware: every layout names its event differently
@@ -722,26 +1010,68 @@
     t.__tm = setTimeout(function () { t.hidden = true; }, 2600);
   }
 
+  /* Top-bar status + the sidebar's plan strip. Both read the project, so
+     they always agree with what was actually bought. */
   function updateBadge() {
-    var flow = readJson(FLOW_KEY) || {};
     var badge = document.getElementById('ed-badge');
-    if (!badge) return;
-    if (flow.published) {
-      badge.textContent = 'Published';
-      badge.classList.add('published');
-    } else if (flow.order) {
-      badge.textContent = 'Order ' + flow.order;
+    var C = window.EVER_C;
+    var p = project();
+
+    if (badge) {
+      if (p && p.published) {
+        badge.textContent = 'Published';
+        badge.classList.add('published');
+      } else if (p && C.isPaid(p)) {
+        badge.textContent = 'Paid';
+        badge.classList.add('published');
+      } else if (p) {
+        badge.textContent = 'Draft — not yet paid';
+        badge.classList.remove('published');
+      } else {
+        badge.textContent = 'Editor';
+      }
     }
+
+    var strip = document.getElementById('ed-plan');
+    if (!strip) return;
+    if (!p || !p.plan) { strip.hidden = true; return; }
+
+    var plan = C.findPlan(p.plan);
+    strip.hidden = false;
+    document.getElementById('ed-plan-name').textContent = plan.name + ' plan';
+    document.getElementById('ed-plan-sub').textContent = plan.editorLevel + ' editor access';
+
+    var up = document.getElementById('ed-plan-up');
+    var isTop = C.PLAN_ORDER[C.PLAN_ORDER.length - 1] === p.plan;
+    up.textContent = isTop ? 'What you get' : 'Upgrade';
   }
 
   /* ------------------------------------------------------------------ *
    *  Boot                                                               *
    * ------------------------------------------------------------------ */
+  /* Make sure the editor opens the invitation the customer actually chose:
+     the active project's saved state is mirrored into EVER_EVENT_KEY before
+     loadState() reads it. Without a project (a direct link, or an older
+     single-invitation session) the previous behaviour is unchanged. */
+  if (window.EVER_C && window.EVER_C.activeId()) {
+    window.EVER_C.openProject(window.EVER_C.activeId());
+  }
+
   loadState();
   buildSidebar();
   buildDesign();
   bindChrome();
   updateBadge();
   render();
+
+  /* Deep links from the dashboard: #publish opens the checklist straight
+     away, #preview drops into the mobile preview. */
+  if (window.location.hash === '#publish') {
+    openPublish();
+  } else if (window.location.hash === '#preview') {
+    var mobileBtn = document.querySelector('.ed-dev-btn[data-dev="mobile"]');
+    if (mobileBtn) mobileBtn.click();
+  }
+
   window.addEventListener('beforeunload', function () { saveNow(); });
 })();

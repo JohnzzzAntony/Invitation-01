@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My invitations — Ever RSVP</title>
+  <meta name="description" content="Your invitations, orders and billing." />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#1798b8" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231798b8'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/commerce.css" />
+  <link rel="stylesheet" href="css/mu.css" />
+  <link rel="stylesheet" href="css/mu-extra.css" />
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="logo" href="index.html" aria-label="Ever RSVP — home">EVER&nbsp;<span>RSVP</span></a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="create.html" class="nav-link">Designs</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+        <a href="dashboard.html" class="nav-link active" aria-current="page">My invitations</a>
+        <a href="create.html" class="btn btn-primary btn-nav">Create invitation</a>
+      </nav>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <nav aria-label="Mobile">
+      <a href="index.html">Home</a>
+      <a href="create.html">Designs</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="dashboard.html">My invitations</a>
+      <a href="create.html" class="btn btn-primary btn-block">Create invitation</a>
+    </nav>
+  </div>
+
+  <main id="content">
+    <section class="dash-head">
+      <div class="container dash-head-inner">
+        <div>
+          <p class="kicker">Your workspace</p>
+          <h1>Welcome back</h1>
+          <p class="lead">Everything you have created on this device.</p>
+        </div>
+        <a href="create.html" class="btn btn-primary btn-lg">Create invitation</a>
+      </div>
+    </section>
+
+    <section class="dash-section">
+      <div class="container">
+        <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
+          <button class="dash-tab on" type="button" role="tab" aria-selected="true" data-tab="invites">Invitations</button>
+          <button class="dash-tab" type="button" role="tab" aria-selected="false" data-tab="billing">Billing &amp; orders</button>
+        </div>
+
+        <div class="dash-panel" id="panel-invites" role="tabpanel">
+          <div class="dash-grid" id="project-grid"></div>
+          <div class="dash-empty" id="project-empty" hidden>
+            <h2>No invitations yet</h2>
+            <p>Pick a design to start your first one — it takes about ten minutes.</p>
+            <a href="create.html" class="btn btn-primary">Browse the designs</a>
+          </div>
+        </div>
+
+        <div class="dash-panel" id="panel-billing" role="tabpanel" hidden>
+          <div class="orders" id="order-list"></div>
+          <div class="dash-empty" id="order-empty" hidden>
+            <h2>No orders yet</h2>
+            <p>Your receipts will appear here after your first purchase.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Share sheet -->
+  <div class="modal-overlay" id="share-modal" hidden>
+    <div class="modal modal-share" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <button class="modal-close" type="button" aria-label="Close">&times;</button>
+      <h3 id="share-title">Share your invitation</h3>
+      <p class="share-sub">Anyone with this link can open your invitation and RSVP.</p>
+
+      <div class="share-url">
+        <input type="text" id="share-input" readonly aria-label="Invitation link" />
+        <button class="btn btn-primary" type="button" id="share-copy">Copy</button>
+      </div>
+
+      <div class="share-row">
+        <a class="share-btn" id="share-wa" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a class="share-btn" id="share-mail">E-mail</a>
+        <button class="share-btn" type="button" id="share-native" hidden>More…</button>
+        <a class="share-btn" id="share-open" target="_blank" rel="noopener noreferrer">Open</a>
+      </div>
+
+      <p class="share-note">
+        The whole invitation travels inside the link, so it opens on any
+        device without an account. That makes the link long — send it as a
+        link rather than reading it out.
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/templates.js"></script>
+  <script src="js/mu.js"></script>
+  <script src="js/layouts/poetic.js"></script>
+  <script src="js/layouts/herald.js"></script>
+  <script src="js/layouts/atrium.js"></script>
+  <script src="js/layouts/editorial.js"></script>
+  <script src="js/layouts/calm.js"></script>
+  <script src="js/layouts/terra.js"></script>
+  <script src="js/layouts/serene.js"></script>
+  <script src="js/layouts/mandala.js"></script>
+  <script src="js/layouts/crescent.js"></script>
+  <script src="js/layouts/heritage.js"></script>
+  <script src="js/commerce.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

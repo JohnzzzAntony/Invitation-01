@@ -105,12 +105,29 @@
     }
   }
 
+  /* One invitation goes straight to its editor; several go to the dashboard
+     so the customer chooses. commerce.js is not loaded on every page, hence
+     the guard. */
+  function resumeTarget() {
+    var C = window.EVER_C;
+    if (C) {
+      var projects = C.allProjects();
+      if (projects.length > 1) return 'dashboard.html';
+      if (projects.length === 1) {
+        C.openProject(projects[0].id);
+        return 'editor.html';
+      }
+    }
+    return hasSavedEvent() ? 'editor.html' : '';
+  }
+
   $$('[data-resume]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      if (hasSavedEvent()) {
-        window.location.href = 'editor.html';
+      var target = resumeTarget();
+      if (target) {
+        window.location.href = target;
       } else {
-        toast('No saved event on this device yet — pick a design to start one.');
+        toast('No saved invitation on this device yet — pick a design to start one.');
         setTimeout(function () { window.location.href = 'create.html'; }, 1400);
       }
     });

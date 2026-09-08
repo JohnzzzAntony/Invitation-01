@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design details | Ever RSVP</title>
+  <meta name="description" content="See everything this invitation design includes — sections, editor level, available plans and price — then make it your own." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://your-domain.example/design.html" />
+  <meta name="theme-color" content="#1798b8" />
+
+  <meta property="og:type" content="product" />
+  <meta property="og:site_name" content="Ever RSVP" />
+  <meta property="og:title" content="Invitation design details | Ever RSVP" />
+  <meta property="og:description" content="Sections, editor level, plans and price for this invitation design." />
+  <meta property="og:image" content="https://your-domain.example/assets/og-cover.jpg" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231798b8'/%3E%3Ctext x='16' y='21.5' font-family='Georgia,serif' font-size='15' fill='white' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/commerce.css" />
+  <link rel="stylesheet" href="css/mu.css" />
+  <link rel="stylesheet" href="css/mu-extra.css" />
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="logo" href="index.html" aria-label="Ever RSVP — home">EVER&nbsp;<span>RSVP</span></a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="create.html" class="nav-link active">Designs</a>
+        <a href="index.html#how" class="nav-link">How it works</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+        <a href="index.html#faq" class="nav-link">F.A.Q.</a>
+        <button class="nav-link resume-btn" type="button" data-resume>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6V12l3 1.8"/></svg>
+          Continue editing
+        </button>
+        <a href="create.html" class="btn btn-primary btn-nav">Get started</a>
+      </nav>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <nav aria-label="Mobile">
+      <a href="index.html">Home</a>
+      <a href="create.html">Designs</a>
+      <a href="index.html#how">How it works</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="index.html#faq">F.A.Q.</a>
+      <a href="create.html" class="btn btn-primary btn-block">Get started</a>
+    </nav>
+  </div>
+
+  <main id="content">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <div class="container">
+        <a href="index.html">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="create.html">Designs</a>
+        <span aria-hidden="true">/</span>
+        <span id="crumb-name" aria-current="page">Design</span>
+      </div>
+    </nav>
+
+    <section class="detail">
+      <div class="container detail-grid">
+        <div class="detail-preview">
+          <div class="detail-frame" id="detail-preview" aria-label="Design preview"></div>
+          <button class="btn btn-ghost btn-block" type="button" id="live-demo">Live demo</button>
+        </div>
+
+        <div class="detail-info">
+          <p class="kicker" id="detail-event">Wedding</p>
+          <h1 id="detail-name">Design</h1>
+          <p class="lead" id="detail-desc"></p>
+
+          <div class="detail-price">
+            <span class="dp-label">Starting from</span>
+            <span class="dp-amount" id="detail-price">AED 0</span>
+            <span class="dp-note">design + plan, paid once</span>
+          </div>
+
+          <h2 class="detail-h">What this design includes</h2>
+          <ul class="detail-features" id="detail-features"></ul>
+
+          <h2 class="detail-h">Available plans</h2>
+          <div class="detail-plans" id="detail-plans"></div>
+
+          <div class="detail-actions">
+            <button class="btn btn-primary btn-lg" type="button" id="use-design">Use this design</button>
+            <a class="arrow-link" href="create.html">Browse other designs <span aria-hidden="true">&#8594;</span></a>
+          </div>
+
+          <p class="detail-rule">
+            One design per invitation. Choosing this design creates a new
+            invitation locked to it — other designs stay available for a
+            separate invitation.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Live demo overlay: the full design rendered with sample content -->
+  <div class="demo-overlay" id="demo-overlay" hidden>
+    <div class="demo-bar">
+      <span class="demo-bar-name" id="demo-bar-name">Live demo</span>
+      <div class="vp-switch" role="group" aria-label="Preview size">
+        <button type="button" class="vp-btn on" data-vp="desktop">Desktop</button>
+        <button type="button" class="vp-btn" data-vp="tablet">Tablet</button>
+        <button type="button" class="vp-btn" data-vp="mobile">Mobile</button>
+      </div>
+      <button class="btn btn-primary btn-sm" type="button" id="demo-use">Use this design</button>
+      <button class="demo-close" type="button" aria-label="Close demo">&times;</button>
+    </div>
+    <div class="demo-stage" id="demo-stage"></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="f-brand">
+        <a class="logo logo-light" href="index.html">EVER&nbsp;<span>RSVP</span></a>
+        <p>Elegant online RSVP pages for weddings, birthdays, anniversaries, housewarmings and every occasion.</p>
+      </div>
+      <nav class="f-col" aria-label="Product">
+        <h4>Product</h4>
+        <a href="index.html#overview">Overview</a>
+        <a href="create.html">Designs</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="dashboard.html">My invitations</a>
+      </nav>
+      <nav class="f-col" aria-label="Support">
+        <h4>Support</h4>
+        <a href="index.html#faq">F.A.Q.</a>
+        <a href="mailto:hello@your-domain.example">Contact us</a>
+        <a href="privacy.html">Privacy policy</a>
+        <a href="terms.html">Terms of service</a>
+      </nav>
+      <div class="f-col f-news">
+        <h4>Stay in touch</h4>
+        <p>Planning tips &amp; new designs, twice a month. No spam.</p>
+        <form class="news-form" novalidate>
+          <label class="sr-only" for="news-email">E-mail address</label>
+          <input id="news-email" type="email" placeholder="Your e-mail" autocomplete="email" />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container fb-inner">
+        <p>© <span id="year">2026</span> Ever RSVP. All rights reserved.</p>
+        <p>Made with care for every celebration.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/templates.js"></script>
+  <script src="js/mu.js"></script>
+  <script src="js/layouts/poetic.js"></script>
+  <script src="js/layouts/herald.js"></script>
+  <script src="js/layouts/atrium.js"></script>
+  <script src="js/layouts/editorial.js"></script>
+  <script src="js/layouts/calm.js"></script>
+  <script src="js/layouts/terra.js"></script>
+  <script src="js/layouts/serene.js"></script>
+  <script src="js/layouts/mandala.js"></script>
+  <script src="js/layouts/crescent.js"></script>
+  <script src="js/layouts/heritage.js"></script>
+  <script src="js/commerce.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/design.js"></script>
+</body>
+</html>

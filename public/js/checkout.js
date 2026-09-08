@@ -1,66 +1,98 @@
 /* ==========================================================================
-   Ever RSVP — checkout page (step 2): validation + simulated payment
+   Ever RSVP — checkout (step 4)
+   Itemised order summary from EVER_C.quote(), card validation, and a
+   simulated payment that records a real order and advances the project's
+   state through PAYMENT_PENDING -> PAID.
+
+   Card data is never persisted — not to localStorage, not to a cookie, not
+   anywhere. Only the resulting order record survives, and it holds amounts
+   only. See docs/DEPLOY.md §5 for wiring a real payment provider.
    ========================================================================== */
 (function () {
   'use strict';
 
-  var FLOW_KEY = 'ever-rsvp-flow';
+  var C = window.EVER_C;
   var form = document.getElementById('pay-form');
   var successView = document.getElementById('pay-success');
   var payBtn = document.getElementById('pay-btn');
 
-  function readFlow() {
-    try { return JSON.parse(localStorage.getItem(FLOW_KEY) || '{}'); }
-    catch (e) { return {}; }
+  if (!C) return;
+
+  function param(name) {
+    var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
   }
 
-  function writeFlow(flow) {
-    try { localStorage.setItem(FLOW_KEY, JSON.stringify(flow)); } catch (e) { /* ignore */ }
-  }
-
-  function findTpl(id) {
-    if (window.EVER_findTemplate) return window.EVER_findTemplate(id);
-    var list = window.EVER_TEMPLATES || [];
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].id === id) return list[i];
-    }
-    return list[0];
-  }
-
-  /* ---------- Order summary ---------- */
-  var flow = readFlow();
-  if (!flow.design) {
-    /* Arrived without picking a design — send them to step 1 */
-    window.location.href = 'create.html';
+  /* ---------- The project being paid for ---------- */
+  var project = C.findProject(param('p')) || C.activeProject();
+  if (!project) {
+    window.location.replace('create.html');
     return;
   }
-  var tpl = findTpl(flow.design);
-
-  /* ---------- Order summary (v4: multi-layout mini + occasion badge) ---------- */
-  function renderMini(t) {
-    try {
-      if (window.EVER_renderSiteMini && window.EVER_layouts && window.EVER_layouts().length) {
-        return window.EVER_renderSiteMini(t, null, { short: true });
-      }
-    } catch (e) { /* fall through to the palette-only shell */ }
-    if (window.EVER_miniRoot) return window.EVER_miniRoot(t, null, t.layout);
-    return document.createElement('div');
+  if (!project.plan) {
+    /* Arrived without choosing a plan — that step owns the decision. */
+    window.location.replace('plan.html?p=' + encodeURIComponent(project.id));
+    return;
   }
+  /* Already paid: nothing to buy twice (§57 duplicate-payment protection). */
+  if (C.isPaid(project)) {
+    window.location.replace('dashboard.html');
+    return;
+  }
+  C.setActive(project.id);
+
+  var tpl = window.EVER_findTemplate(project.themeId);
+  var meta = C.themeCommerce(project.themeId);
+  var quote = C.quote({
+    themeId: project.themeId,
+    plan: project.plan,
+    addons: project.addons
+  });
+
+  /* ---------- Order summary ---------- */
+  var esc = window.EVER_esc;
 
   var previewBox = document.getElementById('summary-preview');
-  if (previewBox) {
+  if (previewBox && tpl) {
     previewBox.innerHTML = '';
-    previewBox.appendChild(renderMini(tpl));
-    var evMeta = (window.EVER_EVENTS && window.EVER_EVENTS[tpl.event])
-      ? window.EVER_EVENTS[tpl.event].label : '';
-    var catMeta = tpl.category || 'Custom';
-    var metaLine = document.createElement('p');
-    metaLine.className = 'summary-design-meta';
-    metaLine.textContent = evMeta ? evMeta + ' \u00b7 ' + catMeta : catMeta;
-    previewBox.appendChild(metaLine);
+    try {
+      previewBox.appendChild(
+        window.EVER_renderSiteMini(tpl, project.state || null, { short: true })
+      );
+    } catch (e) { /* preview is decorative */ }
   }
+
   var nameEl = document.getElementById('summary-design-name');
-  if (nameEl) nameEl.textContent = tpl.name;
+  if (nameEl && tpl) nameEl.textContent = tpl.name;
+
+  var metaEl = document.getElementById('summary-design-meta');
+  if (metaEl && tpl) {
+    var EVENTS = window.EVER_EVENTS || {};
+    metaEl.textContent =
+      ((EVENTS[tpl.event] && EVENTS[tpl.event].label) || 'Event') +
+      ' · ' + meta.style + ' · ' + C.findPlan(project.plan).name + ' plan';
+  }
+
+  var linesEl = document.getElementById('summary-lines');
+  if (linesEl) {
+    linesEl.innerHTML =
+      quote.lines.map(function (l) {
+        return '<li><span>' + esc(l.label) + '<em>' + esc(l.detail) + '</em></span>' +
+          '<span>' + esc(C.money(l.amount)) + '</span></li>';
+      }).join('') +
+      '<li class="pl-sub"><span>Subtotal</span><span>' + esc(C.money(quote.subtotal)) + '</span></li>' +
+      (quote.discount
+        ? '<li class="pl-disc"><span>Discount</span><span>−' + esc(C.money(quote.discount)) + '</span></li>'
+        : '') +
+      '<li class="pl-vat"><span>VAT (' + Math.round(quote.vatRate * 100) + '%)</span>' +
+      '<span>' + esc(C.money(quote.vat)) + '</span></li>';
+  }
+
+  var totalEl = document.getElementById('summary-total');
+  if (totalEl) totalEl.textContent = C.money(quote.total);
+
+  var btnLabel = payBtn && payBtn.querySelector('.pay-btn-label');
+  if (btnLabel) btnLabel.textContent = 'Pay ' + C.money(quote.total) + ' & create invitation';
 
   /* ---------- Input formatting ---------- */
   var cardInput = document.getElementById('pay-card');
@@ -101,7 +133,7 @@
 
   function setError(id, msg) {
     var input = document.getElementById(id);
-    var err = input.parentElement.querySelector('.perror') || input.closest('.pfield').querySelector('.perror');
+    var err = input.closest('.pfield').querySelector('.perror');
     if (err) {
       err.textContent = msg;
       err.hidden = !msg;
@@ -149,20 +181,30 @@
 
       payBtn.classList.add('loading');
       payBtn.disabled = true;
-      var label = payBtn.querySelector('.pay-btn-label');
-      if (label) label.textContent = 'Processing…';
+      if (btnLabel) btnLabel.textContent = 'Processing…';
+
+      /* Make sure the editor's latest work is on the project before it is
+         locked in as paid. */
+      C.syncActiveState();
+      if (project.status === 'CUSTOMIZING') C.setStatus(project.id, 'READY_FOR_PAYMENT');
 
       setTimeout(function () {
-        /* Privacy by design: only the order number is persisted — card data is
-           never written to localStorage, cookies or any server. */
-        var order = 'EV-' + String(Math.floor(100000 + Math.random() * 900000));
-        flow.paid = true;
-        flow.order = order;
-        flow.paidAt = new Date().toISOString();
-        writeFlow(flow);
+        var order = C.createOrder(project.id, quote);
+        if (!order) {
+          payBtn.classList.remove('loading');
+          payBtn.disabled = false;
+          if (btnLabel) btnLabel.textContent = 'Try payment again';
+          if (window.everToast) {
+            window.everToast('That payment could not be completed. Please try again.');
+          }
+          return;
+        }
 
         var msg = document.getElementById('pay-success-msg');
-        if (msg) msg.innerHTML = 'Your order <b>' + order + '</b> is confirmed.';
+        if (msg) {
+          msg.innerHTML = 'Your order <b>' + esc(order.number) + '</b> is confirmed — ' +
+            esc(C.money(order.total)) + ' paid.';
+        }
         form.hidden = true;
         successView.hidden = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
