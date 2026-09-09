@@ -1,0 +1,489 @@
+/* ==========================================================================
+   invite3d.css — shell for the 3D invitation templates
+   (public/invitation-aurora.html and its siblings, written by
+   scripts/gen-invites.mjs)
+
+   Every colour and face in here comes from a custom property, so a template
+   is a palette plus a WebGL scene and nothing else. The five variables each
+   page must set are listed in :root below; the fallbacks are the gold-on-
+   black look of the original prototype, so a page that forgets one still
+   renders.
+   ========================================================================== */
+
+:root {
+  --iv-accent:   #d4af37;   /* rules, numerals, small marks */
+  --iv-accent-2: #f5e6c8;   /* the light end of the title gradient */
+  --iv-bg:       #12100c;   /* page behind the canvas */
+  --iv-fg:       #f4f1ea;   /* body text */
+  --iv-muted:    #9a948a;   /* captions and labels */
+
+  --iv-display: "Playfair Display", Georgia, serif;
+  --iv-script:  "Great Vibes", cursive;
+  --iv-body:    "Montserrat", -apple-system, "Segoe UI", sans-serif;
+
+  --iv-ease:  cubic-bezier(.4, 0, .2, 1);
+  --iv-panel: rgba(255, 255, 255, .04);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--iv-bg);
+  color: var(--iv-fg);
+  font-family: var(--iv-body);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+h1, h2, h3 { font-family: var(--iv-display); font-weight: 400; margin: 0 0 .5em; line-height: 1.15; }
+p { margin: 0 0 1rem; }
+a { color: var(--iv-accent); text-decoration: none; }
+
+.iv-script  { font-family: var(--iv-script); font-weight: 400; }
+.iv-display { font-family: var(--iv-display); }
+
+.iv-skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--iv-accent); color: #000; padding: 10px 18px; border-radius: 0 0 6px 0;
+}
+.iv-skip:focus { left: 0; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- The WebGL layer ---------- */
+#iv-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  /* Decorative: it must never eat a click meant for the form behind it. */
+  pointer-events: none;
+}
+
+/* A soft vignette over the canvas. Cheap, and it does the job the bloom pass
+   would otherwise do: pushes the light into the middle and stops particles
+   fizzing against the type at the edges. */
+.iv-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 42%, transparent 0%, transparent 42%, var(--iv-bg) 100%);
+  opacity: .82;
+}
+
+.iv-content { position: relative; z-index: 2; }
+
+/* ---------- Loader ---------- */
+#iv-loader {
+  position: fixed; inset: 0; z-index: 90;
+  background: var(--iv-bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .6s var(--iv-ease), visibility .6s var(--iv-ease);
+}
+#iv-loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.iv-ring {
+  width: 54px; height: 54px;
+  border: 2px solid rgba(255, 255, 255, .12);
+  border-top-color: var(--iv-accent);
+  border-radius: 50%;
+  animation: iv-spin 1s linear infinite;
+  margin: 0 auto 18px;
+}
+@keyframes iv-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Custom cursor ----------
+   Only for a real mouse. The prototype set `cursor: none` on the body
+   unconditionally, which leaves a touch user — and anyone tabbing through the
+   form — with no pointer at all. */
+#iv-cursor { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .iv-cursor-on { cursor: none; }
+  .iv-cursor-on a,
+  .iv-cursor-on button,
+  .iv-cursor-on input,
+  .iv-cursor-on select,
+  .iv-cursor-on textarea { cursor: none; }
+
+  #iv-cursor {
+    display: block;
+    position: fixed; top: 0; left: 0;
+    width: 20px; height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 1.5px solid var(--iv-accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 95;
+    transition: width .18s var(--iv-ease), height .18s var(--iv-ease),
+                margin .18s var(--iv-ease), background-color .18s var(--iv-ease);
+    will-change: transform;
+  }
+  #iv-cursor.is-grown {
+    width: 42px; height: 42px; margin: -21px 0 0 -21px;
+    background: color-mix(in srgb, var(--iv-accent) 12%, transparent);
+  }
+}
+
+/* ---------- Sections ---------- */
+.iv-section {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: clamp(64px, 12vh, 110px) clamp(18px, 5vw, 32px);
+}
+.iv-wrap { width: min(1120px, 100%); margin-inline: auto; }
+.iv-narrow { width: min(720px, 100%); margin-inline: auto; }
+
+.iv-eyebrow {
+  display: block;
+  font-size: 11px; letter-spacing: .34em; text-transform: uppercase;
+  color: var(--iv-accent); margin-bottom: 12px;
+}
+
+.iv-rule {
+  height: 1px; width: 78px; margin: 20px auto;
+  background: linear-gradient(90deg, transparent, var(--iv-accent), transparent);
+}
+
+.iv-head { text-align: center; margin-bottom: clamp(36px, 6vh, 60px); }
+.iv-head h2 { font-size: clamp(28px, 5vw, 46px); }
+
+.iv-lede { color: var(--iv-muted); max-width: 52ch; margin-inline: auto; }
+
+/* ---------- Hero ---------- */
+.iv-hero { text-align: center; }
+
+/* A scrim under the hero copy. Each scene is tuned to leave the middle of
+   the frame quiet, but "quiet" is not "empty" — a ribbon or a petal will
+   cross the lede eventually, and the invitation has to stay readable when
+   it does. One soft ellipse of the page colour, sized to the copy, buys
+   that for every template at once and is invisible where the scene is
+   already dark. */
+.iv-hero .iv-wrap { position: relative; }
+.iv-hero .iv-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -8% -12%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 46%,
+    color-mix(in srgb, var(--iv-bg) 82%, transparent) 0%,
+    color-mix(in srgb, var(--iv-bg) 62%, transparent) 42%,
+    transparent 72%
+  );
+}
+.iv-hero-date {
+  font-size: clamp(11px, 2.6vw, 13px);
+  letter-spacing: .5em; text-transform: uppercase; color: var(--iv-accent);
+}
+.iv-hero h1 {
+  font-size: clamp(46px, 11vw, 108px);
+  line-height: 1;
+  margin: 10px 0 4px;
+  background: linear-gradient(135deg, var(--iv-accent) 0%, var(--iv-accent-2) 50%, var(--iv-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--iv-accent);          /* fallback where background-clip fails */
+}
+.iv-names { font-size: clamp(20px, 4.4vw, 34px); color: var(--iv-fg); }
+.iv-names .amp { font-family: var(--iv-script); color: var(--iv-accent); margin: 0 .25em; font-size: 1.35em; }
+
+/* ---------- Countdown ---------- */
+.iv-count {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(8px, 2vw, 18px);
+  max-width: 620px;
+  margin: clamp(28px, 5vh, 46px) auto 0;
+}
+.iv-count-box {
+  background: var(--iv-panel);
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 26%, transparent);
+  border-radius: 12px;
+  padding: clamp(12px, 2.4vw, 20px) 8px;
+  text-align: center;
+  transition: transform .15s var(--iv-ease), border-color .15s var(--iv-ease);
+}
+.iv-count-box:hover { transform: translateY(-4px); border-color: var(--iv-accent); }
+.iv-count-num {
+  font-family: var(--iv-display);
+  font-size: clamp(26px, 6vw, 52px);
+  line-height: 1;
+  color: var(--iv-accent);
+  font-variant-numeric: tabular-nums;
+}
+.iv-count-lab {
+  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--iv-muted); margin-top: 8px;
+}
+
+.iv-scroll { margin-top: clamp(32px, 7vh, 64px); text-align: center; }
+.iv-scroll-line {
+  width: 1px; height: 42px; margin: 0 auto 10px;
+  background: linear-gradient(to bottom, var(--iv-accent), transparent);
+  animation: iv-pulse 2.4s ease-in-out infinite;
+}
+.iv-scroll span { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--iv-muted); }
+@keyframes iv-pulse { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+/* ---------- Story ---------- */
+.iv-story { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+.iv-frame { position: relative; }
+.iv-frame-inner {
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 22%, transparent);
+  background: var(--iv-panel);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.iv-frame-inner img { width: 100%; height: 100%; object-fit: cover; }
+.iv-frame::before, .iv-frame::after {
+  content: ""; position: absolute; width: 66px; height: 66px;
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 45%, transparent);
+}
+.iv-frame::before { top: -10px; left: -10px; border-right: 0; border-bottom: 0; border-radius: 14px 0 0 0; }
+.iv-frame::after { bottom: -10px; right: -10px; border-left: 0; border-top: 0; border-radius: 0 0 14px 0; }
+.iv-story h3 { font-family: var(--iv-script); font-size: clamp(26px, 4vw, 38px); color: var(--iv-accent); }
+.iv-story p { color: var(--iv-muted); }
+
+/* ---------- Detail cards ---------- */
+.iv-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2.4vw, 24px); }
+.iv-card {
+  background: var(--iv-panel);
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 18%, transparent);
+  border-radius: 14px;
+  padding: clamp(22px, 3.4vw, 34px);
+  text-align: center;
+  transition: transform .15s var(--iv-ease), border-color .15s var(--iv-ease);
+}
+.iv-card:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--iv-accent) 60%, transparent); }
+.iv-card h3 { font-size: clamp(19px, 2.6vw, 24px); }
+.iv-card-when { color: var(--iv-accent); margin-bottom: 14px; }
+.iv-card-where {
+  color: var(--iv-muted); font-size: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .08); padding-top: 14px; margin: 0;
+}
+.iv-card-mark {
+  width: 58px; height: 58px; margin: 0 auto 18px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 32%, transparent);
+  background: color-mix(in srgb, var(--iv-accent) 8%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--iv-accent);
+}
+.iv-card-mark svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Timeline ---------- */
+.iv-timeline { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; }
+.iv-timeline li {
+  position: relative;
+  padding: 0 0 30px 34px;
+  border-left: 1px solid color-mix(in srgb, var(--iv-accent) 28%, transparent);
+}
+.iv-timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.iv-timeline li::before {
+  content: ""; position: absolute; left: -5px; top: 7px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--iv-accent);
+}
+.iv-timeline .iv-at { color: var(--iv-accent); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+.iv-timeline h3 { font-size: 20px; margin: 4px 0 2px; }
+.iv-timeline p { color: var(--iv-muted); font-size: 14px; margin: 0; }
+
+/* ---------- RSVP ---------- */
+.iv-form {
+  background: var(--iv-panel);
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 20%, transparent);
+  border-radius: 16px;
+  padding: clamp(22px, 4vw, 36px);
+}
+.iv-field { margin-bottom: 22px; }
+.iv-field > label,
+.iv-field > .iv-label {
+  display: block; margin-bottom: 9px;
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--iv-fg);
+}
+
+.iv-form input,
+.iv-form select,
+.iv-form textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 20%, transparent);
+  border-radius: 9px;
+  padding: 12px 14px;
+  color: var(--iv-fg);
+  font: inherit;
+  outline: none;
+  transition: border-color .15s var(--iv-ease);
+}
+.iv-form input:focus,
+.iv-form select:focus,
+.iv-form textarea:focus { border-color: var(--iv-accent); }
+.iv-form input::placeholder, .iv-form textarea::placeholder { color: rgba(255, 255, 255, .28); }
+.iv-form select option { background: var(--iv-bg); color: var(--iv-fg); }
+
+/* Keyboard focus must stay obvious even with the custom cursor on. */
+.iv-form :focus-visible,
+.iv-choice input:focus-visible + .iv-choice-face {
+  outline: 2px solid var(--iv-accent);
+  outline-offset: 2px;
+}
+
+/* Real radios, visually replaced — so the group is arrow-key navigable and
+   announced as a radiogroup, which the prototype's clickable <div>s were not. */
+.iv-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.iv-choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.iv-choice-face {
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--iv-accent) 20%, transparent);
+  border-radius: 11px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s var(--iv-ease), background-color .15s var(--iv-ease);
+}
+.iv-choice-face svg { width: 26px; height: 26px; margin: 0 auto 8px; display: block; fill: none; stroke-width: 1.5; }
+.iv-choice-face span { font-size: 13px; }
+.iv-choice input:checked + .iv-choice-face {
+  border-color: var(--iv-accent);
+  background: color-mix(in srgb, var(--iv-accent) 10%, transparent);
+}
+.iv-yes svg { stroke: #6ec98b; }
+.iv-no  svg { stroke: #d98080; }
+
+.iv-submit {
+  width: 100%;
+  border: 0;
+  border-radius: 11px;
+  padding: 15px 24px;
+  font: inherit;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #14110a;
+  background: linear-gradient(135deg, var(--iv-accent), var(--iv-accent-2));
+  cursor: pointer;
+  transition: filter .15s var(--iv-ease), transform .15s var(--iv-ease);
+}
+.iv-submit:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.iv-error { color: #e79a9a; font-size: 13px; margin: 0 0 14px; }
+.iv-note { color: var(--iv-muted); font-size: 12px; text-align: center; margin: 14px 0 0; }
+
+/* ---------- Footer ---------- */
+.iv-footer {
+  position: relative; z-index: 2;
+  text-align: center;
+  padding: 56px 22px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.iv-footer .iv-script { font-size: 27px; color: var(--iv-accent); }
+.iv-footer p { color: var(--iv-muted); font-size: 13px; }
+
+/* ---------- Toast ---------- */
+.iv-toast {
+  position: fixed; top: 20px; right: 20px; z-index: 96;
+  max-width: min(360px, calc(100vw - 40px));
+  background: var(--iv-bg);
+  border: 1px solid var(--iv-accent);
+  border-radius: 11px;
+  padding: 14px 18px;
+  font-size: 14px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .55);
+  transform: translateX(calc(100% + 30px));
+  transition: transform .45s var(--iv-ease);
+}
+.iv-toast.is-shown { transform: none; }
+
+/* ---------- Reveal ---------- */
+.iv-js .iv-reveal { opacity: 0; transform: translateY(26px); }
+
+/* ---------- Hero intro ----------
+   This was a GSAP timeline. The site's Content-Security-Policy is
+   `script-src 'self'`, so no CDN library loads in production — and a
+   staggered entrance is six animation-delays, which is not worth vendoring
+   a tenth of a megabyte for. The shell adds .iv-intro once the loader
+   clears, so nothing starts behind the loading screen.
+
+   `both` matters: it holds the final state after the run, otherwise every
+   hero element snaps back to opacity 0. */
+@keyframes iv-rise {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes iv-widen {
+  from { opacity: 0; transform: scaleX(0); }
+  to   { opacity: 1; transform: none; }
+}
+
+.iv-js .iv-hero-date,
+.iv-js .iv-hero h1,
+.iv-js .iv-hero .iv-names,
+.iv-js .iv-hero .iv-rule,
+.iv-js .iv-hero .iv-lede,
+.iv-js .iv-hero .iv-count-box,
+.iv-js .iv-hero .iv-scroll { opacity: 0; }
+
+.iv-intro .iv-hero-date       { animation: iv-rise .70s var(--iv-ease) .05s both; }
+.iv-intro .iv-hero h1         { animation: iv-rise .90s var(--iv-ease) .18s both; }
+.iv-intro .iv-names           { animation: iv-rise .70s var(--iv-ease) .34s both; }
+.iv-intro .iv-hero .iv-rule   { animation: iv-widen .55s var(--iv-ease) .48s both; }
+.iv-intro .iv-hero .iv-lede   { animation: iv-rise .70s var(--iv-ease) .56s both; }
+.iv-intro .iv-hero .iv-scroll { animation: iv-rise .50s var(--iv-ease) 1.05s both; }
+
+/* Countdown boxes cascade left to right. */
+.iv-intro .iv-count-box { animation: iv-rise .55s var(--iv-ease) both; }
+.iv-intro .iv-count-box:nth-child(1) { animation-delay: .68s; }
+.iv-intro .iv-count-box:nth-child(2) { animation-delay: .76s; }
+.iv-intro .iv-count-box:nth-child(3) { animation-delay: .84s; }
+.iv-intro .iv-count-box:nth-child(4) { animation-delay: .92s; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .iv-story { grid-template-columns: 1fr; }
+  .iv-cards { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .iv-count { grid-template-columns: repeat(2, 1fr); }
+  .iv-choices { grid-template-columns: 1fr; }
+}
+
+/* ---------- Reduced motion ----------
+   The shell also stops the render loop and skips the GSAP intro; this is the
+   CSS half, so nothing is left mid-transition or permanently invisible. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .iv-js .iv-reveal { opacity: 1; transform: none; }
+  .iv-scroll-line { animation: none; opacity: .6; }
+
+  /* The hero elements are opacity:0 until their animation runs, and the rule
+     above cuts every animation to 0.01ms — which is fine (they land instantly)
+     but only if the shell still adds .iv-intro. It does. This is the belt to
+     that braces: if anything stops the class being added, the hero must not
+     be an invisible page. */
+  .iv-js .iv-hero-date,
+  .iv-js .iv-hero h1,
+  .iv-js .iv-hero .iv-names,
+  .iv-js .iv-hero .iv-rule,
+  .iv-js .iv-hero .iv-lede,
+  .iv-js .iv-hero .iv-count-box,
+  .iv-js .iv-hero .iv-scroll { opacity: 1; }
+}
