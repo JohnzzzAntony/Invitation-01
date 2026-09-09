@@ -45,12 +45,15 @@
        GPU of the three. Area-proportional keeps the look and the cost sane. */
     var area = ctx.width * ctx.height;
     var COUNT = Math.max(90, Math.min(240, Math.round(area / 7000)));
-    var TINTS = [0xf9d3d9, 0xe8a9b6, 0xf5e2c8, 0xdba7a0];
+    var pal = ctx.palette;
+    var TINTS = pal
+      ? [pal.accent2, pal.gold, pal.soft, pal.accent]
+      : [0xf9d3d9, 0xe8a9b6, 0xf5e2c8, 0xdba7a0];
 
     var mesh = new THREE.InstancedMesh(
       petalGeometry(THREE),
       new THREE.MeshStandardMaterial({
-        color: 0xf6c6cf,
+        color: pal ? pal.accent2 : 0xf6c6cf,
         roughness: 0.55,
         metalness: 0.08,
         side: THREE.DoubleSide,

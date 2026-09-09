@@ -24,6 +24,7 @@
 
     renderer.setClearColor(0x000000, 0);
 
+    var pal = ctx.palette;
     var COUNT = 90;
     var BOUND = 22;
     var LINK_DIST = 8.5;
@@ -52,7 +53,7 @@
 
     var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
       size: 0.42,
-      color: 0xf2ede1,
+      color: pal ? pal.accent2 : 0xf2ede1,
       transparent: true,
       opacity: 0.92,
       depthWrite: false,
@@ -66,7 +67,7 @@
     lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
 
     var lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({
-      color: 0xbdb49f,
+      color: pal ? pal.gold : 0xbdb49f,
       transparent: true,
       opacity: 0.34,
       depthWrite: false,

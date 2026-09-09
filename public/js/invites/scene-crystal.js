@@ -21,7 +21,10 @@
 
     renderer.setClearColor(0x000000, 0);
 
-    var TINTS = [0x9fd9bd, 0xd8e8d5, 0x74b394, 0xeef2e6, 0xa8c9b4];
+    var pal = ctx.palette;
+    var TINTS = pal
+      ? [pal.accent, pal.accent2, pal.gold, pal.soft, pal.accent]
+      : [0x9fd9bd, 0xd8e8d5, 0x74b394, 0xeef2e6, 0xa8c9b4];
     var STONES = 22;
     var stones = [];
     var i;
@@ -72,7 +75,7 @@
 
     scene.add(new THREE.AmbientLight(0xdfece2, 0.42));
 
-    var lampA = new THREE.PointLight(0xbfffe0, 1.0, 120);
+    var lampA = new THREE.PointLight(pal ? pal.accent2 : 0xbfffe0, 1.0, 120);
     var lampB = new THREE.PointLight(0xfff2c8, 0.75, 120);
     scene.add(lampA);
     scene.add(lampB);

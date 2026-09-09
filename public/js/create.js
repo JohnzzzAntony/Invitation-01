@@ -160,6 +160,7 @@
       '<span class="tpl-badges">' +
       '<span class="tpl-ev">' + esc((EVENTS[tpl.event] && EVENTS[tpl.event].label) || 'Event') + '</span>' +
       '<span class="tpl-cat">' + esc(meta.style) + '</span>' +
+      (tpl.scene ? '<span class="tpl-anim">Animated</span>' : '') +
       '</span></div>' +
       '<p class="tpl-price">From <strong>' + esc(C.money(C.startingPrice(tpl))) + '</strong></p>' +
       '<p class="tpl-plan">' +

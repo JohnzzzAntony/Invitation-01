@@ -384,7 +384,7 @@
       dark: '#2f2422', gold: '#73543b', bg: '#f6f3ee', ink: '#041117', soft: '#e6dcd0',
       nameFont: 'derivia', ornament: 'floral',
       content: { basics: { nameA: 'Max', nameB: 'Amanda', brand: 'M & A' } } },
-    { id: 'emerald', name: 'Emerald & Gold', event: 'wedding', layout: 'poetic', category: 'Classic',
+    { id: 'emerald', scene: 'crystal', name: 'Emerald & Gold', event: 'wedding', layout: 'poetic', category: 'Classic',
       dark: '#17301f', gold: '#a8843f', bg: '#f7f4ea', ink: '#22301f', soft: '#e3e5d5',
       nameFont: 'derivia', ornament: 'floral',
       content: { basics: { nameA: 'Ananya', nameB: 'Rohan', brand: 'A & R' } } },
@@ -399,11 +399,11 @@
       dark: '#2f2422', gold: '#73543b', bg: '#faf8f4', ink: '#1d1a17', soft: '#eee7dd',
       nameFont: 'derivia', ornament: 'lines',
       content: { basics: { nameA: 'Isla', nameB: 'Theo', brand: 'I & T' } } },
-    { id: 'blush', name: 'Blush Rose', event: 'wedding', layout: 'herald', category: 'Floral',
+    { id: 'blush', scene: 'petals', name: 'Blush Rose', event: 'wedding', layout: 'herald', category: 'Floral',
       dark: '#5c3a40', gold: '#b98a8e', bg: '#faf3ef', ink: '#54423f', soft: '#f2e2dc',
       nameFont: 'paris', ornament: 'floral',
       content: { basics: { nameA: 'Priya', nameB: 'Dev', brand: 'P & D' } } },
-    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald', category: 'Elegant',
+    { id: 'gala', name: 'Midnight Gala', event: 'gala', layout: 'herald', category: 'Elegant', scene: 'gilded',
       dark: '#0d0c11', gold: '#c9a45c', bg: '#17161c', ink: '#ece9e2', soft: '#232129',
       nameFont: 'cinzel', ornament: 'lines',
       content: { basics: { nameA: 'The Ashford', nameB: 'Society', brand: 'ASHFORD' },
@@ -444,7 +444,7 @@
       dark: '#33302b', gold: '#9c8264', bg: '#f8f6f1', ink: '#2c2a26', soft: '#eae4d9',
       nameFont: 'corm', ornament: 'lines',
       content: { basics: { nameA: 'Jina', nameB: 'Minho', brand: 'J & M' } } },
-    { id: 'lavender', name: 'Lavender Mist', event: 'wedding', layout: 'calm', category: 'Floral',
+    { id: 'lavender', scene: 'aurora', name: 'Lavender Mist', event: 'wedding', layout: 'calm', category: 'Floral',
       dark: '#3d3450', gold: '#8f7fb0', bg: '#f8f6fc', ink: '#352e44', soft: '#e8e3f2',
       nameFont: 'paris', ornament: 'floral',
       content: { basics: { nameA: 'Amara', nameB: 'Kian', brand: 'A & K' } } },
@@ -470,7 +470,7 @@
         sections: { hero: { headline: 'Maya turns eight', kicker: 'Party time' } } } },
 
     /* ---- serene — Serene ------------------------------------------ */
-    { id: 'seafoam', name: 'Serene Sea', event: 'wedding', layout: 'serene', category: 'Coastal',
+    { id: 'seafoam', scene: 'aurora', name: 'Serene Sea', event: 'wedding', layout: 'serene', category: 'Coastal',
       dark: '#1e3a3d', gold: '#5b9298', bg: '#f2f8f8', ink: '#20363a', soft: '#dcebec',
       nameFont: 'corm', ornament: 'lines',
       content: { basics: { nameA: 'Leila', nameB: 'Idris', brand: 'L & I' } } },
@@ -508,12 +508,12 @@
         sections: { hero: { headline: 'A little one is on the way', kicker: 'Baby shower' } } } },
 
     /* ---- heritage — Heritage -------------------------------------- */
-    { id: 'jubilee', name: 'Golden Jubilee', event: 'anniversary', layout: 'heritage', category: 'Classic',
+    { id: 'jubilee', scene: 'gilded', name: 'Golden Jubilee', event: 'anniversary', layout: 'heritage', category: 'Classic',
       dark: '#3a2c14', gold: '#c1a04f', bg: '#faf6ea', ink: '#352a17', soft: '#efe4c8',
       nameFont: 'cinzel', ornament: 'floral',
       content: { basics: { nameA: 'Rose', nameB: 'Albert', brand: '50 Years' },
         sections: { hero: { headline: 'Fifty golden years', kicker: 'Golden jubilee' } } } },
-    { id: 'velvet', name: 'Velvet Rope', event: 'gala', layout: 'heritage', category: 'Elegant',
+    { id: 'velvet', scene: 'nocturne', name: 'Velvet Rope', event: 'gala', layout: 'heritage', category: 'Elegant',
       dark: '#3b0f18', gold: '#c9905c', bg: '#f9f4f4', ink: '#33191d', soft: '#eddcd9',
       nameFont: 'cinzel', ornament: 'lines',
       content: { basics: { nameA: 'The Winter', nameB: 'Ball', brand: 'WINTER BALL' },
@@ -900,6 +900,16 @@
     }, true);
     /* layout-level behaviours (sliders, mobile menu, lightbox) — see js/mu.js */
     if (typeof window.MU_bind === 'function') window.MU_bind(root);
+
+    /* Designs that carry an animated hero (`scene` on the theme) mount it
+       here. bindSite runs for full live renders only, never for the gallery
+       miniatures, which is exactly where a WebGL context must not appear.
+       js/site-scene.js loads three.js on demand, so a design without a scene
+       costs nothing. */
+    if (typeof window.EVER_mountScene === 'function') {
+      var sceneTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
+      if (sceneTpl && sceneTpl.scene) window.EVER_mountScene(root, sceneTpl);
+    }
   }
 
   /* ------------------------------------------------------------------ */

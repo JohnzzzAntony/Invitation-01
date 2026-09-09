@@ -21,8 +21,9 @@
 
     renderer.setClearColor(0x000000, 0);
 
-    var GOLD = new THREE.Color(0xd4af37);
-    var PALE = new THREE.Color(0xfff4d8);
+    var pal = ctx.palette;
+    var GOLD = new THREE.Color(pal ? pal.gold : 0xd4af37);
+    var PALE = new THREE.Color(pal ? pal.accent2 : 0xfff4d8);
 
     /* ---- Dust ---- */
     var COUNT = 2600;
@@ -71,7 +72,7 @@
       var mesh = new THREE.Mesh(
         new THREE.TorusGeometry(def.r, def.tube, 8, 220),
         new THREE.MeshBasicMaterial({
-          color: 0xd4af37,
+          color: pal ? pal.gold : 0xd4af37,
           transparent: true,
           opacity: def.opacity,
           blending: THREE.AdditiveBlending,

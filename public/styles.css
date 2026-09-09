@@ -970,70 +970,16 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
 .why-cell h3 { font-size: 21px; margin-bottom: 8px; }
 .why-cell p { font-size: 14.5px; }
 
-/* ---------- 3D template strip ----------
-   Rendered by js/invites/strip.js on the homepage and on create.html. The
-   swatch is two CSS gradients, not a canvas — see the note in that file. */
-.iv3 { padding: 84px 0; border-top: 1px solid var(--line); }
-
-.iv3-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: var(--card-gap);
-  margin-top: 38px;
-}
-
-.iv3-card {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: var(--card-radius);
-  overflow: hidden;
-  background: #fff;
-  color: inherit;
-  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
-              box-shadow var(--t-fast) var(--ease);
-}
-.iv3-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--ink);
-  box-shadow: var(--shadow);
-}
-
-.iv3-swatch {
-  aspect-ratio: 4 / 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 18px 14px;
-  text-align: center;
-  background:
-    radial-gradient(ellipse at 50% 34%, color-mix(in srgb, var(--c) 34%, transparent), transparent 62%),
-    linear-gradient(160deg, color-mix(in srgb, var(--c) 16%, var(--b)), var(--b) 72%);
-}
-.iv3-swatch-title {
-  font-family: var(--serif);
-  font-size: 19px;
-  line-height: 1.15;
-  color: var(--c2);
-}
-.iv3-swatch-rule {
-  width: 46px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--c), transparent);
-}
-.iv3-swatch-couple {
-  font-size: 10.5px;
-  letter-spacing: .2em;
+.tpl-anim {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--teal);
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: .09em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--c2) 72%, transparent);
 }
-
-.iv3-body { padding: var(--card-pad); display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.iv3-name { font-family: var(--serif); font-size: var(--card-title); color: var(--ink); }
-.iv3-blurb { font-size: var(--card-text); color: var(--body); flex: 1; }
-.iv3-cta { font-size: var(--card-meta); color: var(--teal); margin-top: 6px; }
-.iv3-card:hover .iv3-cta span { display: inline-block; transform: translateX(3px); }
 
 /* ---------- Homepage pricing ----------
    The cards themselves are .plan-card, styled once in commerce.css and shared
@@ -3026,6 +2972,21 @@ a.pv-chip:hover { color: var(--pv-accent); border-color: var(--pv-accent); }
   justify-content: center; align-items: center; overflow: hidden; color: #fff; padding: 90px 30px 70px;
 }
 .ws-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* The animated hero some designs carry (js/site-scene.js). It sits over the
+   photograph and under .ws-hero-inner, which is z-index 2 — so the names and
+   the date always read on top of the motion, never through it. */
+.ws-scene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+/* Lift the existing shade a little where a scene is running: the scene adds
+   its own light, and the two together were burying the photograph. */
+.ws-hero.ws-has-scene .ws-hero-shade { opacity: .82; }
 .ws-hero-shade {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(10,18,12,.72), rgba(10,18,12,.42) 45%, rgba(10,18,12,.78));

@@ -59,7 +59,13 @@
 
     renderer.setClearColor(0x000000, 0);
 
-    var COLOURS = [0x6f8cff, 0x9d7bff, 0x4fd6c4, 0xc9a7ff, 0x7fb2ff];
+    /* A theme supplies the ribbon colours when one is attached to a design;
+       the constants are the standalone winter palette this scene was drawn
+       for, and remain the fallback. */
+    var pal = ctx.palette;
+    var COLOURS = pal
+      ? [pal.accent, pal.accent2, pal.soft, pal.accent, pal.gold]
+      : [0x6f8cff, 0x9d7bff, 0x4fd6c4, 0xc9a7ff, 0x7fb2ff];
     var RIBBONS = 7;
     var mats = [];
     var i;
@@ -101,7 +107,7 @@
 
     var motes = new THREE.Points(geo, new THREE.PointsMaterial({
       size: 0.13,
-      color: 0xdce4ff,
+      color: pal ? pal.accent2 : 0xdce4ff,
       transparent: true,
       opacity: 0.75,
       depthWrite: false,
