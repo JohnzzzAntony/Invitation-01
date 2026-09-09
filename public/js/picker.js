@@ -132,4 +132,25 @@
 
   buildChips();
   render();
+
+  /* ---------------- Hero rail ----------------
+     The homepage hero is deliberately quiet — white page, one Playfair line
+     — and lets the invitations themselves supply all the colour (DESIGN.md).
+     The rail paints the same miniature `preview()` the picker cards use, so
+     a design only ever has to be described once, in templates.js.
+
+     The track is rendered twice end to end; the marquee keyframe travels
+     exactly -50%, so the second copy is under the cursor at the moment the
+     first ends and the loop is seamless. CSS pauses it on hover and drops it
+     entirely under prefers-reduced-motion. */
+  var rail = document.getElementById('hero-rail');
+  if (rail) {
+    var covers = THEMES.slice(0, 12);
+    var run = covers.map(function (t) {
+      return '<a class="rail-item" href="design.html?id=' + encodeURIComponent(t.id) +
+        '" tabindex="-1">' + preview(t) + '</a>';
+    }).join('');
+
+    rail.innerHTML = '<div class="rail-track">' + run + run + '</div>';
+  }
 })();

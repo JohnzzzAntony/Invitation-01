@@ -204,24 +204,33 @@
   <main>
     <!-- ======================= HERO ======================= -->
     <section class="hero" id="overview">
-      <div class="hero-media" aria-hidden="false">
-        <img src="assets/hero.jpg" alt="Bride fastening the bow on her white wedding shoe" fetchpriority="high" />
-      </div>
       <div class="container hero-inner">
         <div class="hero-copy reveal">
           <p class="kicker">Online RSVP, elegant &amp; easy</p>
           <h1>Create beautiful invitations that feel uniquely yours.</h1>
           <p class="lead">
-            Build a lovely event page in minutes, send your online invitations,
-            and watch every guest reply arrive in one place.
-            It takes 10&nbsp;minutes to set up and starts at <strong>AED&nbsp;29</strong> — paid once.
+            Choose one of 27 designs, make it yours, and send it as a link.
+            Guests reply in a tap and every answer lands in one place.
+            Ten minutes to set up, from <strong>AED&nbsp;29</strong> — paid once.
           </p>
           <div class="hero-actions">
             <a href="create.html" class="btn btn-primary btn-lg">Create your invitation</a>
-            <a href="#picker" class="arrow-link">Explore the designs <span aria-hidden="true">&#8594;</span></a>
+            <a href="#features" class="btn btn-ghost btn-lg">See what's included</a>
           </div>
+          <ul class="hero-occasions" aria-label="Browse by occasion">
+            <li><a href="wedding-invitations.html">Weddings</a></li>
+            <li><a href="birthday-invitations.html">Birthdays</a></li>
+            <li><a href="anniversary-invitations.html">Anniversaries</a></li>
+            <li><a href="housewarming-invitations.html">Housewarmings</a></li>
+            <li><a href="baptism-invitations.html">Baptisms</a></li>
+            <li><a href="baby-shower-invitations.html">Baby showers</a></li>
+            <li><a href="gala-invitations.html">Galas</a></li>
+          </ul>
         </div>
       </div>
+
+      <!-- Painted by picker.js from the same theme data as the design grid. -->
+      <div class="hero-rail" id="hero-rail" aria-hidden="true"></div>
     </section>
 
     <!-- ======================= FEATURE STRIP ======================= -->
@@ -301,6 +310,28 @@
           <a href="create.html" class="btn btn-primary btn-lg">See all 27 designs</a>
           <a href="pricing.html" class="arrow-link">Compare the plans <span aria-hidden="true">&#8594;</span></a>
         </div>
+      </div>
+    </section>
+
+    <!-- ======================= PRICING ======================= -->
+    <!-- The cards are rendered by js/pricing.js from the same PLANS array the
+         editor enforces, so this block can never drift from pricing.html. -->
+    <section class="home-pricing" id="pricing">
+      <div class="container">
+        <p class="kicker center reveal">Pricing</p>
+        <h2 class="section-title center reveal">Simple pricing, per invitation</h2>
+        <p class="section-sub center reveal">
+          Build the whole thing for free. You pay once — the design price plus
+          one plan — on the day you publish. No subscription, no renewals, and
+          never a charge for extra guests.
+        </p>
+
+        <div class="plan-grid reveal" id="plan-grid"></div>
+
+        <p class="plans-note center reveal">
+          Every plan includes unlimited guests and unlimited replies.
+          <a href="pricing.html">Compare every feature</a>.
+        </p>
       </div>
     </section>
 
@@ -566,6 +597,38 @@
       </div>
     </section>
 
+    <!-- ======================= RSVP QUESTIONS ======================= -->
+    <section class="ask" id="ask">
+      <div class="container ask-inner">
+        <div class="ask-copy reveal">
+          <p class="kicker">Your RSVP, your questions</p>
+          <h2 class="section-title">Ask everything you need to plan, once</h2>
+          <p>
+            Your RSVP is a form you compose. Every question you switch on becomes
+            a column in your guest list, so the caterer, the driver and the hotel
+            all take their answers from the same place.
+          </p>
+          <p>
+            Hosting away from home? Flights, pickups and hotel nights are ordinary
+            questions here — which makes Invitara a comfortable fit for a
+            destination wedding.
+          </p>
+          <a href="create.html" class="btn btn-primary">Build your RSVP</a>
+        </div>
+
+        <ul class="ask-grid reveal">
+          <li>Per-guest meals and allergies</li>
+          <li>Headcounts, with children by age</li>
+          <li>Travel help and shuttle seats</li>
+          <li>Flight details and airport pickup</li>
+          <li>Accommodation and nights needed</li>
+          <li>Step-free access and assistance</li>
+          <li>Song requests for the night</li>
+          <li>Your own custom questions</li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ======================= FAQ ======================= -->
     <section class="faq" id="faq">
       <div class="container faq-inner">
@@ -576,42 +639,42 @@
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>How long does it take to set up?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>Most hosts publish their page in under ten minutes: pick a design, add your details, share the link. You can change anything later.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>Do my guests need an account or an app?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>No. Guests open your personal link and reply in less than a minute — no registration, no download, no fuss.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>What is included in the price?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>Your total is the design price plus one plan — Basic from AED&nbsp;29, Pro from AED&nbsp;59, Advanced from AED&nbsp;99. Every plan includes unlimited guests and unlimited RSVP replies, paid once with no renewals. <a href="pricing.html">Compare the plans</a>.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>Can I try it before paying?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>Yes. Build your entire page for free and preview it as often as you like — you only pay when you are ready to publish.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>Can we keep our event private?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>Of course. Add a password to your page, or allow replies only from guests on your list. All data is encrypted.</p></div>
           </div>
           <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>Can I change the design after publishing?</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>You can change every word, photo and colour at any time. The design itself is bought per invitation, so switching to a different design means starting a new invitation with that design.</p></div>
           </div>
@@ -625,6 +688,7 @@
         <h2>Ready to gather your favorite people?</h2>
         <p>Your beautiful RSVP page is ten minutes away — and your guests will love it.</p>
         <a href="create.html" class="btn btn-light btn-lg">Get started — from AED 29</a>
+        <p class="cta-note">Free to build. You only pay when you publish.</p>
       </div>
     </section>
   </main>
@@ -765,5 +829,6 @@
   <script src="js/commerce.js"></script>
   <script src="js/app.js"></script>
   <script src="js/picker.js"></script>
+  <script src="js/pricing.js"></script>
 </body>
 </html>

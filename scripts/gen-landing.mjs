@@ -239,7 +239,7 @@ ${p.faq
     ([q, a]) => `          <div class="acc-item">
             <button class="acc-btn" type="button" aria-expanded="false">
               <span>${esc(q)}</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="acc-v" d="M12 5v14"/></svg>
             </button>
             <div class="acc-panel"><p>${esc(a)}</p></div>
           </div>`
