@@ -4,27 +4,45 @@
    ========================================================================== */
 
 /* ---------- Design tokens ---------- */
+/* Palette and type follow the design language captured in DESIGN.md:
+   warm near-white page, deep-brown brand used sparingly, near-black for
+   primary actions, editorial Playfair headings over plain Inter body copy.
+   The variable NAMES are unchanged on purpose — every rule in this file and
+   in commerce.css already reads them, so a retheme is a value swap and
+   cannot move any layout. (--teal is therefore the brand accent, whatever
+   colour that happens to be.) */
 :root {
-  --teal:        #1798b8;
-  --teal-dark:   #107d99;
-  --teal-deep:   #0d6a81;
-  --teal-tint:   #e9f6fa;
-  --ink:         #31434c;
-  --body:        #5c6d75;
-  --muted:       #8ba0a8;
-  --line:        #e5ecee;
-  --bg-soft:     #f7fafb;
-  --footer:      #2e3a40;
-  --footer-deep: #263136;
+  --teal:        #652901;   /* brand accent — links, active states */
+  --teal-dark:   #4e1f01;   /* accent hover */
+  --teal-deep:   #3b1801;
+  --teal-tint:   #faf7f2;   /* warm cream wash */
+  --ink:         #171717;   /* headings & primary text */
+  --body:        #404040;
+  --muted:       #737373;
+  --line:        #e5e5e5;   /* hairline */
+  --bg-soft:     #faf7f2;
+  --footer:      #171717;
+  --footer-deep: #0a0a0a;
   --white:       #ffffff;
 
-  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-  --sans:  "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Near-black primary action, per the captured button tokens. */
+  --action:      #171717;
+  --action-hover:#000000;
+  --action-text: #fafafa;
 
-  --radius:     3px;
-  --shadow:     0 12px 34px rgba(23, 152, 184, 0.10);
-  --shadow-sm:  0 4px 14px rgba(49, 67, 76, 0.08);
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --radius:     8px;        /* cards & inputs */
+  --radius-pill: 9999px;    /* buttons are fully round */
+  --shadow:     0 10px 30px rgba(23, 23, 23, 0.07);
+  --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.05);
   --header-h:   68px;
+
+  /* One easing curve, two speeds: hover feedback and entrance. */
+  --ease:       cubic-bezier(.4, 0, .2, 1);
+  --t-fast:     .15s;
+  --t-slow:     .6s;
 
   /* ---------- Breakpoints ----------
      Plain CSS cannot read a custom property inside @media, so these are the
@@ -81,11 +99,12 @@ img { max-width: 100%; display: block; }
 
 h1, h2, h3, h4 {
   font-family: var(--serif);
-  font-weight: 500;
-  color: var(--teal);
-  line-height: 1.18;
+  font-weight: 500;              /* Playfair at 500 — editorial, never bold */
+  color: var(--ink);
+  line-height: 1.1;
   margin: 0 0 14px;
 }
+h1 { line-height: 1.02; }        /* display sizes set solid */
 
 p { margin: 0 0 14px; }
 p:last-child { margin-bottom: 0; }
@@ -157,28 +176,30 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
   justify-content: center;
   gap: 8px;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   font-family: var(--sans);
   font-size: 14.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0;
   padding: 11px 26px;
-  transition: background .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 
 .btn-primary {
-  background: var(--teal);
-  color: #fff;
+  background: var(--action);
+  color: var(--action-text);
 }
-.btn-primary:hover { background: var(--teal-dark); box-shadow: 0 6px 18px rgba(23,152,184,.28); }
+.btn-primary:hover { background: var(--action-hover); box-shadow: none; }
 
 .btn-ghost {
   background: #fff;
   color: var(--ink);
   border-color: var(--line);
 }
-.btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+.btn-ghost { box-shadow: var(--shadow-sm); }
+.btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
 
 .btn-light {
   background: #fff;
@@ -1198,7 +1219,7 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
 .js .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity .7s ease, transform .7s ease;
+  transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
 }
 .js .reveal.in { opacity: 1; transform: none; }
 
@@ -3309,9 +3330,7 @@ body { animation: page-in .45s ease both; }
 .hero-media img { animation: kenburns 20s ease-in-out infinite alternate; will-change: transform; }
 
 /* ---- buttons: premium micro-interactions --------------------------------- */
-.btn { transition: transform .18s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease; }
-.btn:hover  { transform: translateY(-2px); }
-.btn:active { transform: translateY(0) scale(.98); }
+.btn:active { transform: scale(.98); }
 
 .btn-primary { position: relative; overflow: hidden; }
 .btn-primary::after {

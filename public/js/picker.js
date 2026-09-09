@@ -16,12 +16,16 @@
   var chipBox = document.getElementById('pick-chips');
   if (!C || !grid || !window.EVER_THEMES) return;
 
+  /* A landing page pins the grid to one occasion via data-event and ships no
+     chip row; the homepage ships chips and starts on "all". */
+  var pinned = (grid.getAttribute('data-event') || '').trim();
+
   var esc = window.EVER_esc;
   var EVENTS = window.EVER_EVENTS || {};
   var THEMES = window.EVER_THEMES;
 
   var PER_VIEW = 6;
-  var current = 'all';
+  var current = pinned || 'all';
 
   var FONT_STACK = {
     derivia: '"Derivia","Cormorant Garamond",serif',
@@ -102,6 +106,7 @@
   }
 
   function buildChips() {
+    if (!chipBox) return;
     var defs = [{ ev: 'all', label: 'All' }];
     Object.keys(EVENTS).forEach(function (k) { defs.push({ ev: k, label: EVENTS[k].label }); });
 

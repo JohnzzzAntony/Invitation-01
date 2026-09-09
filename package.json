@@ -12,6 +12,7 @@
     "check": "bun run lint && bun run check:js",
     "domain": "node scripts/set-domain.mjs",
     "gen:headers": "node scripts/gen-deploy-headers.mjs",
+    "gen:landing": "node scripts/gen-landing.mjs",
     "gen:css": "node scripts/scope-css.mjs",
     "gen:photos": "node scripts/gen-photos.mjs"
   },

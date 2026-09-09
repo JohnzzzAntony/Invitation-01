@@ -38,3 +38,7 @@ agent-ctx/
 upload/
 worklog.md
 public.zip
+
+# Third-party scrape artifacts (competitor screenshots/copy) — local only.
+# Regenerate with the commands in DESIGN.md.
+.firecrawl/
