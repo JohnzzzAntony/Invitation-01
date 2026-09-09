@@ -140,6 +140,19 @@
         <p class="tpl-count" id="tpl-count" aria-live="polite"></p>
         <div class="tpl-grid" id="tpl-grid" aria-label="Design templates"></div>
         <p class="tpl-empty" id="tpl-empty" hidden>No designs match these filters — try widening them.</p>
+
+        <!-- The 3D templates. They are standalone pages rather than editable
+             layouts, so they sit in their own band below the grid instead of
+             inside it, where the filters and the "use this design" flow would
+             both promise something they cannot do. -->
+        <section class="iv3" id="motion">
+          <h2 class="section-title center">Designs that move</h2>
+          <p class="section-sub center">
+            Five invitations built around a live 3D scene. These are complete
+            example pages — open one to see it running.
+          </p>
+          <div class="iv3-grid" id="invite3d-grid"></div>
+        </section>
       </div>
     </section>
   </main>
@@ -171,5 +184,7 @@
   <script src="js/designer.js"></script>
   <script src="js/app.js"></script>
   <script src="js/create.js"></script>
+  <script src="js/invites/catalog.js"></script>
+  <script src="js/invites/strip.js"></script>
 </body>
 </html>

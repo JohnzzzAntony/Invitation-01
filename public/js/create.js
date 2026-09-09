@@ -75,6 +75,52 @@
     return true;
   }
 
+  /* ---------- Deferred contact sheets ----------
+     One observer for the whole grid. `rootMargin` is a full viewport, so a
+     sheet is already painted by the time the card is scrolled to and the
+     deferral is invisible — the card never appears empty in front of anyone.
+
+     Without IntersectionObserver the sheets are built immediately, which is
+     the behaviour every browser had before this change. */
+  var sheetPending = (typeof WeakMap === 'function') ? new WeakMap() : null;
+  var sheetIO = null;
+
+  function buildSheet(job) {
+    if (job.box.getAttribute('data-sheet') === 'on') return;
+    job.box.setAttribute('data-sheet', 'on');
+    try { job.box.appendChild(window.EVER_renderSiteMini(job.tpl, null, { tiles: 9 })); }
+    catch (e) { /* the preview is decorative — the card still works */ }
+  }
+
+  /* Observe the CARD, not the preview inside it. `.tpl-card` carries
+     content-visibility:auto, and a skipped subtree reports its descendants as
+     never intersecting — so an observer aimed at the preview would sit there
+     waiting forever and no sheet would ever be drawn. The card itself is not
+     skipped, so it does intersect. */
+  function queueSheet(card, box, tpl) {
+    var job = { box: box, tpl: tpl };
+
+    if (!('IntersectionObserver' in window) || !sheetPending) {
+      buildSheet(job);
+      return;
+    }
+    if (!sheetIO) {
+      sheetIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          var pending = sheetPending.get(en.target);
+          if (pending) buildSheet(pending);
+          sheetIO.unobserve(en.target);
+        });
+        /* Two viewports of lead-in. One was not enough on a short window:
+           the filters push the grid about 1,000px down, so on a 440px-tall
+           viewport a single-viewport margin never reached the first row. */
+      }, { rootMargin: '200% 0px' });
+    }
+    sheetPending.set(card, job);
+    sheetIO.observe(card);
+  }
+
   /* ---------- Cards ---------- */
   function makeCard(tpl, custom) {
     var meta = C.themeCommerce(tpl);
@@ -84,11 +130,16 @@
 
     /* A contact sheet of the design's own pages: the whole thing at a glance,
        which is what a host is actually choosing between. Nine tiles fills a
-       3x3 grid; layouts with fewer live sections simply render fewer. */
+       3x3 grid; layouts with fewer live sections simply render fewer.
+
+       Built on approach, not up front. A sheet is nine real rendered layout
+       sections with their photographs, so painting all 27 cards eagerly put
+       ~9,800 nodes and 856 <img> elements on the page before the first
+       card was even scrolled to. The observer below builds a card's sheet
+       when it comes within a screen of the viewport, which is what made
+       this page stop stuttering. */
     var preview = document.createElement('div');
     preview.className = 'tpl-preview tpl-preview-sheet';
-    try { preview.appendChild(window.EVER_renderSiteMini(tpl, null, { tiles: 9 })); }
-    catch (e) { /* preview is decorative — the card still works */ }
 
     if (!custom && meta.plans.indexOf('basic') === -1) {
       var crown = document.createElement('span');
@@ -128,6 +179,7 @@
 
     card.appendChild(preview);
     card.appendChild(meta_el);
+    queueSheet(card, preview, tpl);
 
     card.querySelector('[data-act="view"]').addEventListener('click', function () { viewDesign(tpl); });
     card.querySelector('[data-act="use"]').addEventListener('click', function () { useDesign(tpl); });

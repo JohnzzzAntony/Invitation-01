@@ -970,6 +970,71 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
 .why-cell h3 { font-size: 21px; margin-bottom: 8px; }
 .why-cell p { font-size: 14.5px; }
 
+/* ---------- 3D template strip ----------
+   Rendered by js/invites/strip.js on the homepage and on create.html. The
+   swatch is two CSS gradients, not a canvas — see the note in that file. */
+.iv3 { padding: 84px 0; border-top: 1px solid var(--line); }
+
+.iv3-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--card-gap);
+  margin-top: 38px;
+}
+
+.iv3-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  background: #fff;
+  color: inherit;
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+.iv3-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.iv3-swatch {
+  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 18px 14px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 34%, color-mix(in srgb, var(--c) 34%, transparent), transparent 62%),
+    linear-gradient(160deg, color-mix(in srgb, var(--c) 16%, var(--b)), var(--b) 72%);
+}
+.iv3-swatch-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.15;
+  color: var(--c2);
+}
+.iv3-swatch-rule {
+  width: 46px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c), transparent);
+}
+.iv3-swatch-couple {
+  font-size: 10.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--c2) 72%, transparent);
+}
+
+.iv3-body { padding: var(--card-pad); display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.iv3-name { font-family: var(--serif); font-size: var(--card-title); color: var(--ink); }
+.iv3-blurb { font-size: var(--card-text); color: var(--body); flex: 1; }
+.iv3-cta { font-size: var(--card-meta); color: var(--teal); margin-top: 6px; }
+.iv3-card:hover .iv3-cta span { display: inline-block; transform: translateX(3px); }
+
 /* ---------- Homepage pricing ----------
    The cards themselves are .plan-card, styled once in commerce.css and shared
    with pricing.html; this block only supplies the band around them. */
@@ -1545,6 +1610,20 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
   position: relative;
   display: block;
   padding: 10px;
+}
+
+/* create.js builds a sheet only when its card nears the viewport. Until it
+   does, hold exactly the space the finished sheet will take — a 3x3 grid of
+   4:3 tiles is itself 4:3 — so nothing on the page moves when it arrives.
+   The ratio is dropped once the sheet is in, letting it size to its content. */
+.tpl-preview-sheet:not([data-sheet="on"]) { aspect-ratio: 4 / 3; }
+
+/* Let the browser skip layout and paint for cards that are scrolled well
+   away. contain-intrinsic-size is the guess it uses for their height in the
+   meantime, so the scrollbar stays honest; it is close to a real card. */
+.tpl-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
 }
 
 .tpl-premium {

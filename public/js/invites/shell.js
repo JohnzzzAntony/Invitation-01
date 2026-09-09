@@ -54,6 +54,21 @@
   var rafId = 0;
   var mouse = { x: 0, y: 0 };
 
+  /* Fill rate is what costs on the integrated GPUs most guests are on, and it
+     scales with the square of this number: at devicePixelRatio 2 the renderer
+     is shading four times the pixels of a 1x buffer for scenes that are all
+     soft gradients and bokeh, where the extra samples are close to invisible.
+     1.5 keeps the edges clean and cuts that by nearly half.
+
+     A device that reports many cores is allowed the full 2 — the heuristic is
+     crude, but it is the only signal a browser gives about how much machine
+     is behind the canvas. */
+  function pixelRatio() {
+    var dpr = window.devicePixelRatio || 1;
+    var cores = window.navigator.hardwareConcurrency || 4;
+    return Math.min(dpr, cores >= 8 ? 2 : 1.5);
+  }
+
   function startScene() {
     var canvas = doc.getElementById('iv-canvas');
     var factory = (window.INVITE_SCENES || {})[cfg.scene];
@@ -73,7 +88,7 @@
 
     var w = window.innerWidth;
     var h = window.innerHeight;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(pixelRatio());
     renderer.setSize(w, h, false);
 
     try {
@@ -133,6 +148,7 @@
       if (!renderer || !scene3d) return;
       var w = window.innerWidth;
       var h = window.innerHeight;
+      renderer.setPixelRatio(pixelRatio());
       renderer.setSize(w, h, false);
       scene3d.resize(w, h);
       if (reduced) scene3d.frame(0, mouse);

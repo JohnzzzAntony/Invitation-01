@@ -452,6 +452,26 @@
      inside a scaled wrapper. What the customer previews is what they get. */
   var MINI_W = 1280;
 
+  /* One ResizeObserver for every miniature on the page, not one each.
+     A contact sheet is nine minis and the gallery is 27 cards, so the
+     per-box observer this used to create meant ~225 live observers — each
+     with its own callback and its own entry in the resize work the browser
+     does on every layout pass. One observer with a lookup does the same job
+     for a fraction of the cost. */
+  var sharedRO = null;
+  var fitJobs = (typeof WeakMap === 'function') ? new WeakMap() : null;
+
+  function resizeObserver() {
+    if (sharedRO || !('ResizeObserver' in window) || !fitJobs) return sharedRO;
+    sharedRO = new ResizeObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        var job = fitJobs.get(entries[i].target);
+        if (job) job();
+      }
+    });
+    return sharedRO;
+  }
+
   function fit(box, scale) {
     function apply() {
       var w = box.clientWidth;
@@ -470,8 +490,9 @@
         requestAnimationFrame(spin);
       })();
     }
-    if ('ResizeObserver' in window) {
-      var ro = new ResizeObserver(function () { apply(); });
+    var ro = resizeObserver();
+    if (ro) {
+      fitJobs.set(box, apply);
       ro.observe(box);
     }
   }

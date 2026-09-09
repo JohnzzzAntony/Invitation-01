@@ -39,7 +39,12 @@
 
     renderer.setClearColor(0x000000, 0);
 
-    var COUNT = 260;
+    /* Scale the fall with the window. 260 petals across a desktop reads as
+       weather; the same 260 on a phone is a blizzard that also happens to be
+       260 matrix compositions and a buffer upload every frame, on the weakest
+       GPU of the three. Area-proportional keeps the look and the cost sane. */
+    var area = ctx.width * ctx.height;
+    var COUNT = Math.max(90, Math.min(240, Math.round(area / 7000)));
     var TINTS = [0xf9d3d9, 0xe8a9b6, 0xf5e2c8, 0xdba7a0];
 
     var mesh = new THREE.InstancedMesh(
