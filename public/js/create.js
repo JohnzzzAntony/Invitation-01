@@ -82,10 +82,24 @@
     card.className = 'tpl-card' + (custom ? ' tpl-card-custom' : '');
     card.setAttribute('data-ev', custom ? 'custom' : (tpl.event || 'wedding'));
 
+    /* A contact sheet of the design's own pages: the whole thing at a glance,
+       which is what a host is actually choosing between. Nine tiles fills a
+       3x3 grid; layouts with fewer live sections simply render fewer. */
     var preview = document.createElement('div');
-    preview.className = 'tpl-preview';
-    try { preview.appendChild(window.EVER_renderSiteMini(tpl, null, {})); }
+    preview.className = 'tpl-preview tpl-preview-sheet';
+    try { preview.appendChild(window.EVER_renderSiteMini(tpl, null, { tiles: 9 })); }
     catch (e) { /* preview is decorative — the card still works */ }
+
+    if (!custom && meta.plans.indexOf('basic') === -1) {
+      var crown = document.createElement('span');
+      crown.className = 'tpl-premium';
+      crown.title = 'Premium design';
+      crown.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M4 17.5 3 7l5.2 3.6L12 5l3.8 5.6L21 7l-1 10.5z"/>' +
+        '<path d="M4 20h16"/></svg><span class="sr-only">Premium design</span>';
+      preview.appendChild(crown);
+    }
 
     var meta_el = document.createElement('div');
     meta_el.className = 'tpl-meta';

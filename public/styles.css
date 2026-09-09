@@ -1539,6 +1539,36 @@ section { scroll-margin-top: calc(var(--header-h) + 8px); }
   justify-content: center;
 }
 
+/* Contact-sheet variant: the sheet governs its own grid, so the flex
+   centring above would fight it. */
+.tpl-preview-sheet {
+  position: relative;
+  display: block;
+  padding: 10px;
+}
+
+.tpl-premium {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.tpl-premium svg {
+  width: 14px; height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
 /* The card body stacks: title+badges, price, plan, then the actions row.
    (It was a space-between flex ROW back when the card had only a title and a
    "use" link; with four blocks that crushed everything onto one line and cut

@@ -476,18 +476,21 @@
     }
   }
 
-  function miniWrap(d, tpl, opts, render) {
-    opts = opts || {};
-    var keep = opts.short ? 2 : 4;
-    var d2;
-    try { d2 = JSON.parse(JSON.stringify(d)); } catch (e) { d2 = d; }
-    d2.order = (d2.order || []).filter(function (id) {
-      return d2.sections[id] && d2.sections[id].on !== false;
-    }).slice(0, keep);
+  function clone(d) {
+    try { return JSON.parse(JSON.stringify(d)); } catch (e) { return d; }
+  }
 
-    var inner = render(d2, tpl, { mini: true });
+  function liveOrder(d) {
+    return (d.order || []).filter(function (id) {
+      return d.sections[id] && d.sections[id].on !== false;
+    });
+  }
+
+  /* Build one scaled miniature box around whatever `render` produces. */
+  function miniBox(d, tpl, render, cls) {
+    var inner = render(d, tpl, { mini: true });
     var box = document.createElement('div');
-    box.className = 'wsm ws-' + (d.layoutId || tpl.layout) + (opts.short ? ' wsm-short' : '');
+    box.className = cls;
     box.setAttribute('aria-hidden', 'true');
     E.EVER_applyVars(box, tpl, d);
     var scale = document.createElement('div');
@@ -496,6 +499,41 @@
     box.appendChild(scale);
     fit(box, scale);
     return box;
+  }
+
+  /* A contact sheet: every section of the design rendered as its own
+     miniature and laid out in a grid, so one card shows the whole thing
+     rather than only the first few sections. Every layout reaches this
+     through miniWrap, so none of them need to know about it. */
+  function miniSheet(d, tpl, opts, render) {
+    var ids = liveOrder(d).slice(0, opts.tiles);
+    var sheet = document.createElement('div');
+    sheet.className = 'wsm-sheet ws-' + (d.layoutId || tpl.layout);
+    sheet.setAttribute('aria-hidden', 'true');
+
+    ids.forEach(function (id) {
+      var d2 = clone(d);
+      d2.order = [id];
+      var tile = miniBox(d2, tpl, render, 'wsm wsm-tile');
+      /* Every layout's render() prepends the site nav. One copy per tile
+         would be nine identical headers and no design; the sheet is about
+         the sections. */
+      var nav = tile.querySelector('.ws-head');
+      if (nav) nav.parentNode.removeChild(nav);
+      sheet.appendChild(tile);
+    });
+    return sheet;
+  }
+
+  function miniWrap(d, tpl, opts, render) {
+    opts = opts || {};
+    if (opts.tiles) return miniSheet(d, tpl, opts, render);
+    var keep = opts.short ? 2 : 4;
+    var d2 = clone(d);
+    d2.order = liveOrder(d2).slice(0, keep);
+
+    return miniBox(d2, tpl, render,
+      'wsm ws-' + (d.layoutId || tpl.layout) + (opts.short ? ' wsm-short' : ''));
   }
 
   /* ------------------------------------------------------------------ *

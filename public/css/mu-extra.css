@@ -417,3 +417,24 @@
   pointer-events: none;
 }
 .wsm.wsm-short { aspect-ratio: 16 / 10; }
+
+/* ---- Contact sheet ------------------------------------------------------
+   One tile per section of the design, so a gallery card shows the whole
+   thing instead of its first four sections. Each tile is an ordinary .wsm
+   scaled by fit(), so it inherits every theme variable and ornament rule
+   above; the sheet only arranges them.
+
+   Landscape crop: these layouts render desktop-width pages, so a portrait
+   tile would leave most of its area as bare theme background. The card
+   itself carries the elevation, so tiles wear only a hairline shadow. */
+.wsm-sheet {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.wsm.wsm-tile {
+  max-width: none;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(49, 67, 76, .16);
+}
