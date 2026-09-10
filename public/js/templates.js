@@ -418,7 +418,7 @@
       dark: '#41291f', gold: '#b3563f', bg: '#faf2ec', ink: '#33241d', soft: '#efdcd1',
       nameFont: 'jost', ornament: 'geo',
       content: { basics: { nameA: 'Nadia', nameB: 'Yusuf', brand: 'N & Y' } } },
-    { id: 'newkeys', name: 'New Keys', event: 'housewarming', layout: 'atrium', category: 'Modern',
+    { id: 'newkeys', scene: 'hearth', cover: true, name: 'New Keys', event: 'housewarming', layout: 'atrium', category: 'Modern',
       dark: '#233240', gold: '#5d8aa8', bg: '#f4f7f9', ink: '#22303a', soft: '#dfe8ee',
       nameFont: 'jost', ornament: 'geo',
       content: { basics: { nameA: 'The Mehtas', nameB: '', brand: 'No. 42' },
@@ -433,7 +433,7 @@
       dark: '#3d3428', gold: '#bfa06a', bg: '#fbf7ee', ink: '#3a3226', soft: '#f0e7d5',
       nameFont: 'derivia', ornament: 'floral',
       content: { basics: { nameA: 'Sofia', nameB: 'Luca', brand: 'S & L' } } },
-    { id: 'lamb', name: 'Little Lamb', event: 'baptism', layout: 'editorial', category: 'Soft',
+    { id: 'lamb', scene: 'halo', cover: true, name: 'Little Lamb', event: 'baptism', layout: 'editorial', category: 'Soft',
       dark: '#3b4450', gold: '#9fb4c7', bg: '#f7f9fb', ink: '#333c47', soft: '#e5edf3',
       nameFont: 'corm', ornament: 'lines',
       content: { basics: { nameA: 'Baby', nameB: 'Noor', brand: 'NOOR' },
@@ -448,7 +448,7 @@
       dark: '#3d3450', gold: '#8f7fb0', bg: '#f8f6fc', ink: '#352e44', soft: '#e8e3f2',
       nameFont: 'paris', ornament: 'floral',
       content: { basics: { nameA: 'Amara', nameB: 'Kian', brand: 'A & K' } } },
-    { id: 'sunshine', name: 'Sunshine Sprinkle', event: 'baby', layout: 'calm', category: 'Playful',
+    { id: 'sunshine', scene: 'clouds', cover: true, name: 'Sunshine Sprinkle', event: 'baby', layout: 'calm', category: 'Playful',
       dark: '#4a3a1c', gold: '#e0a63c', bg: '#fdf8ea', ink: '#463a22', soft: '#f8ebcd',
       nameFont: 'baloo', ornament: 'geo',
       content: { basics: { nameA: 'Baby', nameB: 'Rae', brand: 'HELLO' },
@@ -463,7 +463,7 @@
       dark: '#5a2d10', gold: '#e08a1e', bg: '#fdf5e6', ink: '#4a2c14', soft: '#f8e3bf',
       nameFont: 'derivia', ornament: 'floral',
       content: { basics: { nameA: 'Kavya', nameB: 'Aditya', brand: 'K & A' } } },
-    { id: 'balloon', name: 'Balloon Pop', event: 'birthday', layout: 'terra', category: 'Playful',
+    { id: 'balloon', scene: 'confetti', cover: true, name: 'Balloon Pop', event: 'birthday', layout: 'terra', category: 'Playful',
       dark: '#3b1f4a', gold: '#e0567f', bg: '#fdf4f8', ink: '#3a2440', soft: '#f8dce6',
       nameFont: 'baloo', ornament: 'geo',
       content: { basics: { nameA: 'Maya', nameB: '', brand: 'MAYA' },
@@ -479,7 +479,7 @@
       nameFont: 'baloo', ornament: 'geo',
       content: { basics: { nameA: 'Rio', nameB: '', brand: 'RIO 30' },
         sections: { hero: { headline: 'Rio turns thirty', kicker: 'Pool party' } } } },
-    { id: 'cottage', name: 'Cottage Welcome', event: 'housewarming', layout: 'serene', category: 'Garden',
+    { id: 'cottage', scene: 'hearth', cover: true, name: 'Cottage Welcome', event: 'housewarming', layout: 'serene', category: 'Garden',
       dark: '#3a3a26', gold: '#8a9a5b', bg: '#f7f8ef', ink: '#33341f', soft: '#e6ead4',
       nameFont: 'corm', ornament: 'floral',
       content: { basics: { nameA: 'The Bhattis', nameB: '', brand: 'THE NEST' },
@@ -490,7 +490,7 @@
       dark: '#4a121c', gold: '#c9973c', bg: '#fdf3e9', ink: '#42221c', soft: '#f4dcc4',
       nameFont: 'derivia', ornament: 'floral',
       content: { basics: { nameA: 'Ishita', nameB: 'Vikram', brand: 'I & V' } } },
-    { id: 'sixteen', name: 'Golden Sixteen', event: 'birthday', layout: 'mandala', category: 'Elegant',
+    { id: 'sixteen', scene: 'confetti', cover: true, name: 'Golden Sixteen', event: 'birthday', layout: 'mandala', category: 'Elegant',
       dark: '#241f2e', gold: '#d0ad55', bg: '#f9f6f0', ink: '#2b2535', soft: '#ece3cf',
       nameFont: 'cinzel', ornament: 'lines',
       content: { basics: { nameA: 'Zara', nameB: '', brand: 'SWEET 16' },
@@ -501,7 +501,7 @@
       dark: '#123329', gold: '#b08d4d', bg: '#f5f8f4', ink: '#1a2f26', soft: '#dfe9de',
       nameFont: 'derivia', ornament: 'geo',
       content: { basics: { nameA: 'Aisha', nameB: 'Bilal', brand: 'A & B' } } },
-    { id: 'teddy', name: 'Teddy Hug', event: 'baby', layout: 'crescent', category: 'Playful',
+    { id: 'teddy', scene: 'clouds', cover: true, name: 'Teddy Hug', event: 'baby', layout: 'crescent', category: 'Playful',
       dark: '#4a3728', gold: '#c08a5e', bg: '#fbf5ee', ink: '#40312a', soft: '#f2e2d2',
       nameFont: 'baloo', ornament: 'geo',
       content: { basics: { nameA: 'Baby', nameB: 'Ellis', brand: 'ELLIS' },
@@ -906,9 +906,15 @@
        miniatures, which is exactly where a WebGL context must not appear.
        js/site-scene.js loads three.js on demand, so a design without a scene
        costs nothing. */
+    var sceneTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
     if (typeof window.EVER_mountScene === 'function') {
-      var sceneTpl = findTemplate((root.__wsData && root.__wsData.templateId) || '');
       if (sceneTpl && sceneTpl.scene) window.EVER_mountScene(root, sceneTpl);
+    }
+
+    /* Designs that opt into a tap-to-open cover (`cover` on the theme) mount
+       it here, the same way and at the same moment as the scene above. */
+    if (typeof window.EVER_mountCover === 'function') {
+      if (sceneTpl && sceneTpl.cover) window.EVER_mountCover(root, sceneTpl);
     }
   }
 

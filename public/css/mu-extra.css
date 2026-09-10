@@ -438,3 +438,59 @@
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(49, 67, 76, .16);
 }
+
+/* ---- tap-to-open cover ----------------------------------------------------
+   An opt-in overlay some designs carry (`cover` on the theme, mounted by
+   js/site-cover.js). It fills the hero and sits above the scene canvas (if
+   the design also has one) since site-cover.js appends it as the hero's
+   last child. Uses the design's own theme variables so one stylesheet rule
+   serves every theme, and the site's own `.theme-btn` for the button so it
+   inherits the design's chosen button shape (pill/soft/square) for free. */
+.ws .ws-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--ws-dark, #101010) 55%, transparent);
+  backdrop-filter: blur(2px);
+  opacity: 1;
+  transform: scale(1);
+}
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .ws .ws-cover { background: rgba(16, 16, 16, .55); }
+}
+.ws .ws-cover-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.ws .ws-cover-label {
+  margin: 0;
+  color: #fff;
+  font-family: var(--ws-display, inherit);
+  font-size: clamp(22px, 5cqw, 44px);
+  letter-spacing: .04em;
+}
+.ws .ws-cover-btn {
+  cursor: pointer;
+}
+
+/* Fade + slight scale on open, then js removes the node once this ends. */
+.ws .ws-cover--opening {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+  transition: opacity .7s cubic-bezier(.4, 0, .2, 1), transform .7s cubic-bezier(.4, 0, .2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ws .ws-cover--opening {
+    transition: none;
+    opacity: 0;
+    transform: none;
+  }
+}
